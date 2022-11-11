@@ -1,0 +1,211 @@
+.chess {
+  display: flex;
+  .right {
+    width: 250px;
+  }
+  .board.cursor-white-pawn {
+    cursor: url("../images/white/pawn.png") 16.5 20, auto;
+  }
+  .board.cursor-white-rook {
+    cursor: url("../images/white/rook.png") 18 20, auto;
+  }
+  .board.cursor-white-knight {
+    cursor: url("../images/white/knight.png") 18 20, auto;
+  }
+  .board.cursor-white-bishop {
+    cursor: url("../images/white/bishop.png") 20 20, auto;
+  }
+  .board.cursor-white-king {
+    cursor: url("../images/white/king.png") 20 20, auto;
+  }
+  .board.cursor-white-queen {
+    cursor: url("../images/white/queen.png") 22 20, auto;
+  }
+
+  .board.cursor-black-pawn {
+    cursor: url("../images/black/pawn.png") 16.5 20, auto;
+  }
+  .board.cursor-black-rook {
+    cursor: url("../images/black/rook.png") 18 20, auto;
+  }
+  .board.cursor-black-knight {
+    cursor: url("../images/black/knight.png") 18 20, auto;
+  }
+  .board.cursor-black-bishop {
+    cursor: url("../images/black/bishop.png") 20 20, auto;
+  }
+  .board.cursor-black-king {
+    cursor: url("../images/black/king.png") 20 20, auto;
+  }
+  .board.cursor-black-queen {
+    cursor: url("../images/black/queen.png") 22 20, auto;
+  }
+  .cause {
+    margin: 0 50px;
+    background:#f00;
+    color:#fff;
+    opacity: 0;
+    padding: 7px;
+    border-radius: 3px;
+  }
+  .cause.show {
+    opacity: 1;
+    animation-name: hide;
+    animation-duration: 5s;
+    animation-delay: 0s;
+    animation-fill-mode: forwards;
+  }
+  @keyframes hide {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  .scoreboard {
+    font-family: Microsoft YaHei, serif;
+    margin-top: 15px;
+    .team {
+      .notice {
+        font-style: normal;
+        margin-right: 5px;
+        color: #999;
+      }
+    }
+    .condition {
+      background: #f0fff0;
+      margin: 5px 0;
+      padding: 5px;
+      font-size: 18px;
+      border-radius: 5px;
+    }
+    .condition.over {
+      background: #c00;
+      color:#fff
+    }
+    .notice {
+      font-style: italic;
+    }
+    .turn {
+      margin: 5px 0;
+      padding: 0 10px;
+      font-size: 34px;
+      background: #ccc;
+      color: #fff;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+    .turn.over {
+      opacity: 0;
+    }
+    .turn::first-letter {
+      text-transform:capitalize;
+    }
+    .turn.your-move {
+      animation-name: highlight;
+      animation-duration: 2s;
+      animation-delay: 0s;
+      animation-fill-mode: forwards;
+    }
+    @keyframes highlight {
+      from {
+        background: #ccc;
+      }
+      to {
+        background: #0c0;
+      }
+    }
+    .time-left {
+      margin: 5px 0;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .time-left.warning {
+      color: #c00
+    }
+    .reserve-time-left {
+      margin: 10px 0;
+      .header {
+      }
+    }
+  }
+  .actions {
+    font-family: Microsoft YaHei, serif;
+
+    .offer-draw-decisions {
+      width: 230px;
+      margin: 10px 0;
+      border-radius: 15px;
+      background: #0c0;
+      padding: 10px;
+      .header {
+        font-size: 18px;
+        color:#fff;
+      }
+      .question {
+        color:#fff;
+      }
+      .buttons {
+        display: flex;
+        align-items: center;
+        .accept {
+          width: 70px;
+          flex-grow: 1;
+          border-color: #000;
+        }
+        .accept:hover {
+          background: #0c0;
+        }
+        .reject {
+          width: 70px;
+          flex-grow: 1;
+          border-color: #000;
+        }
+        .reject:hover {
+          background: #c00;
+        }
+        .timer {
+          text-align: center;
+          width: 70px;
+          flex-grow: 1;
+          margin: 3px;
+          font-size: 24px;
+          color: #fff;
+        }
+      }
+    }
+
+    button.surrender, button.new-game, button.offer-draw {
+      display: block;
+    }
+    button {
+      font-size: 14px;
+      margin: 3px;
+      padding: 10px;
+      background:#fff;
+      color:#09c;
+      border-radius: 7px;
+      border: 1px solid #09c;
+    }
+    button:hover {
+      background: #09c;
+      color:#fff;
+    }
+    button:hover:disabled {
+      background: #fff;
+      color:#999;
+    }
+    button:disabled {
+      border: 1px solid #999;
+      color:#999;
+    }
+  }
+  .hide {
+    display: none !important;
+  }
+}
+.link-to-github {
+  margin-left: 50px;
+  margin-top: 20px;
+}

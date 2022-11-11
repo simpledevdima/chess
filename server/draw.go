@@ -94,11 +94,6 @@ func (draw *draw) resetTimeLeftForConfirm() {
 	draw.timeLeftForConfirm = draw.client.server.config.TimeLeftForConfirmDraw
 }
 
-// setAttemptsLeft sets the remaining number of attempts to offer a draw
-//func (draw *draw) setAttemptsLeft(attemptsLeft int) {
-//	draw.attemptsLeft = attemptsLeft
-//}
-
 // setClient sets the link to the client
 func (draw *draw) setClient(client *client) {
 	draw.client = client

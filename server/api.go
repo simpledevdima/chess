@@ -15,7 +15,6 @@ func Start(configFile string) {
 
 	// setup
 	server.board.MakeTeams()
-	//server.board.setServer(server)
 	server.setLinks()
 	server.newGame()
 

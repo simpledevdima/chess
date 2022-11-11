@@ -161,16 +161,11 @@ func (team *Team) setStartPosition() error {
 	team.Figures[12].SetPosition(5, FiguresLine)
 	// queen
 	team.Figures[13] = &Queen{}
-	//team.SetFigure(13, &Queen{})
 	team.Figures[13].SetName("queen")
 	team.Figures[13].SetPosition(4, FiguresLine)
 
 	return nil
 }
-
-//func (team *Team) SetFigure(index int, figure Figure) {
-//	team.Figures[index] = figure
-//}
 
 // ClearFigures remake Figures and Eaten map
 func (team *Team) ClearFigures() {

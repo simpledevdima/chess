@@ -37,15 +37,15 @@ type drawAttemptsLeft struct {
 func (server *server) newGame() {
 	// over
 	server.status.resetOver()
+
 	// timers
 	server.timers.white.setLeft(server.config.StepTimeLeft, server.config.ReserveTimeLeft)
 	server.timers.black.setLeft(server.config.StepTimeLeft, server.config.ReserveTimeLeft)
+
 	// turn
 	server.turn.setDefault()
 
 	// draw attempts left
-	//server.getClientByTeamName(game.White).draw.setAttemptsLeft(server.config.OfferDrawTimesLeft)
-	//server.getClientByTeamName(game.Black).draw.setAttemptsLeft(server.config.OfferDrawTimesLeft)
 	server.drawAttemptsLeft.white = server.config.OfferDrawTimesLeft
 	server.drawAttemptsLeft.black = server.config.OfferDrawTimesLeft
 
@@ -63,9 +63,6 @@ func (server *server) setLinks() {
 	server.board.White.SetEnemy(server.board.Black)
 	server.board.Black.SetEnemy(server.board.White)
 	server.turn.setServer(server)
-
-	//board.White.draw.setTeam(board.White)
-	//board.Black.draw.setTeam(board.Black)
 }
 
 // getFreeTeam return free team as game.TeamName order: white, black, spectators

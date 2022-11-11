@@ -58,11 +58,6 @@ func (board *Board) NewBoard() {
 	}
 }
 
-// setServer setting a link to the server
-//func (board *Board) setServer(server *chess.server) {
-//	board.server = server
-//}
-
 // ExportJSON getting data about all the Figures on the board in JSON format
 func (board *Board) ExportJSON() []byte {
 	dataJSON, err := json.Marshal(board)

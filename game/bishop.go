@@ -95,6 +95,6 @@ func (bishop *Bishop) Validation(x int, y int) (bool, string) {
 
 // Move change Position of figure to Position from arguments
 func (bishop *Bishop) Move(x int, y int) {
-	bishop.board.pawnDoubleMove.clearPawnDoubleMove()
-	bishop.moveFigure(x, y)
+	bishop.team.pawnDoubleMove.clearPawnDoubleMove()
+	bishop.MoveFigure(x, y)
 }

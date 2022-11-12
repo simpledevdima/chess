@@ -108,6 +108,6 @@ func (king *King) Validation(x int, y int) (bool, string) {
 
 // Move change Position of figure to Position from arguments
 func (king *King) Move(x int, y int) {
-	king.board.pawnDoubleMove.clearPawnDoubleMove()
-	king.moveFigure(x, y)
+	king.team.pawnDoubleMove.clearPawnDoubleMove()
+	king.MoveFigure(x, y)
 }

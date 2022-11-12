@@ -78,7 +78,7 @@ func (pawn *Pawn) Validation(x int, y int) (bool, string) {
 	// detect Position for eat and check it for input data eat coords
 	for _, Position := range pawn.detectionOfBrokenFields() {
 		if Position.X == x && Position.Y == y &&
-			(pawn.enemy.FigureExist(x, y) || pawn.board.pawnDoubleMove.isTakeOnThePass(x, y)) {
+			(pawn.enemy.FigureExist(x, y) || pawn.team.pawnDoubleMove.isTakeOnThePass(x, y)) {
 			return true, ""
 		}
 	}
@@ -93,11 +93,11 @@ func (pawn *Pawn) Validation(x int, y int) (bool, string) {
 
 // Move change Position of figure to Position from arguments
 func (pawn *Pawn) Move(x int, y int) {
-	pawn.board.pawnDoubleMove.pawnTakeOnThePass(x, y)
-	pawn.board.pawnDoubleMove.clearPawnDoubleMove()
-	pawn.board.pawnDoubleMove.pawnMakesDoubleMove(pawn, &Position{X: pawn.X, Y: pawn.Y}, &Position{X: x, Y: y})
+	pawn.team.pawnDoubleMove.pawnTakeOnThePass(x, y)
+	pawn.team.pawnDoubleMove.clearPawnDoubleMove()
+	pawn.team.pawnDoubleMove.pawnMakesDoubleMove(pawn, &Position{X: pawn.X, Y: pawn.Y}, &Position{X: x, Y: y})
 
-	pawn.moveFigure(x, y)
+	pawn.MoveFigure(x, y)
 
 	// transform pawn to queen
 	if pawn.Y == 1 || pawn.Y == 8 {
@@ -109,7 +109,6 @@ func (pawn *Pawn) Move(x int, y int) {
 		pawn.team.Figures[figureID] = &Queen{}
 		pawn.team.Figures[figureID].SetPosition(x, y)
 		pawn.team.Figures[figureID].SetTeams(pawn.team, pawn.enemy)
-		pawn.team.Figures[figureID].setBoard(pawn.board)
 		pawn.team.Figures[figureID].setAlreadyMove(true)
 	}
 }

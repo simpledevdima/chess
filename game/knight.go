@@ -73,6 +73,6 @@ func (knight *Knight) Validation(x int, y int) (bool, string) {
 
 // Move change Position of figure to Position from arguments
 func (knight *Knight) Move(x int, y int) {
-	knight.board.pawnDoubleMove.clearPawnDoubleMove()
-	knight.moveFigure(x, y)
+	knight.team.pawnDoubleMove.clearPawnDoubleMove()
+	knight.MoveFigure(x, y)
 }

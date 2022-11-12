@@ -11,10 +11,11 @@ import (
 
 // Team data type for white or black team
 type Team struct {
-	Name    TeamName
-	Figures map[int]Figure `json:"figures"`
-	Eaten   map[int]Figure
-	enemy   *Team
+	Name           TeamName
+	Figures        map[int]Figure `json:"figures"`
+	Eaten          map[int]Figure
+	enemy          *Team
+	pawnDoubleMove pawnDoubleMove
 }
 
 // SetName exported method of setting the command name by the string from the argument
@@ -164,6 +165,13 @@ func (team *Team) setStartPosition() error {
 	team.Figures[13].SetName("queen")
 	team.Figures[13].SetPosition(4, FiguresLine)
 
+	// set links to team and enemy for all Figures
+	for _, figure := range team.Figures {
+		figure.SetTeams(team, team.enemy)
+	}
+
+	team.GetPossibleMoves()
+
 	return nil
 }
 
@@ -207,23 +215,18 @@ func (team *Team) ImportFigures(figuresJSON []byte) {
 	}
 }
 
-type PossibleMove struct {
-	From Position
-	To   Position
-}
+type PossibleMoves map[int][]Position
 
-func (team *Team) GetPossibleMoves() []PossibleMove {
-	var possibleMoves []PossibleMove
-	for _, figure := range team.Figures {
-		positions := figure.DetectionOfPossibleMove()
-		for _, position := range positions {
-			fx, fy := figure.GetPosition()
-			tx, ty := position.Get()
-			possibleMoves = append(possibleMoves, PossibleMove{
-				From: Position{fx, fy},
-				To:   Position{tx, ty},
-			})
+func (team *Team) GetPossibleMoves() PossibleMoves {
+	possibleMoves := make(PossibleMoves)
+	//fmt.Println(team.Name.String())
+	for index, figure := range team.Figures {
+		//fmt.Println(figure.GetName(), figure.DetectionOfPossibleMove())
+		moves := figure.DetectionOfPossibleMove()
+		if len(moves) > 0 {
+			possibleMoves[index] = moves
 		}
 	}
+	//fmt.Println("-----------")
 	return possibleMoves
 }

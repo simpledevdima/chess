@@ -91,6 +91,6 @@ func (rook *Rook) Validation(x int, y int) (bool, string) {
 
 // Move change Position of figure to Position from arguments
 func (rook *Rook) Move(x int, y int) {
-	rook.board.pawnDoubleMove.clearPawnDoubleMove()
-	rook.moveFigure(x, y)
+	rook.team.pawnDoubleMove.clearPawnDoubleMove()
+	rook.MoveFigure(x, y)
 }

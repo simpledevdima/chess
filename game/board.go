@@ -7,9 +7,8 @@ import (
 
 // Board data type with information about the board and its control
 type Board struct {
-	boardData      `json:"board"`
-	Spectators     *Team `json:"-"`
-	pawnDoubleMove pawnDoubleMove
+	boardData  `json:"board"`
+	Spectators *Team `json:"-"`
 }
 
 // boardData
@@ -46,15 +45,6 @@ func (board *Board) NewBoard() {
 	err = board.Black.setStartPosition()
 	if err != nil {
 		log.Println(err)
-	}
-	// set link to teams and board for all Figures
-	for _, figure := range board.White.Figures {
-		figure.SetTeams(board.White, board.Black)
-		figure.setBoard(board)
-	}
-	for _, figure := range board.Black.Figures {
-		figure.SetTeams(board.Black, board.White)
-		figure.setBoard(board)
 	}
 }
 

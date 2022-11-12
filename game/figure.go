@@ -11,10 +11,9 @@ type Figure interface {
 	SetPosition(int, int)
 	GetPosition() (int, int)
 	Move(int, int)
-	moveFigure(int, int)
+	MoveFigure(int, int)
 	Validation(int, int) (bool, string)
 	SetTeams(*Team, *Team)
-	setBoard(*Board)
 	coordsOnBoard(int, int) bool
 	kingOnTheBeatenFieldAfterMove(int, int) bool
 	detectionOfBrokenFields() []Position
@@ -30,7 +29,6 @@ type figureData struct {
 	alreadyMove bool
 	team        *Team
 	enemy       *Team
-	board       *Board
 }
 
 func (figureData *figureData) GetName() string {
@@ -39,11 +37,6 @@ func (figureData *figureData) GetName() string {
 
 func (figureData *figureData) SetName(name string) {
 	figureData.Name = name
-}
-
-// setBoard sets a link to the board
-func (figureData *figureData) setBoard(board *Board) {
-	figureData.board = board
 }
 
 // IsAlreadyMove returns true if the figure has moved in the current match otherwise returns false
@@ -95,8 +88,8 @@ func (figureData *figureData) SetTeams(team *Team, enemy *Team) {
 	figureData.enemy = enemy
 }
 
-// move figure to new coords and eat enemy figure if need that
-func (figureData *figureData) moveFigure(x int, y int) {
+// MoveFigure to new coords and eat enemy figure if need that
+func (figureData *figureData) MoveFigure(x int, y int) {
 	figureData.SetPosition(x, y)
 	figureData.setAlreadyMove(true)
 	if figureData.enemy != nil && figureData.enemy.FigureExist(x, y) {

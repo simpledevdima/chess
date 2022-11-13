@@ -14,8 +14,7 @@ func Start(configFile string) {
 	server.config.read(configFile)
 
 	// setup
-	server.setLinks()
-	server.newGame()
+	server.setup()
 
 	// run channel processing
 	go server.runChannelProcessing()

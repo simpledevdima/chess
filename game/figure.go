@@ -31,10 +31,12 @@ type figureData struct {
 	enemy       *Team
 }
 
+// GetName get name from figure
 func (figureData *figureData) GetName() string {
 	return figureData.Name
 }
 
+// SetName set name to the figure
 func (figureData *figureData) SetName(name string) {
 	figureData.Name = name
 }

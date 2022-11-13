@@ -14,6 +14,7 @@ type status struct {
 	server    *server
 }
 
+// waitCause reason for waiting
 type waitCause int
 
 const (
@@ -23,6 +24,7 @@ const (
 	allPayersReady
 )
 
+// overCause termination reason
 type overCause int
 
 const (

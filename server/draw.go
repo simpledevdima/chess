@@ -45,7 +45,7 @@ func (draw *draw) isOpen() (bool, string) {
 	}()
 }
 
-// setRequest sets a link to the request
+// setRequestId sets a link to the request.Id
 func (draw *draw) setRequestId(requestId *int) {
 	draw.requestId = requestId
 }

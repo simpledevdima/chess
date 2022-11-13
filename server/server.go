@@ -27,14 +27,17 @@ type timers struct {
 	black *timer
 }
 
-// attemptsLeft
+// attemptsLeft type with the number of pops to offer a draw
 type drawAttemptsLeft struct {
 	white int
 	black int
 }
 
-// newGame
-func (server *server) newGame() {
+// setup initial server setup
+func (server *server) setup() {
+	// set links
+	server.setLinks()
+
 	// over
 	server.status.resetOver()
 
@@ -108,6 +111,7 @@ func (server *server) run() {
 	}
 }
 
+// setClientsEnemyLinks setting playing clients links to the opponent's client
 func (server *server) setClientsEnemyLinks() {
 	wc := server.getClientByTeamName(game.White)
 	bc := server.getClientByTeamName(game.Black)
@@ -115,6 +119,7 @@ func (server *server) setClientsEnemyLinks() {
 	bc.enemy = wc
 }
 
+// getClientByTeamName get a reference to the client by specifying the command name in the argument
 func (server *server) getClientByTeamName(teamName game.TeamName) *client {
 	for client := range server.clients {
 		if client.team.Name == teamName {
@@ -162,7 +167,7 @@ func (server *server) runChannelProcessing() {
 	}
 }
 
-// sendGameDataToAll
+// sendGameDataToAll sending game data to all clients
 func (server *server) sendGameDataToAll() {
 	for client := range server.clients {
 		client.sendGameData()

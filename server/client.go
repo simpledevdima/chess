@@ -19,6 +19,7 @@ type client struct {
 	draw   *draw
 }
 
+// makeDraw create a draw in the client and set draw to a reference to the client
 func (client *client) makeDraw() {
 	client.draw = &draw{}
 	client.draw.setClient(client)
@@ -79,7 +80,7 @@ func (client *client) register(w http.ResponseWriter, r *http.Request) {
 	go client.write()
 }
 
-// response
+// response send response to request to client
 func (client *client) response(id int, valid bool, cause string) {
 	response := &nrp.Simple{Post: "response", Body: &struct {
 		RequestId int    `json:"request_id,omitempty"`
@@ -93,6 +94,7 @@ func (client *client) response(id int, valid bool, cause string) {
 	client.send <- response.Export()
 }
 
+// postToMove if a request for a move came
 func (client *client) postToMove(request *nrp.Simple) {
 	var move move
 	move.setClient(client)
@@ -105,6 +107,7 @@ func (client *client) postToMove(request *nrp.Simple) {
 	}
 }
 
+// postToSurrender if the request came to surrender
 func (client *client) postToSurrender(request *nrp.Simple) {
 	var surrender surrender
 	surrender.setClient(client)
@@ -115,6 +118,7 @@ func (client *client) postToSurrender(request *nrp.Simple) {
 	client.response(request.Id, valid, cause)
 }
 
+// postToNewGame if you are asked to create a new game
 func (client *client) postToNewGame(request *nrp.Simple) {
 	var newGame newGame
 	newGame.setServer(client.server)
@@ -125,6 +129,7 @@ func (client *client) postToNewGame(request *nrp.Simple) {
 	client.response(request.Id, valid, cause)
 }
 
+// postToOfferADraw if a request came with a draw offer
 func (client *client) postToOfferADraw(request *nrp.Simple) {
 	valid, cause := client.draw.isValid()
 	if valid {
@@ -135,6 +140,7 @@ func (client *client) postToOfferADraw(request *nrp.Simple) {
 	}
 }
 
+// postToDrawOfferAccepted if a request is received approving the offer of a draw
 func (client *client) postToDrawOfferAccepted(request *nrp.Simple) {
 	valid, cause := client.enemy.draw.isOpen()
 	if valid {
@@ -143,6 +149,7 @@ func (client *client) postToDrawOfferAccepted(request *nrp.Simple) {
 	client.response(request.Id, valid, cause)
 }
 
+// postToDrawOfferRejected if a request is received rejecting the offer of a draw
 func (client *client) postToDrawOfferRejected(request *nrp.Simple) {
 	valid, cause := client.enemy.draw.isOpen()
 	if valid {
@@ -151,6 +158,7 @@ func (client *client) postToDrawOfferRejected(request *nrp.Simple) {
 	client.response(request.Id, valid, cause)
 }
 
+// incomingDataProcessing handles the request from the argument
 func (client *client) incomingDataProcessing(dataJSON []byte) {
 	var request nrp.Simple
 	request.Parse(dataJSON)

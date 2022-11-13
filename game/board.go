@@ -12,18 +12,6 @@ type Board struct {
 	Spectators *Team `json:"-"`
 }
 
-// setTeam
-func (board *Board) setTeam(teamName TeamName, team *Team) {
-	switch teamName {
-	case White:
-		board.White = team
-	case Black:
-		board.Black = team
-	case Spectators:
-		board.Spectators = team
-	}
-}
-
 // NewBoard making a new board
 func (board *Board) NewBoard() {
 	err := board.White.setStartPosition()

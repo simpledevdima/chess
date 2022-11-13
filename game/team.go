@@ -181,6 +181,7 @@ func (team *Team) ClearFigures() {
 	team.Eaten = make(map[int]Figure)
 }
 
+// ImportFigures sets the data received in JSON format from the argument to the command shapes
 func (team *Team) ImportFigures(figuresJSON []byte) {
 	team.ClearFigures()
 	var figures map[int]struct {
@@ -215,18 +216,17 @@ func (team *Team) ImportFigures(figuresJSON []byte) {
 	}
 }
 
+// PossibleMoves data type with possible moves of pieces
 type PossibleMoves map[int][]Position
 
+// GetPossibleMoves returns a map with the keys of the team's shapes and the slices of coordinates that those shapes can make
 func (team *Team) GetPossibleMoves() PossibleMoves {
 	possibleMoves := make(PossibleMoves)
-	//fmt.Println(team.Name.String())
 	for index, figure := range team.Figures {
-		//fmt.Println(figure.GetName(), figure.DetectionOfPossibleMove())
 		moves := figure.DetectionOfPossibleMove()
 		if len(moves) > 0 {
 			possibleMoves[index] = moves
 		}
 	}
-	//fmt.Println("-----------")
 	return possibleMoves
 }

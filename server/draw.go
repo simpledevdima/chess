@@ -20,7 +20,6 @@ type draw struct {
 // acceptADraw confirmation for a draw and its installation
 func (draw *draw) acceptADraw() {
 	draw.client.enemy.draw.open = false
-	//draw.client.enemy.draw.request.makeAndSendResponse(draw.client.enemy.draw.request.getResponseValid(true, "draw offer accepted"))
 	draw.client.enemy.response(*draw.client.enemy.draw.requestId, true, "draw offer accepted")
 
 	// set draw
@@ -31,7 +30,6 @@ func (draw *draw) acceptADraw() {
 // rejectADraw refusal to accept a draw
 func (draw *draw) rejectADraw() {
 	draw.client.enemy.draw.open = false
-	//draw.client.enemy.draw.request.makeAndSendResponse(draw.client.enemy.draw.request.getResponseValid(false, "draw offer rejected"))
 	draw.client.enemy.response(*draw.client.enemy.draw.requestId, false, "draw offer rejected")
 }
 
@@ -58,7 +56,6 @@ func (draw *draw) tick() {
 		// draw time is over
 		draw.open = false
 		draw.ticker.Stop()
-		//draw.request.makeAndSendResponse(draw.request.getResponseValid(false, "draw offer rejected"))
 		draw.client.response(*draw.requestId, false, "draw offer rejected")
 	}
 }
@@ -97,6 +94,11 @@ func (draw *draw) resetTimeLeftForConfirm() {
 // setClient sets the link to the client
 func (draw *draw) setClient(client *client) {
 	draw.client = client
+}
+
+// unsetClient remove link to the client
+func (draw *draw) unsetClient() {
+	draw.client = nil
 }
 
 // isValid returns true and an empty string if a draw can be offered otherwise returns false and a string indicating the reason why this is not possible

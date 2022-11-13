@@ -149,6 +149,10 @@ func (server *server) runChannelProcessing() {
 		case client := <-server.unregister:
 			if _, ok := server.clients[client]; ok {
 				delete(server.clients, client)
+				// remove links to the client
+				if client.draw != nil {
+					client.draw.unsetClient()
+				}
 				fmt.Println("client disconnected")
 			}
 		case message := <-server.broadcast:

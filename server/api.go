@@ -13,8 +13,8 @@ func Start(configFile string) {
 	// get config
 	server.config.read(configFile)
 
-	// setup
-	server.setup()
+	// setup of new game
+	server.newGame()
 
 	// run channel processing
 	go server.runChannelProcessing()

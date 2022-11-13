@@ -33,8 +33,8 @@ type drawAttemptsLeft struct {
 	black int
 }
 
-// setup initial server setup
-func (server *server) setup() {
+// newGame initial server setup
+func (server *server) newGame() {
 	// set links
 	server.setLinks()
 

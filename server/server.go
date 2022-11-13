@@ -35,9 +35,6 @@ type drawAttemptsLeft struct {
 
 // newGame initial server setup
 func (server *server) newGame() {
-	// set links
-	server.setLinks()
-
 	// over
 	server.status.resetOver()
 

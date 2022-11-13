@@ -13,6 +13,9 @@ func Start(configFile string) {
 	// get config
 	server.config.read(configFile)
 
+	// set links
+	server.setLinks()
+
 	// setup of new game
 	server.newGame()
 

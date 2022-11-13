@@ -3,22 +3,19 @@ package server
 import (
 	"encoding/json"
 	"github.com/skvdmt/chess/game"
+	"github.com/skvdmt/nrp"
 	"log"
 )
 
 // move data type containing the processing of the movement of the figure
 type move struct {
-	moveData `json:"move"`
-	client   *client
-}
-
-type moveData struct {
 	From struct {
 		game.Position `json:"position"`
 	} `json:"from"`
 	To struct {
 		game.Position `json:"position"`
 	} `json:"to"`
+	client *client
 }
 
 // setClient set a link to the client that makes the move
@@ -71,7 +68,8 @@ func (m *move) exec() {
 	}
 
 	m.client.team.Figures[figureID].Move(m.To.Position.X, m.To.Position.Y)
-	m.client.server.broadcast <- m.exportJSON()
+	event := nrp.Simple{Post: "move", Body: &m}
+	m.client.server.broadcast <- event.Export()
 }
 
 // exportJSON get data of current type in JSON format
@@ -81,12 +79,4 @@ func (m *move) exportJSON() []byte {
 		log.Println(err)
 	}
 	return dataJSON
-}
-
-// importJSON get the JSON data in the argument and put it in the current type
-func (m *move) importJSON(jsonData []byte) {
-	err := json.Unmarshal(jsonData, &m.moveData)
-	if err != nil {
-		log.Println(err)
-	}
 }

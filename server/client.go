@@ -1,9 +1,9 @@
 package server
 
 import (
-	"encoding/json"
 	"github.com/gorilla/websocket"
 	"github.com/skvdmt/chess/game"
+	"github.com/skvdmt/nrp"
 	"log"
 	"net/http"
 )
@@ -47,15 +47,12 @@ func (client *client) sendGameData() {
 
 // exportJSON getting data with the name of the command of the current client in JSON format
 func (client *client) exportJSON() []byte {
-	dataJSON, err := json.Marshal(struct {
-		YourTeamName string `json:"your_team_name"`
+	request := nrp.Simple{Post: "your", Body: struct {
+		TeamName string `json:"team_name"`
 	}{
-		YourTeamName: client.team.Name.String(),
-	})
-	if err != nil {
-		log.Println(err)
-	}
-	return dataJSON
+		TeamName: client.team.Name.String(),
+	}}
+	return request.Export()
 }
 
 // register making websocket connection with client, run read and write methods and register current client on server
@@ -82,6 +79,80 @@ func (client *client) register(w http.ResponseWriter, r *http.Request) {
 	go client.write()
 }
 
+// response
+func (client *client) response(id int, valid bool, cause string) {
+	response := &nrp.Simple{Post: "response", Body: &struct {
+		RequestId int    `json:"request_id,omitempty"`
+		Valid     bool   `json:"valid"`
+		Cause     string `json:"cause,omitempty"`
+	}{
+		RequestId: id,
+		Valid:     valid,
+		Cause:     cause,
+	}}
+	client.send <- response.Export()
+}
+
+func (client *client) incomingDataProcessing(dataJSON []byte) {
+	var request nrp.Simple
+	request.Parse(dataJSON)
+	switch client.team.Name {
+	case game.White, game.Black:
+		switch request.Post {
+		case "move":
+			var move move
+			move.setClient(client)
+			request.BodyToVariable(&move)
+			valid, cause := move.isValid()
+			client.response(request.Id, valid, cause)
+			if valid {
+				move.exec()
+				client.server.turn.change()
+			}
+		case "surrender":
+			var surrender surrender
+			surrender.setClient(client)
+			valid, cause := surrender.isValid()
+			if valid {
+				surrender.exec()
+			}
+			client.response(request.Id, valid, cause)
+		case "new":
+			var newGame newGame
+			newGame.setServer(client.server)
+			valid, cause := newGame.isValid()
+			if valid {
+				newGame.exec()
+			}
+			client.response(request.Id, valid, cause)
+		case "offer_a_draw":
+			valid, cause := client.draw.isValid()
+			if valid {
+				client.draw.setRequestId(&request.Id)
+				client.draw.offerADrawToOpponent()
+			} else {
+				client.response(request.Id, valid, cause)
+			}
+		case "draw_offer_accepted":
+			valid, cause := client.enemy.draw.isOpen()
+			if valid {
+				client.draw.acceptADraw()
+			}
+			client.response(request.Id, valid, cause)
+		case "draw_offer_rejected":
+			valid, cause := client.enemy.draw.isOpen()
+			if valid {
+				client.draw.rejectADraw()
+			}
+			client.response(request.Id, valid, cause)
+		default:
+			client.response(request.Id, false, "unknown request")
+		}
+	default:
+		client.response(request.Id, false, "you are a spectator and cannot send requests")
+	}
+}
+
 // read receive request data from client and execute requests
 func (client *client) read() {
 	defer func() {
@@ -92,15 +163,12 @@ func (client *client) read() {
 		}
 	}()
 	for {
-		_, jsonData, err := client.conn.ReadMessage()
+		_, dataJSDON, err := client.conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			break
 		}
-		var request request
-		request.importJSON(jsonData)
-		request.setClient(client)
-		request.exec()
+		client.incomingDataProcessing(dataJSDON)
 	}
 }
 
@@ -119,16 +187,18 @@ func (client *client) write() {
 
 // surrender the client accepts defeat and gives victory to the enemy
 func (client *client) surrender() {
-	switch client.server.turn.now() {
-	case game.White:
-		client.server.timers.white.stop()
-	case game.Black:
-		client.server.timers.black.stop()
+	if client.server.status.isPlay() && !client.server.status.isOver() {
+		switch client.server.turn.now() {
+		case game.White:
+			client.server.timers.white.stop()
+		case game.Black:
+			client.server.timers.black.stop()
+		}
 	}
-	switch client.enemy.team.Name {
+	switch client.team.Name {
 	case game.White:
-		client.server.status.setOverCauseToWhite()
-	case game.Black:
 		client.server.status.setOverCauseToBlack()
+	case game.Black:
+		client.server.status.setOverCauseToWhite()
 	}
 }

@@ -35,7 +35,11 @@ class Game {
 
     // set turn
     setTurn(turn) {
-        this.turn = turn
+        if (turn.white) {
+            this.turn = "white"
+        } else if (turn.black) {
+            this.turn = "black"
+        }
     }
 
     // set game over

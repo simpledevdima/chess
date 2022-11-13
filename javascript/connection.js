@@ -25,7 +25,7 @@ class Connection {
         this.socket.onmessage = function (answer) {
             const data = JSON.parse(answer.data);
             // console.log(data)
-            if (typeof data.id == "undefined") {
+            if (typeof data.body == "undefined" || typeof data.body.request_id == "undefined") {
                 // event
                 conn.onEvent(data)
             } else {
@@ -57,60 +57,64 @@ class Connection {
     }
 
     onEvent(data) {
-        if (typeof data.your_team_name !== "undefined") {
-            this.chess.game.setTeamName(data.your_team_name)
-            this.chess.game.setEnemyName()
-            this.chess.scoreboard.showTeamName()
-        }
-        if (typeof data.board !== "undefined") {
-            this.chess.board.setBoardFigures(data.board)
-        }
-        if (typeof data.play !== "undefined") {
-            this.chess.game.setPlay(data)
-            if (!this.chess.game.over) {
-                this.chess.scoreboard.showPlay()
+        if (typeof data.post !== "undefined") {
+            switch (data.post) {
+                case "your":
+                    this.chess.game.setTeamName(data.body.team_name)
+                    this.chess.game.setEnemyName()
+                    this.chess.scoreboard.showTeamName()
+                    break
+                case "board":
+                    this.chess.board.setBoardFigures(data.body)
+                    break
+                case "game_play":
+                    this.chess.game.setPlay(data.body)
+                    if (!this.chess.game.over) {
+                        this.chess.scoreboard.showPlay()
+                    }
+                    break
+                case "game_over":
+                    this.chess.game.setOver(data.body)
+                    if (this.chess.game.over) {
+                        this.chess.game.execOver()
+                        this.chess.scoreboard.showOver()
+                        this.chess.actions.showOver()
+                    } else {
+                        this.chess.game.setStart()
+                        this.chess.scoreboard.showPlay()
+                        this.chess.actions.showPlay()
+                    }
+                    break
+                case "turn":
+                    this.chess.game.setTurn(data.body)
+                    this.chess.scoreboard.showTurn()
+                    this.chess.scoreboard.changeTurnBacklight()
+                    break
+                case "step_time":
+                    this.chess.game.setTime(data.body.left, data.body.team_name)
+                    this.chess.scoreboard.showStepTimeLeft()
+                    this.chess.scoreboard.timeLeftChangeBacklight()
+                    break
+                case "reserve_time":
+                    this.chess.game.setTime(data.body.left, data.body.team_name)
+                    this.chess.scoreboard.showReserveTimeLeft()
+                    this.chess.scoreboard.reserveTimeLeftChangeTimers()
+                    break
+                case "move":
+                    this.chess.board.setMove(data.body)
+                    this.chess.board.execMove()
+                    break
+                case "opponent_offer_a_draw":
+                    this.chess.actions.showOfferDrawDecisions()
+                    break
+                case "draw_confirm_time":
+                    this.chess.actions.changeOfferDrawTimer(data.body.left)
+                    break
+                case "attempts_to_offer_a_draw":
+                    this.chess.actions.setAttemptsLeftToOfferADraw(data.body.left)
+                    this.chess.actions.changeAttemptsLeftToOfferADrawButton()
+                    break
             }
-        }
-        if (typeof data.over !== "undefined") {
-            this.chess.game.setOver(data)
-            if (this.chess.game.over) {
-                this.chess.game.execOver()
-                this.chess.scoreboard.showOver()
-                this.chess.actions.showOver()
-            } else {
-                this.chess.game.setStart()
-                this.chess.scoreboard.showPlay()
-                this.chess.actions.showPlay()
-            }
-        }
-        if (typeof data.turn !== "undefined") {
-            this.chess.game.setTurn(data.turn)
-            this.chess.scoreboard.showTurn(data.turn)
-            this.chess.scoreboard.changeTurnBacklight()
-        }
-        if (typeof data.step_time_left !== "undefined" && typeof data.team_name !== "undefined") {
-            this.chess.game.setTime(data.step_time_left, data.team_name)
-            this.chess.scoreboard.showStepTimeLeft()
-            this.chess.scoreboard.timeLeftChangeBacklight()
-        }
-        if (typeof data.reserve_time_left !== "undefined" && typeof data.team_name !== "undefined") {
-            this.chess.game.setTime(data.reserve_time_left, data.team_name)
-            this.chess.scoreboard.showReserveTimeLeft()
-            this.chess.scoreboard.reserveTimeLeftChangeTimers()
-        }
-        if (typeof data.move !== "undefined") {
-            this.chess.board.setMove(data.move)
-            this.chess.board.execMove()
-        }
-        if (typeof data.opponent_offer_a_draw !== "undefined") {
-            this.chess.actions.showOfferDrawDecisions()
-        }
-        if (typeof data.time_left_for_confirm_draw !== "undefined") {
-            this.chess.actions.changeOfferDrawTimer(data.time_left_for_confirm_draw)
-        }
-        if (typeof data.attempts_left_to_offer_a_draw !== "undefined") {
-            this.chess.actions.setAttemptsLeftToOfferADraw(data.attempts_left_to_offer_a_draw)
-            this.chess.actions.changeAttemptsLeftToOfferADrawButton()
         }
     }
 
@@ -134,7 +138,7 @@ class Connection {
 
     // server response to request
     onResponse(data) {
-        switch (this.requests[data.id].type) {
+        switch (this.requests[data.body.request_id].type) {
             case "move":
                 this.moveResponseProcessing(data)
                 break

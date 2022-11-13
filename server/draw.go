@@ -1,9 +1,9 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/skvdmt/chess/game"
+	"github.com/skvdmt/nrp"
 	"log"
 	"time"
 )
@@ -13,14 +13,15 @@ type draw struct {
 	timeLeftForConfirm int
 	open               bool
 	client             *client
-	request            *request
+	requestId          *int
 	ticker             *time.Ticker
 }
 
 // acceptADraw confirmation for a draw and its installation
 func (draw *draw) acceptADraw() {
 	draw.client.enemy.draw.open = false
-	draw.client.enemy.draw.request.makeAndSendResponse(draw.client.enemy.draw.request.getResponseValid(true, "draw offer accepted"))
+	//draw.client.enemy.draw.request.makeAndSendResponse(draw.client.enemy.draw.request.getResponseValid(true, "draw offer accepted"))
+	draw.client.enemy.response(*draw.client.enemy.draw.requestId, true, "draw offer accepted")
 
 	// set draw
 	draw.client.server.stop()
@@ -30,7 +31,8 @@ func (draw *draw) acceptADraw() {
 // rejectADraw refusal to accept a draw
 func (draw *draw) rejectADraw() {
 	draw.client.enemy.draw.open = false
-	draw.client.enemy.draw.request.makeAndSendResponse(draw.client.enemy.draw.request.getResponseValid(false, "draw offer rejected"))
+	//draw.client.enemy.draw.request.makeAndSendResponse(draw.client.enemy.draw.request.getResponseValid(false, "draw offer rejected"))
+	draw.client.enemy.response(*draw.client.enemy.draw.requestId, false, "draw offer rejected")
 }
 
 // isOpen returns true and an empty string if the draw offer is open otherwise returns a false and a string indicating the reason
@@ -44,8 +46,8 @@ func (draw *draw) isOpen() (bool, string) {
 }
 
 // setRequest sets a link to the request
-func (draw *draw) setRequest(request *request) {
-	draw.request = request
+func (draw *draw) setRequestId(requestId *int) {
+	draw.requestId = requestId
 }
 
 // tick executed after one second has elapsed after receiving a draw offer from the opponent
@@ -56,7 +58,8 @@ func (draw *draw) tick() {
 		// draw time is over
 		draw.open = false
 		draw.ticker.Stop()
-		draw.request.makeAndSendResponse(draw.request.getResponseValid(false, "draw offer rejected"))
+		//draw.request.makeAndSendResponse(draw.request.getResponseValid(false, "draw offer rejected"))
+		draw.client.response(*draw.requestId, false, "draw offer rejected")
 	}
 }
 
@@ -78,15 +81,12 @@ func (draw *draw) waitResponse() {
 
 // exportLeftTimeToConfirmJSON returns data on the amount of time left to decide on the confirmation of a draw in JSON format
 func (draw *draw) exportLeftTimeToConfirmJSON() []byte {
-	dataJSON, err := json.Marshal(struct {
-		TimeLeftForConfirmDraw int `json:"time_left_for_confirm_draw"`
+	request := nrp.Simple{Post: "draw_confirm_time", Body: struct {
+		Left int `json:"left"`
 	}{
-		TimeLeftForConfirmDraw: draw.timeLeftForConfirm,
-	})
-	if err != nil {
-		log.Println(err)
-	}
-	return dataJSON
+		Left: draw.timeLeftForConfirm,
+	}}
+	return request.Export()
 }
 
 // resetTimeLeftForConfirm resets the amount of time to make a decision to the value from the configuration
@@ -130,15 +130,8 @@ func (draw *draw) offerADrawToOpponent() {
 
 // exportOfferADrawToOpponentJSON returns a structure with a request for a draw offer in JSON format
 func (draw *draw) exportOfferADrawToOpponentJSON() []byte {
-	dataJSON, err := json.Marshal(struct {
-		OpponentOfferADraw bool `json:"opponent_offer_a_draw"`
-	}{
-		OpponentOfferADraw: true,
-	})
-	if err != nil {
-		log.Println(err)
-	}
-	return dataJSON
+	request := nrp.Simple{Post: "opponent_offer_a_draw"}
+	return request.Export()
 }
 
 // reduceAttemptsLeft reduces the number of attempts to offer a draw
@@ -164,10 +157,10 @@ func (draw *draw) write(data []byte) {
 
 // exportAttemptsLeftJSON returns the remaining number of attempts to offer a draw
 func (draw *draw) exportAttemptsLeftJSON() []byte {
-	dataJSON, err := json.Marshal(struct {
-		AttemptsLeftToOfferADraw int `json:"attempts_left_to_offer_a_draw"`
+	request := nrp.Simple{Post: "attempts_to_offer_a_draw", Body: struct {
+		Left int `json:"left"`
 	}{
-		AttemptsLeftToOfferADraw: func() int {
+		Left: func() int {
 			switch draw.client.team.Name {
 			case game.White:
 				return draw.client.server.drawAttemptsLeft.white
@@ -178,9 +171,6 @@ func (draw *draw) exportAttemptsLeftJSON() []byte {
 				return -1
 			}
 		}(),
-	})
-	if err != nil {
-		log.Println(err)
-	}
-	return dataJSON
+	}}
+	return request.Export()
 }

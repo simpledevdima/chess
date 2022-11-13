@@ -93,8 +93,8 @@ class Scoreboard {
     }
 
     // show turn
-    showTurn(turn) {
-        this.turn.innerHTML = turn + " turn"
+    showTurn() {
+        this.turn.innerHTML = this.chess.game.turn + " turn"
     }
 
     // change turn backlight

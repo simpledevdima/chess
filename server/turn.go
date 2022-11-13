@@ -1,9 +1,8 @@
 package server
 
 import (
-	"encoding/json"
 	"github.com/skvdmt/chess/game"
-	"log"
+	"github.com/skvdmt/nrp"
 )
 
 // turn data structure denoting turn queue
@@ -76,15 +75,14 @@ func (turn *turn) change() {
 
 // exportJSON return data with current turn in JSON format
 func (turn *turn) exportJSON() []byte {
-	dataJSON, err := json.Marshal(struct {
-		Turn string `json:"turn"`
+	request := &nrp.Simple{Post: "turn", Body: struct {
+		White bool `json:"white,omitempty"`
+		Black bool `json:"black,omitempty"`
 	}{
-		Turn: turn.getNowString(),
-	})
-	if err != nil {
-		log.Println(err)
-	}
-	return dataJSON
+		White: turn.now() == game.White,
+		Black: turn.now() == game.Black,
+	}}
+	return request.Export()
 }
 
 // send data to broadcast

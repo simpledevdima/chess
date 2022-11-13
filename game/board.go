@@ -1,20 +1,15 @@
 package game
 
 import (
-	"encoding/json"
+	"github.com/skvdmt/nrp"
 	"log"
 )
 
 // Board data type with information about the board and its control
 type Board struct {
-	boardData  `json:"board"`
+	White      *Team `json:"white"`
+	Black      *Team `json:"black"`
 	Spectators *Team `json:"-"`
-}
-
-// boardData
-type boardData struct {
-	White *Team `json:"white"`
-	Black *Team `json:"black"`
 }
 
 // setTeam
@@ -27,13 +22,6 @@ func (board *Board) setTeam(teamName TeamName, team *Team) {
 	case Spectators:
 		board.Spectators = team
 	}
-}
-
-// MakeTeams setup teams on the Board
-func (board *Board) MakeTeams() {
-	board.setTeam(White, &Team{Name: White})
-	board.setTeam(Black, &Team{Name: Black})
-	board.setTeam(Spectators, &Team{Name: Spectators})
 }
 
 // NewBoard making a new board
@@ -50,9 +38,6 @@ func (board *Board) NewBoard() {
 
 // ExportJSON getting data about all the Figures on the board in JSON format
 func (board *Board) ExportJSON() []byte {
-	dataJSON, err := json.Marshal(board)
-	if err != nil {
-		log.Println(err)
-	}
-	return dataJSON
+	request := nrp.Simple{Post: "board", Body: board}
+	return request.Export()
 }

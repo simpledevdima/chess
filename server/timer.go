@@ -1,9 +1,8 @@
 package server
 
 import (
-	"encoding/json"
 	"github.com/skvdmt/chess/game"
-	"log"
+	"github.com/skvdmt/nrp"
 	"time"
 )
 
@@ -94,32 +93,26 @@ func (timer *timer) reset() {
 
 // exportStepJSON return stepTimeLeft data from struct in JSON
 func (timer *timer) exportStepJSON() []byte {
-	dataJSON, err := json.Marshal(struct {
-		TeamName     string `json:"team_name"`
-		StepTimeLeft int    `json:"step_time_left"`
+	request := nrp.Simple{Post: "step_time", Body: struct {
+		TeamName string `json:"team_name"`
+		Left     int    `json:"left"`
 	}{
-		TeamName:     timer.team.Name.String(),
-		StepTimeLeft: timer.getTimeLeft(),
-	})
-	if err != nil {
-		log.Println(err)
-	}
-	return dataJSON
+		TeamName: timer.team.Name.String(),
+		Left:     timer.getTimeLeft(),
+	}}
+	return request.Export()
 }
 
 // exportReserveJSON return reserveTimeLeft data from struct in JSON
 func (timer *timer) exportReserveJSON() []byte {
-	dataJSON, err := json.Marshal(struct {
-		TeamName        string `json:"team_name"`
-		ReserveTimeLeft int    `json:"reserve_time_left"`
+	request := nrp.Simple{Post: "reserve_time", Body: struct {
+		TeamName string `json:"team_name"`
+		Left     int    `json:"left"`
 	}{
-		TeamName:        timer.team.Name.String(),
-		ReserveTimeLeft: timer.reserveLeft,
-	})
-	if err != nil {
-		log.Println(err)
-	}
-	return dataJSON
+		TeamName: timer.team.Name.String(),
+		Left:     timer.reserveLeft,
+	}}
+	return request.Export()
 }
 
 // getTimLeft return time left

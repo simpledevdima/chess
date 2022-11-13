@@ -14,7 +14,6 @@ func Start(configFile string) {
 	server.config.read(configFile)
 
 	// setup
-	server.board.MakeTeams()
 	server.setLinks()
 	server.newGame()
 
@@ -31,8 +30,12 @@ func Start(configFile string) {
 // getServer returns a structure of the server type with data for the game process
 func getServer() *server {
 	return &server{
-		config:           &config{},
-		board:            &game.Board{},
+		config: &config{},
+		board: &game.Board{
+			White:      &game.Team{Name: game.White},
+			Black:      &game.Team{Name: game.Black},
+			Spectators: &game.Team{Name: game.Spectators},
+		},
 		clients:          make(map[*client]bool),
 		register:         make(chan *client),
 		unregister:       make(chan *client),

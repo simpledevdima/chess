@@ -1,9 +1,8 @@
 package server
 
 import (
-	"encoding/json"
 	"github.com/skvdmt/chess/game"
-	"log"
+	"github.com/skvdmt/nrp"
 )
 
 // status data structure storing various states of the game process
@@ -107,8 +106,8 @@ func (status *status) isWaitBothPlayers() bool {
 
 // isWaitWhitePlayer returns true if only the white team player is not present and the wait reason is not set to this value otherwise returns false
 func (status *status) isWaitWhitePlayer() bool {
-	if status.server.clientExistsByTeamName(game.White) &&
-		!status.server.clientExistsByTeamName(game.Black) &&
+	if !status.server.clientExistsByTeamName(game.White) &&
+		status.server.clientExistsByTeamName(game.Black) &&
 		status.waitCause != waitWhitePlayer {
 		return true
 	}
@@ -117,8 +116,8 @@ func (status *status) isWaitWhitePlayer() bool {
 
 // isWaitBlackPlayer returns true if only the black team player is not present and the wait reason is not set to this value otherwise returns false
 func (status *status) isWaitBlackPlayer() bool {
-	if !status.server.clientExistsByTeamName(game.White) &&
-		status.server.clientExistsByTeamName(game.Black) &&
+	if status.server.clientExistsByTeamName(game.White) &&
+		!status.server.clientExistsByTeamName(game.Black) &&
 		status.waitCause != waitBlackPlayer {
 		return true
 	}
@@ -203,17 +202,14 @@ func (status *status) getCauseOver() string {
 
 // exportOverJSON returns completion status and exit reason in JSON format
 func (status *status) exportOverJSON() []byte {
-	dataJSON, err := json.Marshal(struct {
+	request := nrp.Simple{Post: "game_over", Body: struct {
 		Over  bool   `json:"over"`
 		Cause string `json:"cause,omitempty"`
 	}{
 		Over:  status.over,
 		Cause: status.getCauseOver(),
-	})
-	if err != nil {
-		log.Println(err)
-	}
-	return dataJSON
+	}}
+	return request.Export()
 }
 
 // getCausePlay returns the string value of the replay reason
@@ -231,17 +227,14 @@ func (status *status) getCausePlay() string {
 
 // exportPlayJSON returns the playback status and reason for playback in JSON format
 func (status *status) exportPlayJSON() []byte {
-	dataJSON, err := json.Marshal(struct {
+	request := nrp.Simple{Post: "game_play", Body: struct {
 		Play  bool   `json:"play"`
 		Cause string `json:"cause,omitempty"`
 	}{
 		Play:  status.play,
 		Cause: status.getCausePlay(),
-	})
-	if err != nil {
-		log.Println(err)
-	}
-	return dataJSON
+	}}
+	return request.Export()
 }
 
 // send data to broadcast

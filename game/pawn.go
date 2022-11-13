@@ -20,6 +20,7 @@ func (pawn *Pawn) DetectionOfPossibleMove() []Position {
 		}
 		if pawn.coordsOnBoard(pawn.X, pawn.Y+2) &&
 			!pawn.IsAlreadyMove() &&
+			!pawn.team.FigureExist(pawn.X, pawn.Y+1) &&
 			!pawn.enemy.FigureExist(pawn.X, pawn.Y+1) &&
 			!pawn.enemy.FigureExist(pawn.X, pawn.Y+2) {
 			data = append(data, Position{X: pawn.X, Y: pawn.Y + 2})
@@ -31,6 +32,7 @@ func (pawn *Pawn) DetectionOfPossibleMove() []Position {
 		}
 		if pawn.coordsOnBoard(pawn.X, pawn.Y-2) &&
 			!pawn.IsAlreadyMove() &&
+			!pawn.team.FigureExist(pawn.X, pawn.Y-1) &&
 			!pawn.enemy.FigureExist(pawn.X, pawn.Y-1) &&
 			!pawn.enemy.FigureExist(pawn.X, pawn.Y-2) {
 			data = append(data, Position{X: pawn.X, Y: pawn.Y - 2})

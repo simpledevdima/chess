@@ -93,6 +93,64 @@ func (client *client) response(id int, valid bool, cause string) {
 	client.send <- response.Export()
 }
 
+func (client *client) postToMove(request *nrp.Simple) {
+	var move move
+	move.setClient(client)
+	request.BodyToVariable(&move)
+	valid, cause := move.isValid()
+	client.response(request.Id, valid, cause)
+	if valid {
+		move.exec()
+		client.server.turn.change()
+	}
+}
+
+func (client *client) postToSurrender(request *nrp.Simple) {
+	var surrender surrender
+	surrender.setClient(client)
+	valid, cause := surrender.isValid()
+	if valid {
+		surrender.exec()
+	}
+	client.response(request.Id, valid, cause)
+}
+
+func (client *client) postToNewGame(request *nrp.Simple) {
+	var newGame newGame
+	newGame.setServer(client.server)
+	valid, cause := newGame.isValid()
+	if valid {
+		newGame.exec()
+	}
+	client.response(request.Id, valid, cause)
+}
+
+func (client *client) postToOfferADraw(request *nrp.Simple) {
+	valid, cause := client.draw.isValid()
+	if valid {
+		client.draw.setRequestId(&request.Id)
+		client.draw.offerADrawToOpponent()
+	} else {
+		client.response(request.Id, valid, cause)
+	}
+}
+
+func (client *client) postToDrawOfferAccepted(request *nrp.Simple) {
+	valid, cause := client.enemy.draw.isOpen()
+	if valid {
+		client.draw.acceptADraw()
+	}
+	client.response(request.Id, valid, cause)
+}
+
+func (client *client) postToDrawOfferRejected(request *nrp.Simple) {
+	valid, cause := client.enemy.draw.isOpen()
+	if valid {
+		client.draw.rejectADraw()
+	}
+	client.response(request.Id, valid, cause)
+}
+
 func (client *client) incomingDataProcessing(dataJSON []byte) {
 	var request nrp.Simple
 	request.Parse(dataJSON)
@@ -100,51 +158,17 @@ func (client *client) incomingDataProcessing(dataJSON []byte) {
 	case game.White, game.Black:
 		switch request.Post {
 		case "move":
-			var move move
-			move.setClient(client)
-			request.BodyToVariable(&move)
-			valid, cause := move.isValid()
-			client.response(request.Id, valid, cause)
-			if valid {
-				move.exec()
-				client.server.turn.change()
-			}
+			client.postToMove(&request)
 		case "surrender":
-			var surrender surrender
-			surrender.setClient(client)
-			valid, cause := surrender.isValid()
-			if valid {
-				surrender.exec()
-			}
-			client.response(request.Id, valid, cause)
+			client.postToSurrender(&request)
 		case "new":
-			var newGame newGame
-			newGame.setServer(client.server)
-			valid, cause := newGame.isValid()
-			if valid {
-				newGame.exec()
-			}
-			client.response(request.Id, valid, cause)
+			client.postToNewGame(&request)
 		case "offer_a_draw":
-			valid, cause := client.draw.isValid()
-			if valid {
-				client.draw.setRequestId(&request.Id)
-				client.draw.offerADrawToOpponent()
-			} else {
-				client.response(request.Id, valid, cause)
-			}
+			client.postToOfferADraw(&request)
 		case "draw_offer_accepted":
-			valid, cause := client.enemy.draw.isOpen()
-			if valid {
-				client.draw.acceptADraw()
-			}
-			client.response(request.Id, valid, cause)
+			client.postToDrawOfferAccepted(&request)
 		case "draw_offer_rejected":
-			valid, cause := client.enemy.draw.isOpen()
-			if valid {
-				client.draw.rejectADraw()
-			}
-			client.response(request.Id, valid, cause)
+			client.postToDrawOfferRejected(&request)
 		default:
 			client.response(request.Id, false, "unknown request")
 		}

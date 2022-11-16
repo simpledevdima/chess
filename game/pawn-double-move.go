@@ -11,37 +11,37 @@ type pawnDoubleMove struct {
 }
 
 // isTakeOnThePass returns true if it is possible to capture on the pass otherwise returns false
-func (pDM *pawnDoubleMove) isTakeOnThePass(x, y int) bool {
-	if pDM.pawn != nil && pDM.Position.X == x && pDM.Position.Y == y {
+func (p *pawnDoubleMove) isTakeOnThePass(x, y int) bool {
+	if p.pawn != nil && p.Position.X == x && p.Position.Y == y {
 		return true
 	}
 	return false
 }
 
 // pawnTakeOnThePass makes a pawn take on the pass
-func (pDM *pawnDoubleMove) pawnTakeOnThePass(x, y int) {
-	if pDM.Position.X == x && pDM.Position.Y == y {
+func (p *pawnDoubleMove) pawnTakeOnThePass(x, y int) {
+	if p.Position.X == x && p.Position.Y == y {
 		// eat figure
-		figureID, err := pDM.pawn.team.GetFigureID(pDM.pawn.Position.X, pDM.pawn.Position.Y)
+		figureID, err := p.pawn.team.GetFigureID(p.pawn.Position.X, p.pawn.Position.Y)
 		if err != nil {
 			log.Println(err)
 		}
-		pDM.pawn.team.Eaten[figureID] = pDM.pawn.team.Figures[figureID]
-		delete(pDM.pawn.team.Figures, figureID)
+		p.pawn.team.Eaten[figureID] = p.pawn.team.Figures[figureID]
+		delete(p.pawn.team.Figures, figureID)
 	}
 }
 
 // clearPawnDoubleMove clear data about double pawn move
-func (pDM *pawnDoubleMove) clearPawnDoubleMove() {
-	pDM.Position = Position{}
-	pDM.pawn = nil
+func (p *pawnDoubleMove) clearPawnDoubleMove() {
+	p.Position = Position{}
+	p.pawn = nil
 }
 
 // pawnMakesDoubleMove remember data about double pawn move
-func (pDM *pawnDoubleMove) pawnMakesDoubleMove(pawn *Pawn, from, to *Position) {
+func (p *pawnDoubleMove) pawnMakesDoubleMove(pawn *Pawn, from, to *Position) {
 	if to.Y == from.Y+2 || to.Y == from.Y-2 {
-		pDM.pawn = pawn
-		pDM.Position.X = to.X
-		pDM.Position.Y = (to.Y + from.Y) / 2
+		p.pawn = pawn
+		p.Position.X = to.X
+		p.Position.Y = (to.Y + from.Y) / 2
 	}
 }

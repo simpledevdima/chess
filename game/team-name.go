@@ -10,6 +10,6 @@ const (
 )
 
 // string return team name as string
-func (teamName *TeamName) String() string {
-	return [...]string{"white", "black", "spectators"}[*teamName]
+func (t *TeamName) String() string {
+	return [...]string{"white", "black", "spectators"}[*t]
 }

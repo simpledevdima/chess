@@ -5,6 +5,12 @@ import (
 	"github.com/skvdmt/nrp"
 )
 
+func newTurn() *turn {
+	turn := &turn{}
+	turn.setDefault()
+	return turn
+}
+
 // turn data structure denoting turn queue
 type turn struct {
 	teamName game.TeamName
@@ -12,13 +18,13 @@ type turn struct {
 }
 
 // now return teamName whose turn is currently active
-func (turn *turn) now() game.TeamName {
-	return turn.teamName
+func (t *turn) now() game.TeamName {
+	return t.teamName
 }
 
 // getNowString return string with teamName whose turn is currently active
-func (turn *turn) getNowString() string {
-	switch turn.teamName {
+func (t *turn) getNowString() string {
+	switch t.teamName {
 	case game.White:
 		return "white"
 	case game.Black:
@@ -28,45 +34,45 @@ func (turn *turn) getNowString() string {
 }
 
 // setServer set link to the server
-func (turn *turn) setServer(server *server) {
-	turn.server = server
+func (t *turn) setServer(server *server) {
+	t.server = server
 }
 
 // setDefault set default values for a new game
-func (turn *turn) setDefault() {
-	turn.teamName = game.White
+func (t *turn) setDefault() {
+	t.teamName = game.White
 }
 
 // change transfers the turn to the opposing team
-func (turn *turn) change() {
-	if turn.server.status.isPlay() {
-		switch turn.now() {
+func (t *turn) change() {
+	if t.server.status.isPlay() {
+		switch t.now() {
 		case game.White:
-			turn.server.timers.white.stop()
-			turn.server.timers.white.reset()
-			if turn.server.board.Black.HavePossibleMove() {
-				turn.teamName = game.Black
-				go turn.server.timers.black.play()
-				turn.send(turn.exportJSON())
+			t.server.timers.white.stop()
+			t.server.timers.white.reset()
+			if t.server.board.Black.HavePossibleMove() {
+				t.teamName = game.Black
+				go t.server.timers.black.play()
+				t.send(t.exportJSON())
 			} else {
-				if turn.server.board.Black.CheckingCheck() {
-					turn.server.status.setOverCauseToWhite()
+				if t.server.board.Black.CheckingCheck() {
+					t.server.status.setOverCauseToWhite()
 				} else {
-					turn.server.status.setOverCauseToStalemate()
+					t.server.status.setOverCauseToStalemate()
 				}
 			}
 		case game.Black:
-			turn.server.timers.black.stop()
-			turn.server.timers.black.reset()
-			if turn.server.board.White.HavePossibleMove() {
-				turn.teamName = game.White
-				go turn.server.timers.white.play()
-				turn.send(turn.exportJSON())
+			t.server.timers.black.stop()
+			t.server.timers.black.reset()
+			if t.server.board.White.HavePossibleMove() {
+				t.teamName = game.White
+				go t.server.timers.white.play()
+				t.send(t.exportJSON())
 			} else {
-				if turn.server.board.White.CheckingCheck() {
-					turn.server.status.setOverCauseToBlack()
+				if t.server.board.White.CheckingCheck() {
+					t.server.status.setOverCauseToBlack()
 				} else {
-					turn.server.status.setOverCauseToStalemate()
+					t.server.status.setOverCauseToStalemate()
 				}
 			}
 		}
@@ -74,18 +80,18 @@ func (turn *turn) change() {
 }
 
 // exportJSON return data with current turn in JSON format
-func (turn *turn) exportJSON() []byte {
+func (t *turn) exportJSON() []byte {
 	request := &nrp.Simple{Post: "turn", Body: struct {
 		White bool `json:"white,omitempty"`
 		Black bool `json:"black,omitempty"`
 	}{
-		White: turn.now() == game.White,
-		Black: turn.now() == game.Black,
+		White: t.now() == game.White,
+		Black: t.now() == game.Black,
 	}}
 	return request.Export()
 }
 
 // send data to broadcast
-func (turn *turn) send(dataJSON []byte) {
-	turn.server.broadcast <- dataJSON
+func (t *turn) send(dataJSON []byte) {
+	t.server.broadcast <- dataJSON
 }

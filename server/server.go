@@ -7,6 +7,22 @@ import (
 	"net/http"
 )
 
+// newServer returns a server type variable with information for playing chess
+func newServer(configFile string) *server {
+	return &server{
+		config:           newConfig(configFile),
+		board:            game.NewBoard(),
+		turn:             newTurn(),
+		status:           newStatus(),
+		timers:           newTimers(),
+		drawAttemptsLeft: newDrawAttemptsLeft(),
+		clients:          make(map[*client]bool),
+		register:         make(chan *client),
+		unregister:       make(chan *client),
+		broadcast:        make(chan []byte),
+	}
+}
+
 // server type of server data
 type server struct {
 	config           *config
@@ -21,10 +37,21 @@ type server struct {
 	drawAttemptsLeft *drawAttemptsLeft
 }
 
+func newTimers() *timers {
+	return &timers{
+		white: newTimer(),
+		black: newTimer(),
+	}
+}
+
 // timers struct for timers of team
 type timers struct {
 	white *timer
 	black *timer
+}
+
+func newDrawAttemptsLeft() *drawAttemptsLeft {
+	return &drawAttemptsLeft{}
 }
 
 // attemptsLeft type with the number of pops to offer a draw
@@ -33,44 +60,52 @@ type drawAttemptsLeft struct {
 	black int
 }
 
-// newGame initial server setup
-func (server *server) newGame() {
-	// over
-	server.status.resetOver()
+func (d *drawAttemptsLeft) setLeft(left int) {
+	d.white = left
+	d.black = left
+}
 
-	// timers
-	server.timers.white.setLeft(server.config.StepTimeLeft, server.config.ReserveTimeLeft)
-	server.timers.black.setLeft(server.config.StepTimeLeft, server.config.ReserveTimeLeft)
+func (s *server) loadConfig() {
+	s.config.importYAML(s.config.read())
+}
 
-	// turn
-	server.turn.setDefault()
+// newGame setting server settings for a new game
+func (s *server) newGame() {
+	// reset over status
+	s.status.resetOver()
 
-	// draw attempts left
-	server.drawAttemptsLeft.white = server.config.OfferDrawTimesLeft
-	server.drawAttemptsLeft.black = server.config.OfferDrawTimesLeft
+	// change timer values to values from config
+	s.timers.white.setLeft(s.config.StepTimeLeft, s.config.ReserveTimeLeft)
+	s.timers.black.setLeft(s.config.StepTimeLeft, s.config.ReserveTimeLeft)
+
+	// set turn to default
+	s.turn.setDefault()
+
+	// set draw attempts left to values from config
+	s.drawAttemptsLeft.setLeft(s.config.OfferDrawTimesLeft)
 
 	// new board
-	server.board.NewBoard()
+	s.board.NewBoard()
 }
 
 // setupBoardLinks setting links in objects contained inside the board
-func (server *server) setLinks() {
-	server.status.setServer(server)
-	server.timers.white.setTeam(server.board.White)
-	server.timers.black.setTeam(server.board.Black)
-	server.timers.white.setServer(server)
-	server.timers.black.setServer(server)
-	server.board.White.SetEnemy(server.board.Black)
-	server.board.Black.SetEnemy(server.board.White)
-	server.turn.setServer(server)
+func (s *server) setLinks() {
+	s.status.setServer(s)
+	s.timers.white.setTeam(s.board.White)
+	s.timers.black.setTeam(s.board.Black)
+	s.timers.white.setServer(s)
+	s.timers.black.setServer(s)
+	s.board.White.SetEnemy(s.board.Black)
+	s.board.Black.SetEnemy(s.board.White)
+	s.turn.setServer(s)
 }
 
 // getFreeTeam return free team as game.TeamName order: white, black, spectators
-func (server *server) getFreeTeam() game.TeamName {
+func (s *server) getFreeTeam() game.TeamName {
 	switch {
-	case !server.clientExistsByTeamName(game.White):
+	case !s.clientExistsByTeamName(game.White):
 		return game.White
-	case !server.clientExistsByTeamName(game.Black):
+	case !s.clientExistsByTeamName(game.Black):
 		return game.Black
 	default:
 		return game.Spectators
@@ -78,47 +113,47 @@ func (server *server) getFreeTeam() game.TeamName {
 }
 
 // handlers run server handlers
-func (server *server) handlers() {
+func (s *server) handlers() {
 	// Client registration on server
-	http.HandleFunc(server.config.WebsocketURL, func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc(s.config.WebsocketURL, func(w http.ResponseWriter, r *http.Request) {
 		// making client
-		client := &client{server: server, send: make(chan []byte, 256)}
-		switch server.getFreeTeam() {
+		client := &client{server: s, send: make(chan []byte, 256)}
+		switch s.getFreeTeam() {
 		case game.White:
 			// add white team link to client
-			client.team = server.board.White
+			client.team = s.board.White
 			client.makeDraw()
 		case game.Black:
 			// add black team link to client
-			client.team = server.board.Black
+			client.team = s.board.Black
 			client.makeDraw()
 		default:
 			// add spectators team link to client
-			client.team = server.board.Spectators
+			client.team = s.board.Spectators
 		}
 		client.register(w, r)
 	})
 }
 
 // run listening on a port
-func (server *server) run() {
-	err := http.ListenAndServe(server.config.Addr, nil)
+func (s *server) run() {
+	err := http.ListenAndServe(s.config.Addr, nil)
 	if err != nil {
 		log.Println(err)
 	}
 }
 
 // setClientsEnemyLinks setting playing clients links to the opponent's client
-func (server *server) setClientsEnemyLinks() {
-	wc := server.getClientByTeamName(game.White)
-	bc := server.getClientByTeamName(game.Black)
+func (s *server) setClientsEnemyLinks() {
+	wc := s.getClientByTeamName(game.White)
+	bc := s.getClientByTeamName(game.Black)
 	wc.enemy = bc
 	bc.enemy = wc
 }
 
 // getClientByTeamName get a reference to the client by specifying the command name in the argument
-func (server *server) getClientByTeamName(teamName game.TeamName) *client {
-	for client := range server.clients {
+func (s *server) getClientByTeamName(teamName game.TeamName) *client {
+	for client := range s.clients {
 		if client.team.Name == teamName {
 			return client
 		}
@@ -128,8 +163,8 @@ func (server *server) getClientByTeamName(teamName game.TeamName) *client {
 }
 
 // clientExistsByTeamName returns true if the command has a connected client otherwise returns false
-func (server *server) clientExistsByTeamName(teamName game.TeamName) bool {
-	for client := range server.clients {
+func (s *server) clientExistsByTeamName(teamName game.TeamName) bool {
+	for client := range s.clients {
 		if client.team.Name == teamName {
 			return true
 		}
@@ -138,30 +173,30 @@ func (server *server) clientExistsByTeamName(teamName game.TeamName) bool {
 }
 
 // runChannelProcessing start server
-func (server *server) runChannelProcessing() {
+func (s *server) runChannelProcessing() {
 	for {
-		go server.status.changeCausePlay()
+		go s.status.changeCausePlay()
 		select {
-		case client := <-server.register:
-			server.clients[client] = true
+		case client := <-s.register:
+			s.clients[client] = true
 			fmt.Println("client connected")
 			client.sendGameData()
-		case client := <-server.unregister:
-			if _, ok := server.clients[client]; ok {
-				delete(server.clients, client)
+		case client := <-s.unregister:
+			if _, ok := s.clients[client]; ok {
+				delete(s.clients, client)
 				// remove links to the client
 				if client.draw != nil {
 					client.draw.unsetClient()
 				}
 				fmt.Println("client disconnected")
 			}
-		case message := <-server.broadcast:
-			for client := range server.clients {
+		case message := <-s.broadcast:
+			for client := range s.clients {
 				select {
 				case client.send <- message:
 				default:
 					close(client.send)
-					delete(server.clients, client)
+					delete(s.clients, client)
 				}
 			}
 		}
@@ -169,35 +204,35 @@ func (server *server) runChannelProcessing() {
 }
 
 // sendGameDataToAll sending game data to all clients
-func (server *server) sendGameDataToAll() {
-	for client := range server.clients {
+func (s *server) sendGameDataToAll() {
+	for client := range s.clients {
 		client.sendGameData()
 	}
 }
 
 // play game on the server
-func (server *server) play() {
-	if server.turn.now() == game.White {
-		go server.timers.white.play()
-	} else if server.turn.now() == game.Black {
-		go server.timers.black.play()
+func (s *server) play() {
+	if s.turn.now() == game.White {
+		go s.timers.white.play()
+	} else if s.turn.now() == game.Black {
+		go s.timers.black.play()
 	}
 }
 
 // stop game on the server
-func (server *server) stop() {
-	if server.turn.now() == game.White {
-		server.timers.white.stop()
-	} else if server.turn.now() == game.Black {
-		server.timers.black.stop()
+func (s *server) stop() {
+	if s.turn.now() == game.White {
+		s.timers.white.stop()
+	} else if s.turn.now() == game.Black {
+		s.timers.black.stop()
 	}
 }
 
 // swapTeams swap clients and their teams
-func (server *server) swapTeams() {
-	if server.clientExistsByTeamName(game.White) && server.clientExistsByTeamName(game.Black) {
-		wc := server.getClientByTeamName(game.White)
-		bc := server.getClientByTeamName(game.Black)
+func (s *server) swapTeams() {
+	if s.clientExistsByTeamName(game.White) && s.clientExistsByTeamName(game.Black) {
+		wc := s.getClientByTeamName(game.White)
+		bc := s.getClientByTeamName(game.Black)
 		wc, bc = bc, wc
 		wc.team, bc.team = bc.team, wc.team
 	}

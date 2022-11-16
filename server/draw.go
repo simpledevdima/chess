@@ -18,25 +18,25 @@ type draw struct {
 }
 
 // acceptADraw confirmation for a draw and its installation
-func (draw *draw) acceptADraw() {
-	draw.client.enemy.draw.open = false
-	draw.client.enemy.response(*draw.client.enemy.draw.requestId, true, "draw offer accepted")
+func (d *draw) acceptADraw() {
+	d.client.enemy.draw.open = false
+	d.client.enemy.response(*d.client.enemy.draw.requestId, true, "draw offer accepted")
 
 	// set draw
-	draw.client.server.stop()
-	draw.client.server.status.setOverCauseToDraw()
+	d.client.server.stop()
+	d.client.server.status.setOverCauseToDraw()
 }
 
 // rejectADraw refusal to accept a draw
-func (draw *draw) rejectADraw() {
-	draw.client.enemy.draw.open = false
-	draw.client.enemy.response(*draw.client.enemy.draw.requestId, false, "draw offer rejected")
+func (d *draw) rejectADraw() {
+	d.client.enemy.draw.open = false
+	d.client.enemy.response(*d.client.enemy.draw.requestId, false, "draw offer rejected")
 }
 
 // isOpen returns true and an empty string if the draw offer is open otherwise returns a false and a string indicating the reason
-func (draw *draw) isOpen() (bool, string) {
-	return draw.open, func() string {
-		if !draw.open {
+func (d *draw) isOpen() (bool, string) {
+	return d.open, func() string {
+		if !d.open {
 			return "draw offer closed"
 		}
 		return ""
@@ -44,74 +44,74 @@ func (draw *draw) isOpen() (bool, string) {
 }
 
 // setRequestId sets a link to the request.Id
-func (draw *draw) setRequestId(requestId *int) {
-	draw.requestId = requestId
+func (d *draw) setRequestId(requestId *int) {
+	d.requestId = requestId
 }
 
 // tick executed after one second has elapsed after receiving a draw offer from the opponent
-func (draw *draw) tick() {
-	draw.client.enemy.draw.write(draw.exportLeftTimeToConfirmJSON())
-	draw.timeLeftForConfirm--
-	if draw.timeLeftForConfirm < 0 {
+func (d *draw) tick() {
+	d.client.enemy.draw.write(d.exportLeftTimeToConfirmJSON())
+	d.timeLeftForConfirm--
+	if d.timeLeftForConfirm < 0 {
 		// draw time is over
-		draw.open = false
-		draw.ticker.Stop()
-		draw.client.response(*draw.requestId, false, "draw offer rejected")
+		d.open = false
+		d.ticker.Stop()
+		d.client.response(*d.requestId, false, "draw offer rejected")
 	}
 }
 
 // waitResponse countdown for waiting for a response in case of no response at the end of the time, reject the offer
-func (draw *draw) waitResponse() {
-	draw.resetTimeLeftForConfirm()
-	draw.ticker = time.NewTicker(time.Second)
-	draw.tick()
+func (d *draw) waitResponse() {
+	d.resetTimeLeftForConfirm()
+	d.ticker = time.NewTicker(time.Second)
+	d.tick()
 	for {
-		if !draw.open {
+		if !d.open {
 			break
 		}
 		select {
-		case <-draw.ticker.C:
-			draw.tick()
+		case <-d.ticker.C:
+			d.tick()
 		}
 	}
 }
 
 // exportLeftTimeToConfirmJSON returns data on the amount of time left to decide on the confirmation of a draw in JSON format
-func (draw *draw) exportLeftTimeToConfirmJSON() []byte {
+func (d *draw) exportLeftTimeToConfirmJSON() []byte {
 	request := nrp.Simple{Post: "draw_confirm_time", Body: struct {
 		Left int `json:"left"`
 	}{
-		Left: draw.timeLeftForConfirm,
+		Left: d.timeLeftForConfirm,
 	}}
 	return request.Export()
 }
 
 // resetTimeLeftForConfirm resets the amount of time to make a decision to the value from the configuration
-func (draw *draw) resetTimeLeftForConfirm() {
-	draw.timeLeftForConfirm = draw.client.server.config.TimeLeftForConfirmDraw
+func (d *draw) resetTimeLeftForConfirm() {
+	d.timeLeftForConfirm = d.client.server.config.TimeLeftForConfirmDraw
 }
 
 // setClient sets the link to the client
-func (draw *draw) setClient(client *client) {
-	draw.client = client
+func (d *draw) setClient(client *client) {
+	d.client = client
 }
 
 // unsetClient remove link to the client
-func (draw *draw) unsetClient() {
-	draw.client = nil
+func (d *draw) unsetClient() {
+	d.client = nil
 }
 
 // isValid returns true and an empty string if a draw can be offered otherwise returns false and a string indicating the reason why this is not possible
-func (draw *draw) isValid() (bool, string) {
-	if draw.client.server.status.isOver() {
+func (d *draw) isValid() (bool, string) {
+	if d.client.server.status.isOver() {
 		return false, "game over"
 	} else {
-		if draw.client.server.status.isPlay() {
-			if draw.open {
+		if d.client.server.status.isPlay() {
+			if d.open {
 				return false, "draw offer already open"
 			} else {
-				if draw.client.server.drawAttemptsLeft.white > 0 && draw.client.team.Name == game.White ||
-					draw.client.server.drawAttemptsLeft.black > 0 && draw.client.team.Name == game.Black {
+				if d.client.server.drawAttemptsLeft.white > 0 && d.client.team.Name == game.White ||
+					d.client.server.drawAttemptsLeft.black > 0 && d.client.team.Name == game.Black {
 					return true, ""
 				}
 				return false, "attempts to offer a draw ended"
@@ -123,51 +123,51 @@ func (draw *draw) isValid() (bool, string) {
 }
 
 // offerADrawToOpponent is executed when a request for a draw is received from the opponent
-func (draw *draw) offerADrawToOpponent() {
-	draw.open = true
-	draw.client.enemy.draw.write(draw.exportOfferADrawToOpponentJSON())
-	go draw.waitResponse()
-	draw.reduceAttemptsLeft()
+func (d *draw) offerADrawToOpponent() {
+	d.open = true
+	d.client.enemy.draw.write(d.exportOfferADrawToOpponentJSON())
+	go d.waitResponse()
+	d.reduceAttemptsLeft()
 }
 
 // exportOfferADrawToOpponentJSON returns a structure with a request for a draw offer in JSON format
-func (draw *draw) exportOfferADrawToOpponentJSON() []byte {
+func (d *draw) exportOfferADrawToOpponentJSON() []byte {
 	request := nrp.Simple{Post: "opponent_offer_a_draw"}
 	return request.Export()
 }
 
 // reduceAttemptsLeft reduces the number of attempts to offer a draw
-func (draw *draw) reduceAttemptsLeft() {
-	switch draw.client.team.Name {
+func (d *draw) reduceAttemptsLeft() {
+	switch d.client.team.Name {
 	case game.White:
-		draw.client.server.drawAttemptsLeft.white--
+		d.client.server.drawAttemptsLeft.white--
 	case game.Black:
-		draw.client.server.drawAttemptsLeft.black--
+		d.client.server.drawAttemptsLeft.black--
 	}
-	draw.write(draw.exportAttemptsLeftJSON())
+	d.write(d.exportAttemptsLeftJSON())
 }
 
 // write send data to websocket chan of client
-func (draw *draw) write(data []byte) {
+func (d *draw) write(data []byte) {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println("recovering from draw.write()", r)
+			fmt.Println("recovering from d.write()", r)
 		}
 	}()
-	draw.client.send <- data
+	d.client.send <- data
 }
 
 // exportAttemptsLeftJSON returns the remaining number of attempts to offer a draw
-func (draw *draw) exportAttemptsLeftJSON() []byte {
+func (d *draw) exportAttemptsLeftJSON() []byte {
 	request := nrp.Simple{Post: "attempts_to_offer_a_draw", Body: struct {
 		Left int `json:"left"`
 	}{
 		Left: func() int {
-			switch draw.client.team.Name {
+			switch d.client.team.Name {
 			case game.White:
-				return draw.client.server.drawAttemptsLeft.white
+				return d.client.server.drawAttemptsLeft.white
 			case game.Black:
-				return draw.client.server.drawAttemptsLeft.black
+				return d.client.server.drawAttemptsLeft.black
 			default:
 				log.Println("error: unknown team in draw")
 				return -1

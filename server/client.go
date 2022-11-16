@@ -20,68 +20,68 @@ type client struct {
 }
 
 // makeDraw create a draw in the client and set draw to a reference to the client
-func (client *client) makeDraw() {
-	client.draw = &draw{}
-	client.draw.setClient(client)
+func (c *client) makeDraw() {
+	c.draw = &draw{}
+	c.draw.setClient(c)
 }
 
 // sendGameData sends game data to the client
-func (client *client) sendGameData() {
-	client.send <- client.exportJSON()
-	client.send <- client.server.board.ExportJSON()
-	client.send <- client.server.turn.exportJSON()
-	client.send <- client.server.timers.white.exportReserveJSON()
-	client.send <- client.server.timers.black.exportReserveJSON()
-	switch client.server.turn.now() {
+func (c *client) sendGameData() {
+	c.send <- c.exportJSON()
+	c.send <- c.server.board.ExportJSON()
+	c.send <- c.server.turn.exportJSON()
+	c.send <- c.server.timers.white.exportReserveJSON()
+	c.send <- c.server.timers.black.exportReserveJSON()
+	switch c.server.turn.now() {
 	case game.White:
-		client.send <- client.server.timers.white.exportStepJSON()
+		c.send <- c.server.timers.white.exportStepJSON()
 	case game.Black:
-		client.send <- client.server.timers.black.exportStepJSON()
+		c.send <- c.server.timers.black.exportStepJSON()
 	}
-	switch client.team.Name {
+	switch c.team.Name {
 	case game.White, game.Black:
-		client.send <- client.draw.exportAttemptsLeftJSON()
+		c.send <- c.draw.exportAttemptsLeftJSON()
 	}
-	client.send <- client.server.status.exportPlayJSON()
-	client.send <- client.server.status.exportOverJSON()
+	c.send <- c.server.status.exportPlayJSON()
+	c.send <- c.server.status.exportOverJSON()
 }
 
 // exportJSON getting data with the name of the command of the current client in JSON format
-func (client *client) exportJSON() []byte {
+func (c *client) exportJSON() []byte {
 	request := nrp.Simple{Post: "your", Body: struct {
 		TeamName string `json:"team_name"`
 	}{
-		TeamName: client.team.Name.String(),
+		TeamName: c.team.Name.String(),
 	}}
 	return request.Export()
 }
 
 // register making websocket connection with client, run read and write methods and register current client on server
-func (client *client) register(w http.ResponseWriter, r *http.Request) {
+func (c *client) register(w http.ResponseWriter, r *http.Request) {
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 		CheckOrigin: func(r *http.Request) bool {
 			var origin = r.Header.Get("origin")
-			if origin == client.server.config.OriginalClientURL {
+			if origin == c.server.config.OriginalClientURL {
 				return true
 			}
 			return false
 		},
 	}
 	var err error
-	client.conn, err = upgrader.Upgrade(w, r, nil)
+	c.conn, err = upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 	}
-	client.server.register <- client
+	c.server.register <- c
 
-	go client.read()
-	go client.write()
+	go c.read()
+	go c.write()
 }
 
 // response send response to request to client
-func (client *client) response(id int, valid bool, cause string) {
+func (c *client) response(id int, valid bool, cause string) {
 	response := &nrp.Simple{Post: "response", Body: &struct {
 		RequestId int    `json:"request_id,omitempty"`
 		Valid     bool   `json:"valid"`
@@ -91,125 +91,124 @@ func (client *client) response(id int, valid bool, cause string) {
 		Valid:     valid,
 		Cause:     cause,
 	}}
-	client.send <- response.Export()
+	c.send <- response.Export()
 }
 
 // postToMove if a request for a move came
-func (client *client) postToMove(request *nrp.Simple) {
-	var move move
-	move.setClient(client)
-	request.BodyToVariable(&move)
-	valid, cause := move.isValid()
-	client.response(request.Id, valid, cause)
+func (c *client) postToMove(request *nrp.Simple) {
+	m := NewMove(c)
+	request.BodyToVariable(&m)
+	valid, cause := m.isValid()
+	c.response(request.Id, valid, cause)
 	if valid {
-		move.exec()
-		client.server.turn.change()
+		m.exec()
+		c.server.turn.change()
 	}
 }
 
 // postToSurrender if the request came to surrender
-func (client *client) postToSurrender(request *nrp.Simple) {
+func (c *client) postToSurrender(request *nrp.Simple) {
 	var surrender surrender
-	surrender.setClient(client)
+	surrender.setClient(c)
 	valid, cause := surrender.isValid()
 	if valid {
 		surrender.exec()
 	}
-	client.response(request.Id, valid, cause)
+	c.response(request.Id, valid, cause)
 }
 
 // postToNewGame if you are asked to create a new game
-func (client *client) postToNewGame(request *nrp.Simple) {
+func (c *client) postToNewGame(request *nrp.Simple) {
 	var newGame newGame
-	newGame.setServer(client.server)
+	newGame.setServer(c.server)
 	valid, cause := newGame.isValid()
 	if valid {
 		newGame.exec()
 	}
-	client.response(request.Id, valid, cause)
+	c.response(request.Id, valid, cause)
 }
 
 // postToOfferADraw if a request came with a draw offer
-func (client *client) postToOfferADraw(request *nrp.Simple) {
-	valid, cause := client.draw.isValid()
+func (c *client) postToOfferADraw(request *nrp.Simple) {
+	valid, cause := c.draw.isValid()
 	if valid {
-		client.draw.setRequestId(&request.Id)
-		client.draw.offerADrawToOpponent()
+		c.draw.setRequestId(&request.Id)
+		c.draw.offerADrawToOpponent()
 	} else {
-		client.response(request.Id, valid, cause)
+		c.response(request.Id, valid, cause)
 	}
 }
 
 // postToDrawOfferAccepted if a request is received approving the offer of a draw
-func (client *client) postToDrawOfferAccepted(request *nrp.Simple) {
-	valid, cause := client.enemy.draw.isOpen()
+func (c *client) postToDrawOfferAccepted(request *nrp.Simple) {
+	valid, cause := c.enemy.draw.isOpen()
 	if valid {
-		client.draw.acceptADraw()
+		c.draw.acceptADraw()
 	}
-	client.response(request.Id, valid, cause)
+	c.response(request.Id, valid, cause)
 }
 
 // postToDrawOfferRejected if a request is received rejecting the offer of a draw
-func (client *client) postToDrawOfferRejected(request *nrp.Simple) {
-	valid, cause := client.enemy.draw.isOpen()
+func (c *client) postToDrawOfferRejected(request *nrp.Simple) {
+	valid, cause := c.enemy.draw.isOpen()
 	if valid {
-		client.draw.rejectADraw()
+		c.draw.rejectADraw()
 	}
-	client.response(request.Id, valid, cause)
+	c.response(request.Id, valid, cause)
 }
 
 // incomingDataProcessing handles the request from the argument
-func (client *client) incomingDataProcessing(dataJSON []byte) {
+func (c *client) incomingDataProcessing(dataJSON []byte) {
 	var request nrp.Simple
 	request.Parse(dataJSON)
-	switch client.team.Name {
+	switch c.team.Name {
 	case game.White, game.Black:
 		switch request.Post {
 		case "move":
-			client.postToMove(&request)
+			c.postToMove(&request)
 		case "surrender":
-			client.postToSurrender(&request)
+			c.postToSurrender(&request)
 		case "new":
-			client.postToNewGame(&request)
+			c.postToNewGame(&request)
 		case "offer_a_draw":
-			client.postToOfferADraw(&request)
+			c.postToOfferADraw(&request)
 		case "draw_offer_accepted":
-			client.postToDrawOfferAccepted(&request)
+			c.postToDrawOfferAccepted(&request)
 		case "draw_offer_rejected":
-			client.postToDrawOfferRejected(&request)
+			c.postToDrawOfferRejected(&request)
 		default:
-			client.response(request.Id, false, "unknown request")
+			c.response(request.Id, false, "unknown request")
 		}
 	default:
-		client.response(request.Id, false, "you are a spectator and cannot send requests")
+		c.response(request.Id, false, "you are a spectator and cannot send requests")
 	}
 }
 
 // read receive request data from client and execute requests
-func (client *client) read() {
+func (c *client) read() {
 	defer func() {
-		client.server.unregister <- client
-		err := client.conn.Close()
+		c.server.unregister <- c
+		err := c.conn.Close()
 		if err != nil {
 			log.Println(err)
 		}
 	}()
 	for {
-		_, dataJSDON, err := client.conn.ReadMessage()
+		_, dataJSDON, err := c.conn.ReadMessage()
 		if err != nil {
 			log.Println(err)
 			break
 		}
-		client.incomingDataProcessing(dataJSDON)
+		c.incomingDataProcessing(dataJSDON)
 	}
 }
 
 // write send data from client channel to websocket connection
-func (client *client) write() {
+func (c *client) write() {
 	for {
 		select {
-		case message := <-client.send:
-			err := client.conn.WriteMessage(websocket.TextMessage, message)
+		case message := <-c.send:
+			err := c.conn.WriteMessage(websocket.TextMessage, message)
 			if err != nil {
 				log.Println(err)
 			}
@@ -218,19 +217,19 @@ func (client *client) write() {
 }
 
 // surrender the client accepts defeat and gives victory to the enemy
-func (client *client) surrender() {
-	if client.server.status.isPlay() && !client.server.status.isOver() {
-		switch client.server.turn.now() {
+func (c *client) surrender() {
+	if c.server.status.isPlay() && !c.server.status.isOver() {
+		switch c.server.turn.now() {
 		case game.White:
-			client.server.timers.white.stop()
+			c.server.timers.white.stop()
 		case game.Black:
-			client.server.timers.black.stop()
+			c.server.timers.black.stop()
 		}
 	}
-	switch client.team.Name {
+	switch c.team.Name {
 	case game.White:
-		client.server.status.setOverCauseToBlack()
+		c.server.status.setOverCauseToBlack()
 	case game.Black:
-		client.server.status.setOverCauseToWhite()
+		c.server.status.setOverCauseToWhite()
 	}
 }

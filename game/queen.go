@@ -1,15 +1,23 @@
 package game
 
+func NewQueen(x, y int, t *Team) *Queen {
+	f := &Queen{}
+	f.SetName("queen")
+	f.SetPosition(x, y)
+	f.SetTeam(t)
+	return f
+}
+
 // Queen is data type of chess figure
 type Queen struct {
 	figureData
 }
 
 // DetectionOfPossibleMove return slice of Position with coords for possible moves
-func (queen *Queen) DetectionOfPossibleMove() []Position {
+func (q *Queen) DetectionOfPossibleMove() []Position {
 	var possibleMoves []Position
-	for _, position := range queen.detectionOfBrokenFields() {
-		if !queen.team.FigureExist(position.X, position.Y) {
+	for _, position := range q.detectionOfBrokenFields() {
+		if !q.team.FigureExist(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}
@@ -17,7 +25,7 @@ func (queen *Queen) DetectionOfPossibleMove() []Position {
 }
 
 // detectionOfBrokenFields return a slice of Positions with broken fields
-func (queen *Queen) detectionOfBrokenFields() []Position {
+func (q *Queen) detectionOfBrokenFields() []Position {
 	var data []Position
 
 	directions := struct {
@@ -31,68 +39,68 @@ func (queen *Queen) detectionOfBrokenFields() []Position {
 		leftTop     bool
 	}{true, true, true, true, true, true, true, true}
 	for i := 1; i <= 7; i++ {
-		if directions.top && queen.coordsOnBoard(queen.X, queen.Y+i) {
-			data = append(data, Position{X: queen.X, Y: queen.Y + i})
+		if directions.top && q.coordsOnBoard(q.X, q.Y+i) {
+			data = append(data, Position{X: q.X, Y: q.Y + i})
 		}
-		if directions.rightTop && queen.coordsOnBoard(queen.X+i, queen.Y+i) {
-			data = append(data, Position{X: queen.X + i, Y: queen.Y + i})
+		if directions.rightTop && q.coordsOnBoard(q.X+i, q.Y+i) {
+			data = append(data, Position{X: q.X + i, Y: q.Y + i})
 		}
-		if directions.right && queen.coordsOnBoard(queen.X+i, queen.Y) {
-			data = append(data, Position{X: queen.X + i, Y: queen.Y})
+		if directions.right && q.coordsOnBoard(q.X+i, q.Y) {
+			data = append(data, Position{X: q.X + i, Y: q.Y})
 		}
-		if directions.rightBottom && queen.coordsOnBoard(queen.X+i, queen.Y-i) {
-			data = append(data, Position{X: queen.X + i, Y: queen.Y - i})
+		if directions.rightBottom && q.coordsOnBoard(q.X+i, q.Y-i) {
+			data = append(data, Position{X: q.X + i, Y: q.Y - i})
 		}
-		if directions.bottom && queen.coordsOnBoard(queen.X, queen.Y-i) {
-			data = append(data, Position{X: queen.X, Y: queen.Y - i})
+		if directions.bottom && q.coordsOnBoard(q.X, q.Y-i) {
+			data = append(data, Position{X: q.X, Y: q.Y - i})
 		}
-		if directions.leftBottom && queen.coordsOnBoard(queen.X-i, queen.Y-i) {
-			data = append(data, Position{X: queen.X - i, Y: queen.Y - i})
+		if directions.leftBottom && q.coordsOnBoard(q.X-i, q.Y-i) {
+			data = append(data, Position{X: q.X - i, Y: q.Y - i})
 		}
-		if directions.left && queen.coordsOnBoard(queen.X-i, queen.Y) {
-			data = append(data, Position{X: queen.X - i, Y: queen.Y})
+		if directions.left && q.coordsOnBoard(q.X-i, q.Y) {
+			data = append(data, Position{X: q.X - i, Y: q.Y})
 		}
-		if directions.leftTop && queen.coordsOnBoard(queen.X-i, queen.Y+i) {
-			data = append(data, Position{X: queen.X - i, Y: queen.Y + i})
+		if directions.leftTop && q.coordsOnBoard(q.X-i, q.Y+i) {
+			data = append(data, Position{X: q.X - i, Y: q.Y + i})
 		}
-		if queen.team.FigureExist(queen.X, queen.Y+i) ||
-			queen.enemy.FigureExist(queen.X, queen.Y+i) ||
-			!queen.coordsOnBoard(queen.X, queen.Y+i) {
+		if q.team.FigureExist(q.X, q.Y+i) ||
+			q.team.enemy.FigureExist(q.X, q.Y+i) ||
+			!q.coordsOnBoard(q.X, q.Y+i) {
 			directions.top = false
 		}
-		if queen.team.FigureExist(queen.X+i, queen.Y+i) ||
-			queen.enemy.FigureExist(queen.X+i, queen.Y+i) ||
-			!queen.coordsOnBoard(queen.X+i, queen.Y+i) {
+		if q.team.FigureExist(q.X+i, q.Y+i) ||
+			q.team.enemy.FigureExist(q.X+i, q.Y+i) ||
+			!q.coordsOnBoard(q.X+i, q.Y+i) {
 			directions.rightTop = false
 		}
-		if queen.team.FigureExist(queen.X+i, queen.Y) ||
-			queen.enemy.FigureExist(queen.X+i, queen.Y) ||
-			!queen.coordsOnBoard(queen.X+i, queen.Y) {
+		if q.team.FigureExist(q.X+i, q.Y) ||
+			q.team.enemy.FigureExist(q.X+i, q.Y) ||
+			!q.coordsOnBoard(q.X+i, q.Y) {
 			directions.right = false
 		}
-		if queen.team.FigureExist(queen.X+i, queen.Y-i) ||
-			queen.enemy.FigureExist(queen.X+i, queen.Y-i) ||
-			!queen.coordsOnBoard(queen.X+i, queen.Y-i) {
+		if q.team.FigureExist(q.X+i, q.Y-i) ||
+			q.team.enemy.FigureExist(q.X+i, q.Y-i) ||
+			!q.coordsOnBoard(q.X+i, q.Y-i) {
 			directions.rightBottom = false
 		}
-		if queen.team.FigureExist(queen.X, queen.Y-i) ||
-			queen.enemy.FigureExist(queen.X, queen.Y-i) ||
-			!queen.coordsOnBoard(queen.X, queen.Y-i) {
+		if q.team.FigureExist(q.X, q.Y-i) ||
+			q.team.enemy.FigureExist(q.X, q.Y-i) ||
+			!q.coordsOnBoard(q.X, q.Y-i) {
 			directions.bottom = false
 		}
-		if queen.team.FigureExist(queen.X-i, queen.Y-i) ||
-			queen.enemy.FigureExist(queen.X-i, queen.Y-i) ||
-			!queen.coordsOnBoard(queen.X-i, queen.Y-i) {
+		if q.team.FigureExist(q.X-i, q.Y-i) ||
+			q.team.enemy.FigureExist(q.X-i, q.Y-i) ||
+			!q.coordsOnBoard(q.X-i, q.Y-i) {
 			directions.leftBottom = false
 		}
-		if queen.team.FigureExist(queen.X-i, queen.Y) ||
-			queen.enemy.FigureExist(queen.X-i, queen.Y) ||
-			!queen.coordsOnBoard(queen.X-i, queen.Y) {
+		if q.team.FigureExist(q.X-i, q.Y) ||
+			q.team.enemy.FigureExist(q.X-i, q.Y) ||
+			!q.coordsOnBoard(q.X-i, q.Y) {
 			directions.left = false
 		}
-		if queen.team.FigureExist(queen.X-i, queen.Y+i) ||
-			queen.enemy.FigureExist(queen.X-i, queen.Y+i) ||
-			!queen.coordsOnBoard(queen.X-i, queen.Y+i) {
+		if q.team.FigureExist(q.X-i, q.Y+i) ||
+			q.team.enemy.FigureExist(q.X-i, q.Y+i) ||
+			!q.coordsOnBoard(q.X-i, q.Y+i) {
 			directions.leftTop = false
 		}
 	}
@@ -101,28 +109,28 @@ func (queen *Queen) detectionOfBrokenFields() []Position {
 }
 
 // Validation return true if this move are valid or return false
-func (queen *Queen) Validation(x int, y int) (bool, string) {
-	if !queen.coordsOnBoard(x, y) {
+func (q *Queen) Validation(x int, y int) (bool, string) {
+	if !q.coordsOnBoard(x, y) {
 		return false, "attempt to go out the board"
 	}
-	if queen.X == x && queen.Y == y {
+	if q.X == x && q.Y == y {
 		return false, "can't walk around"
 	}
-	if queen.team.FigureExist(x, y) {
+	if q.team.FigureExist(x, y) {
 		return false, "this place is occupied by your figure"
 	}
-	if queen.kingOnTheBeatenFieldAfterMove(x, y) {
+	if q.kingOnTheBeatenFieldAfterMove(x, y) {
 		return false, "your king stands on a beaten field"
 	}
 	// if change x && y is not valid for queen
-	if (queen.X != x && queen.Y != y && x < queen.X && y < queen.Y && queen.X-x != queen.Y-y) ||
-		(queen.X != x && queen.Y != y && x < queen.X && y > queen.Y && queen.X-x != y-queen.Y) ||
-		(queen.X != x && queen.Y != y && x > queen.X && y < queen.Y && x-queen.X != queen.Y-y) ||
-		(queen.X != x && queen.Y != y && x > queen.X && y > queen.Y && x-queen.X != y-queen.Y) {
+	if (q.X != x && q.Y != y && x < q.X && y < q.Y && q.X-x != q.Y-y) ||
+		(q.X != x && q.Y != y && x < q.X && y > q.Y && q.X-x != y-q.Y) ||
+		(q.X != x && q.Y != y && x > q.X && y < q.Y && x-q.X != q.Y-y) ||
+		(q.X != x && q.Y != y && x > q.X && y > q.Y && x-q.X != y-q.Y) {
 		return false, "queen doesn't walk like that"
 	}
 	// detect Position for move and check it for input data move coords
-	for _, position := range queen.detectionOfBrokenFields() {
+	for _, position := range q.detectionOfBrokenFields() {
 		if position.X == x && position.Y == y {
 			// this move is valid
 			return true, ""
@@ -132,7 +140,7 @@ func (queen *Queen) Validation(x int, y int) (bool, string) {
 }
 
 // Move change Position of figure to Position from arguments
-func (queen *Queen) Move(x int, y int) {
-	queen.team.pawnDoubleMove.clearPawnDoubleMove()
-	queen.MoveFigure(x, y)
+func (q *Queen) Move(x int, y int) {
+	q.team.pawnDoubleMove.clearPawnDoubleMove()
+	q.MoveFigure(x, y)
 }

@@ -6,8 +6,15 @@ import (
 	"log"
 )
 
+func newConfig(configFile string) *config {
+	c := &config{}
+	c.setConfigFile(configFile)
+	return c
+}
+
 // config data type for package customization
 type config struct {
+	configFile                  string
 	StepTimeLeft                int    `yaml:"step_time_left"`
 	ReserveTimeLeft             int    `yaml:"reserve_time_left"`
 	Addr                        string `yaml:"addr"`
@@ -18,18 +25,22 @@ type config struct {
 	SwapTeamsAfterMakingNewGame bool   `yaml:"swap_teams_after_making_new_game"`
 }
 
+func (c *config) setConfigFile(configFile string) {
+	c.configFile = configFile
+}
+
 // read get data from file in argument
-func (config *config) read(filename string) {
-	dataYAML, err := ioutil.ReadFile(filename)
+func (c *config) read() []byte {
+	data, err := ioutil.ReadFile(c.configFile)
 	if err != nil {
 		log.Println(err)
 	}
-	config.importYAML(dataYAML)
+	return data
 }
 
 // importYAML import data from []byte into argument and set to main type
-func (config *config) importYAML(dataYAML []byte) {
-	err := yaml.Unmarshal(dataYAML, &config)
+func (c *config) importYAML(dataYAML []byte) {
+	err := yaml.Unmarshal(dataYAML, &c)
 	if err != nil {
 		log.Println(err)
 	}

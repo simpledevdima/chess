@@ -360,10 +360,20 @@ class Board {
         }
     }
 
-    // eating enemy figure
-    eatingFigure() {
+    eatingFigureByCords(x, y) {
+        const eatenFigureTeam = this.getTeamFigureByCords(x, y)
+        const eatenFigureID = this.getAnyFigureIDByCords(x, y)
+        this.eatingFigure(eatenFigureTeam, eatenFigureID)
+    }
+
+    eatingFigureByCurrentMove() {
         const eatenFigureTeam = this.getTeamFigureByCords(this.move.to.position.x, this.move.to.position.y)
         const eatenFigureID = this.getAnyFigureIDByCords(this.move.to.position.x, this.move.to.position.y)
+        this.eatingFigure(eatenFigureTeam, eatenFigureID)
+    }
+
+    // eating enemy figure
+    eatingFigure(eatenFigureTeam, eatenFigureID) {
         if (eatenFigureID) {
             this.teams[eatenFigureTeam].eaten[eatenFigureID] = this.teams[eatenFigureTeam].figures[eatenFigureID]
             delete this.teams[eatenFigureTeam].figures[eatenFigureID]
@@ -380,7 +390,8 @@ class Board {
         this.clearPawnDoubleMove()
         const figure = this.getAnyFigureByCords(this.move.to.position.x, this.move.to.position.y)
         if (figure && figure.name === "pawn") {
-            if (this.move.to.position.y === (this.move.from.position.y + 2 || this.move.from.position.y - 2)) {
+            if (this.move.to.position.y === this.move.from.position.y + 2 ||
+                this.move.to.position.y === this.move.from.position.y - 2) {
                 // add pawn double move
                 this.pawnDoubleMove = {
                     id: this.getAnyFigureIDByCords(this.move.to.position.x, this.move.to.position.y),
@@ -399,7 +410,7 @@ class Board {
         if (figure && figure.name === "pawn") {
             if (typeof this.pawnDoubleMove.id !== "undefined") {
                 if (this.move.to.position.x === this.pawnDoubleMove.x && this.move.to.position.y === this.pawnDoubleMove.y) {
-                    this.eatingFigure(
+                    this.eatingFigureByCords(
                         this.teams[this.pawnDoubleMove.teamName].figures[this.pawnDoubleMove.id].position.x,
                         this.teams[this.pawnDoubleMove.teamName].figures[this.pawnDoubleMove.id].position.y
                     )
@@ -417,7 +428,7 @@ class Board {
     execMove() {
         this.chess.cause.hideCause()
         this.lastMoveBacklight()
-        this.eatingFigure()
+        this.eatingFigureByCurrentMove()
         if (typeof this.taken.id !== "undefined" && this.taken.figure.position.x === this.move.from.position.x && this.taken.figure.position.y === this.move.from.position.y) {
             this.moveFigureFromHand()
         } else {
@@ -427,12 +438,10 @@ class Board {
         this.pawnMakesDoubleMove()
     }
 
-
     // set board figures
     setBoardFigures(board) {
         this.teams["white"].figures = board.white.figures
         this.teams["black"].figures = board.black.figures
-        //console.log(this.teams)
         this.drawNotices()
         if (this.chess.game.youArePlayer) {
             this.onClick()

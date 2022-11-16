@@ -5,6 +5,10 @@ import (
 	"github.com/skvdmt/nrp"
 )
 
+func newStatus() *status {
+	return &status{}
+}
+
 // status data structure storing various states of the game process
 type status struct {
 	play      bool
@@ -36,160 +40,160 @@ const (
 )
 
 // setServer sets a link to the server
-func (status *status) setServer(server *server) {
-	status.server = server
+func (s *status) setServer(server *server) {
+	s.server = server
 }
 
 // isPlay returns the play state
-func (status *status) isPlay() bool {
-	return status.play
+func (s *status) isPlay() bool {
+	return s.play
 }
 
 // isOver returns the completion status
-func (status *status) isOver() bool {
-	return status.over
+func (s *status) isOver() bool {
+	return s.over
 }
 
 // changePlayAndSend changes the play state and sends data about it to the broadcast
-func (status *status) changePlayAndSend() {
-	status.changePlay()
-	status.send(status.exportPlayJSON())
+func (s *status) changePlayAndSend() {
+	s.changePlay()
+	s.send(s.exportPlayJSON())
 }
 
 // changePlay changes playback state
-func (status *status) changePlay() {
-	if status.waitCause == allPayersReady {
-		status.play = true
-		if !status.isOver() {
-			status.server.play()
+func (s *status) changePlay() {
+	if s.waitCause == allPayersReady {
+		s.play = true
+		if !s.isOver() {
+			s.server.play()
 		}
 	} else {
-		if status.isPlay() {
-			status.play = false
-			status.server.stop()
+		if s.isPlay() {
+			s.play = false
+			s.server.stop()
 		}
 	}
 }
 
 // setWaitBothPlayers sets the reason for the wait to be both players' wait
-func (status *status) setWaitBothPlayers() {
-	status.waitCause = waitBothPlayers
-	status.changePlayAndSend()
+func (s *status) setWaitBothPlayers() {
+	s.waitCause = waitBothPlayers
+	s.changePlayAndSend()
 }
 
 // setWaitWhitePlayer sets the cause of the wait to the value of waiting for a white team player
-func (status *status) setWaitWhitePlayer() {
-	status.waitCause = waitWhitePlayer
-	status.changePlayAndSend()
+func (s *status) setWaitWhitePlayer() {
+	s.waitCause = waitWhitePlayer
+	s.changePlayAndSend()
 }
 
 // setWaitBlackPlayer sets the reason for waiting to the value of waiting for a black team player
-func (status *status) setWaitBlackPlayer() {
-	status.waitCause = waitBlackPlayer
-	status.changePlayAndSend()
+func (s *status) setWaitBlackPlayer() {
+	s.waitCause = waitBlackPlayer
+	s.changePlayAndSend()
 }
 
 // setAllPlayersReady sets wait reason to all players ready
-func (status *status) setAllPlayersReady() {
-	status.waitCause = allPayersReady
-	status.changePlayAndSend()
-	status.server.setClientsEnemyLinks()
+func (s *status) setAllPlayersReady() {
+	s.waitCause = allPayersReady
+	s.changePlayAndSend()
+	s.server.setClientsEnemyLinks()
 }
 
 // isWaitBothPlayers returns true if both players are not present and the wait reason is not set to this value otherwise returns false
-func (status *status) isWaitBothPlayers() bool {
-	if !status.server.clientExistsByTeamName(game.White) &&
-		!status.server.clientExistsByTeamName(game.Black) &&
-		status.waitCause != waitBothPlayers {
+func (s *status) isWaitBothPlayers() bool {
+	if !s.server.clientExistsByTeamName(game.White) &&
+		!s.server.clientExistsByTeamName(game.Black) &&
+		s.waitCause != waitBothPlayers {
 		return true
 	}
 	return false
 }
 
 // isWaitWhitePlayer returns true if only the white team player is not present and the wait reason is not set to this value otherwise returns false
-func (status *status) isWaitWhitePlayer() bool {
-	if !status.server.clientExistsByTeamName(game.White) &&
-		status.server.clientExistsByTeamName(game.Black) &&
-		status.waitCause != waitWhitePlayer {
+func (s *status) isWaitWhitePlayer() bool {
+	if !s.server.clientExistsByTeamName(game.White) &&
+		s.server.clientExistsByTeamName(game.Black) &&
+		s.waitCause != waitWhitePlayer {
 		return true
 	}
 	return false
 }
 
 // isWaitBlackPlayer returns true if only the black team player is not present and the wait reason is not set to this value otherwise returns false
-func (status *status) isWaitBlackPlayer() bool {
-	if status.server.clientExistsByTeamName(game.White) &&
-		!status.server.clientExistsByTeamName(game.Black) &&
-		status.waitCause != waitBlackPlayer {
+func (s *status) isWaitBlackPlayer() bool {
+	if s.server.clientExistsByTeamName(game.White) &&
+		!s.server.clientExistsByTeamName(game.Black) &&
+		s.waitCause != waitBlackPlayer {
 		return true
 	}
 	return false
 }
 
 // isWaitBothPlayers returns true if both players are ready and the wait reason is not set to this value otherwise returns false
-func (status *status) isAllPlayersReady() bool {
-	if status.server.clientExistsByTeamName(game.White) &&
-		status.server.clientExistsByTeamName(game.Black) &&
-		status.waitCause != allPayersReady {
+func (s *status) isAllPlayersReady() bool {
+	if s.server.clientExistsByTeamName(game.White) &&
+		s.server.clientExistsByTeamName(game.Black) &&
+		s.waitCause != allPayersReady {
 		return true
 	}
 	return false
 }
 
 // changeCausePlay change cause and server states depending on connecting and disconnecting clients
-func (status *status) changeCausePlay() {
-	if status.isWaitBothPlayers() {
-		status.setWaitBothPlayers()
-	} else if status.isWaitWhitePlayer() {
-		status.setWaitWhitePlayer()
-	} else if status.isWaitBlackPlayer() {
-		status.setWaitBlackPlayer()
-	} else if status.isAllPlayersReady() {
-		status.setAllPlayersReady()
+func (s *status) changeCausePlay() {
+	if s.isWaitBothPlayers() {
+		s.setWaitBothPlayers()
+	} else if s.isWaitWhitePlayer() {
+		s.setWaitWhitePlayer()
+	} else if s.isWaitBlackPlayer() {
+		s.setWaitBlackPlayer()
+	} else if s.isAllPlayersReady() {
+		s.setAllPlayersReady()
 	}
 }
 
 // setOverCauseToWhite sets the reason for the end of the game to white win
-func (status *status) setOverCauseToWhite() {
-	status.overCause = winnerIsWhite
-	status.changeOver()
+func (s *status) setOverCauseToWhite() {
+	s.overCause = winnerIsWhite
+	s.changeOver()
 }
 
 // setOverCauseToBlack sets the reason for the end of the game to black win
-func (status *status) setOverCauseToBlack() {
-	status.overCause = winnerIsBlack
-	status.changeOver()
+func (s *status) setOverCauseToBlack() {
+	s.overCause = winnerIsBlack
+	s.changeOver()
 }
 
 // setOverCauseToStalemate sets the reason for ending the game to stalemate
-func (status *status) setOverCauseToStalemate() {
-	status.overCause = stalemate
-	status.changeOver()
+func (s *status) setOverCauseToStalemate() {
+	s.overCause = stalemate
+	s.changeOver()
 }
 
 // setOverCauseToDraw sets game end reason to draw
-func (status *status) setOverCauseToDraw() {
-	status.overCause = drawGame
-	status.changeOver()
+func (s *status) setOverCauseToDraw() {
+	s.overCause = drawGame
+	s.changeOver()
 }
 
 // changeOver changes the value of the termination state to true if the values of the termination reason contribute to it and sends the data to the broadcast
-func (status *status) changeOver() {
-	if status.overCause != winnerNotSet {
-		status.over = true
+func (s *status) changeOver() {
+	if s.overCause != winnerNotSet {
+		s.over = true
 	}
-	status.send(status.exportOverJSON())
+	s.send(s.exportOverJSON())
 }
 
 // resetOver resets the termination value and termination reason to the default value
-func (status *status) resetOver() {
-	status.overCause = winnerNotSet
-	status.over = false
+func (s *status) resetOver() {
+	s.overCause = winnerNotSet
+	s.over = false
 }
 
 // getCauseOver returns the string value of the termination reason
-func (status *status) getCauseOver() string {
-	switch status.overCause {
+func (s *status) getCauseOver() string {
+	switch s.overCause {
 	case winnerIsWhite:
 		return "white win"
 	case winnerIsBlack:
@@ -203,20 +207,20 @@ func (status *status) getCauseOver() string {
 }
 
 // exportOverJSON returns completion status and exit reason in JSON format
-func (status *status) exportOverJSON() []byte {
+func (s *status) exportOverJSON() []byte {
 	request := nrp.Simple{Post: "game_over", Body: struct {
 		Over  bool   `json:"over"`
 		Cause string `json:"cause,omitempty"`
 	}{
-		Over:  status.over,
-		Cause: status.getCauseOver(),
+		Over:  s.over,
+		Cause: s.getCauseOver(),
 	}}
 	return request.Export()
 }
 
 // getCausePlay returns the string value of the replay reason
-func (status *status) getCausePlay() string {
-	switch status.waitCause {
+func (s *status) getCausePlay() string {
+	switch s.waitCause {
 	case waitBothPlayers:
 		return "wait both players"
 	case waitWhitePlayer:
@@ -228,18 +232,18 @@ func (status *status) getCausePlay() string {
 }
 
 // exportPlayJSON returns the playback status and reason for playback in JSON format
-func (status *status) exportPlayJSON() []byte {
+func (s *status) exportPlayJSON() []byte {
 	request := nrp.Simple{Post: "game_play", Body: struct {
 		Play  bool   `json:"play"`
 		Cause string `json:"cause,omitempty"`
 	}{
-		Play:  status.play,
-		Cause: status.getCausePlay(),
+		Play:  s.play,
+		Cause: s.getCausePlay(),
 	}}
 	return request.Export()
 }
 
 // send data to broadcast
-func (status *status) send(exportJSON []byte) {
-	status.server.broadcast <- exportJSON
+func (s *status) send(exportJSON []byte) {
+	s.server.broadcast <- exportJSON
 }

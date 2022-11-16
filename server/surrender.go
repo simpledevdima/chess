@@ -10,11 +10,11 @@ type surrender struct {
 }
 
 // isValid returns true and an empty string if you can give up otherwise returns false and a reason why you can't give up
-func (surrender *surrender) isValid() (bool, string) {
-	if surrender.client.server.status.isOver() {
+func (s *surrender) isValid() (bool, string) {
+	if s.client.server.status.isOver() {
 		return false, "game is over"
 	} else {
-		switch surrender.client.team.Name {
+		switch s.client.team.Name {
 		case game.White, game.Black:
 			return true, ""
 		default:
@@ -24,11 +24,11 @@ func (surrender *surrender) isValid() (bool, string) {
 }
 
 // setClient setting a client link
-func (surrender *surrender) setClient(client *client) {
-	surrender.client = client
+func (s *surrender) setClient(client *client) {
+	s.client = client
 }
 
 // exec delivery
-func (surrender *surrender) exec() {
-	surrender.client.surrender()
+func (s *surrender) exec() {
+	s.client.surrender()
 }

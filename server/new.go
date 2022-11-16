@@ -6,13 +6,13 @@ type newGame struct {
 }
 
 // setServer set link to server
-func (newGame *newGame) setServer(server *server) {
-	newGame.server = server
+func (n *newGame) setServer(server *server) {
+	n.server = server
 }
 
 // isValid returns true if it is possible to start a new game and an empty string otherwise returns false and a string with the reason why it is not possible to start a new game
-func (newGame *newGame) isValid() (bool, string) {
-	if newGame.server.status.isOver() {
+func (n *newGame) isValid() (bool, string) {
+	if n.server.status.isOver() {
 		return true, ""
 	} else {
 		return false, "game not over"
@@ -20,11 +20,11 @@ func (newGame *newGame) isValid() (bool, string) {
 }
 
 // exec making a new game
-func (newGame *newGame) exec() {
-	if newGame.server.config.SwapTeamsAfterMakingNewGame {
-		newGame.server.swapTeams()
+func (n *newGame) exec() {
+	if n.server.config.SwapTeamsAfterMakingNewGame {
+		n.server.swapTeams()
 	}
-	newGame.server.newGame()
-	newGame.server.sendGameDataToAll()
-	newGame.server.status.changePlay()
+	n.server.newGame()
+	n.server.sendGameDataToAll()
+	n.server.status.changePlay()
 }

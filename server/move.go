@@ -7,6 +7,12 @@ import (
 	"log"
 )
 
+func NewMove(c *client) *move {
+	m := &move{}
+	m.setClient(c)
+	return m
+}
+
 // move data type containing the processing of the movement of the figure
 type move struct {
 	From struct {
@@ -52,19 +58,19 @@ func (m *move) exec() {
 	}
 	// castling
 	if !m.client.team.Figures[figureID].IsAlreadyMove() && m.From.Position.X == 5 && (m.From.Position.Y == 1 || m.From.Position.Y == 8) && (m.To.Position.X == 3 || m.To.Position.X == 7) {
-		var move move
-		move.From.Position.Y = m.From.Position.Y
-		move.To.Position.Y = m.To.Position.Y
+		var m2 move
+		m2.From.Position.Y = m.From.Position.Y
+		m2.To.Position.Y = m.To.Position.Y
 		switch m.To.Position.X {
 		case 3:
-			move.From.Position.X = 1
-			move.To.Position.X = 4
+			m2.From.Position.X = 1
+			m2.To.Position.X = 4
 		case 7:
-			move.From.Position.X = 8
-			move.To.Position.X = 6
+			m2.From.Position.X = 8
+			m2.To.Position.X = 6
 		}
-		move.setClient(m.client)
-		move.exec()
+		m2.setClient(m.client)
+		m2.exec()
 	}
 
 	m.client.team.Figures[figureID].Move(m.To.Position.X, m.To.Position.Y)

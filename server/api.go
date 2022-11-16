@@ -1,50 +1,13 @@
 // Package server contains a functional chess server that allows two players to play chess, as well as watching it for many spectators
 package server
 
-import (
-	"github.com/skvdmt/chess/game"
-)
-
 // Start API to run chess server
 func Start(configFile string) {
-	// make server
-	server := getServer()
-
-	// get config
-	server.config.read(configFile)
-
-	// set links
-	server.setLinks()
-
-	// setup of new game
-	server.newGame()
-
-	// run channel processing
-	go server.runChannelProcessing()
-
-	// run handlers
-	server.handlers()
-
-	// run server
-	server.run()
-}
-
-// getServer returns a structure of the server type with data for the game process
-func getServer() *server {
-	return &server{
-		config: &config{},
-		board: &game.Board{
-			White:      &game.Team{Name: game.White},
-			Black:      &game.Team{Name: game.Black},
-			Spectators: &game.Team{Name: game.Spectators},
-		},
-		clients:          make(map[*client]bool),
-		register:         make(chan *client),
-		unregister:       make(chan *client),
-		broadcast:        make(chan []byte),
-		turn:             &turn{},
-		status:           &status{},
-		timers:           &timers{white: &timer{}, black: &timer{}},
-		drawAttemptsLeft: &drawAttemptsLeft{},
-	}
+	server := newServer(configFile)  // making a new empty server
+	server.loadConfig()              // get config from installed configuration file
+	server.setLinks()                // setting links inside server types
+	server.newGame()                 // setup of new game
+	go server.runChannelProcessing() // run channel processing
+	server.handlers()                // run handlers
+	server.run()                     // run server
 }

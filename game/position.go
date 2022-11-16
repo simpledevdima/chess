@@ -1,5 +1,11 @@
 package game
 
+func NewPosition(x, y int) *Position {
+	p := &Position{}
+	p.Set(x, y)
+	return p
+}
+
 // Position data type containing the coordinates on the board
 type Position struct {
 	X int `json:"x"`
@@ -7,12 +13,12 @@ type Position struct {
 }
 
 // Set position to argument values
-func (Position *Position) Set(x, y int) {
-	Position.X = x
-	Position.Y = y
+func (p *Position) Set(x, y int) {
+	p.X = x
+	p.Y = y
 }
 
 // Get return position
-func (Position *Position) Get() (int, int) {
-	return Position.X, Position.Y
+func (p *Position) Get() (int, int) {
+	return p.X, p.Y
 }

@@ -13,7 +13,7 @@ type Figure interface {
 	Move(int, int)
 	MoveFigure(int, int)
 	Validation(int, int) (bool, string)
-	SetTeams(*Team, *Team)
+	SetTeam(*Team)
 	coordsOnBoard(int, int) bool
 	kingOnTheBeatenFieldAfterMove(int, int) bool
 	detectionOfBrokenFields() []Position
@@ -28,46 +28,45 @@ type figureData struct {
 	Position    `json:"position"`
 	alreadyMove bool
 	team        *Team
-	enemy       *Team
 }
 
 // GetName get name from figure
-func (figureData *figureData) GetName() string {
-	return figureData.Name
+func (f *figureData) GetName() string {
+	return f.Name
 }
 
 // SetName set name to the figure
-func (figureData *figureData) SetName(name string) {
-	figureData.Name = name
+func (f *figureData) SetName(name string) {
+	f.Name = name
 }
 
 // IsAlreadyMove returns true if the figure has moved in the current match otherwise returns false
-func (figureData *figureData) IsAlreadyMove() bool {
-	return figureData.alreadyMove
+func (f *figureData) IsAlreadyMove() bool {
+	return f.alreadyMove
 }
 
 // setAlreadyMove setting a value about moving a figure in the current match
-func (figureData *figureData) setAlreadyMove(flag bool) {
-	figureData.alreadyMove = flag
+func (f *figureData) setAlreadyMove(flag bool) {
+	f.alreadyMove = flag
 }
 
 // kingOnTheBeatenFieldAfterMove returns true if your king is on the beaten square after the move otherwise return false
-func (figureData *figureData) kingOnTheBeatenFieldAfterMove(x int, y int) bool {
-	curX, curY := figureData.Position.Get()
-	figureData.SetPosition(x, y)
+func (f *figureData) kingOnTheBeatenFieldAfterMove(x int, y int) bool {
+	curX, curY := f.Position.Get()
+	f.SetPosition(x, y)
 	undoMove := func() {
-		figureData.SetPosition(curX, curY)
+		f.SetPosition(curX, curY)
 	}
 	undoEating := func() {}
-	if figureData.enemy.FigureExist(x, y) {
-		eatenID, _ := figureData.enemy.GetFigureID(x, y)
-		eatenFigure := figureData.enemy.Figures[eatenID]
-		delete(figureData.enemy.Figures, eatenID)
+	if f.team.enemy.FigureExist(x, y) {
+		eatenID, _ := f.team.enemy.GetFigureID(x, y)
+		eatenFigure := f.team.enemy.Figures[eatenID]
+		delete(f.team.enemy.Figures, eatenID)
 		undoEating = func() {
-			figureData.enemy.Figures[eatenID] = eatenFigure
+			f.team.enemy.Figures[eatenID] = eatenFigure
 		}
 	}
-	check := figureData.team.CheckingCheck()
+	check := f.team.CheckingCheck()
 	undoMove()
 	undoEating()
 	if check {
@@ -77,38 +76,40 @@ func (figureData *figureData) kingOnTheBeatenFieldAfterMove(x int, y int) bool {
 }
 
 // coordsOnBoard returns true if the coordinates are within the board, otherwise return false
-func (figureData *figureData) coordsOnBoard(x int, y int) bool {
+func (f *figureData) coordsOnBoard(x int, y int) bool {
 	if x >= 1 && x <= 8 && y >= 1 && y <= 8 {
 		return true
 	}
 	return false
 }
 
-// SetTeams set links to your team and enemy team for current figure
-func (figureData *figureData) SetTeams(team *Team, enemy *Team) {
-	figureData.team = team
-	figureData.enemy = enemy
+// SetTeam set links to your team for current figure
+func (f *figureData) SetTeam(team *Team) {
+	f.team = team
 }
 
 // MoveFigure to new coords and eat enemy figure if need that
-func (figureData *figureData) MoveFigure(x int, y int) {
-	figureData.SetPosition(x, y)
-	figureData.setAlreadyMove(true)
-	if figureData.enemy != nil && figureData.enemy.FigureExist(x, y) {
+func (f *figureData) MoveFigure(x int, y int) {
+	f.SetPosition(x, y)
+	f.setAlreadyMove(true)
+	if f.team.enemy != nil && f.team.enemy.FigureExist(x, y) {
 		// eat enemy figure
-		err := figureData.enemy.Eating(x, y)
+		err := f.team.enemy.Eating(x, y)
 		if err != nil {
 			log.Println(err)
 		}
 	}
+
+	//f.team.GetPossibleMoves()
+	//f.team.enemy.GetPossibleMoves()
 }
 
 // SetPosition set Position to coords from argument
-func (figureData *figureData) SetPosition(x, y int) {
-	figureData.Position.Set(x, y)
+func (f *figureData) SetPosition(x, y int) {
+	f.Position.Set(x, y)
 }
 
 // GetPosition return current Position of Figure
-func (figureData *figureData) GetPosition() (int, int) {
-	return figureData.Position.Get()
+func (f *figureData) GetPosition() (int, int) {
+	return f.Position.Get()
 }

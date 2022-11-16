@@ -5,6 +5,14 @@ import (
 	"log"
 )
 
+func NewBoard() *Board {
+	return &Board{
+		White:      NewTeam(White),
+		Black:      NewTeam(Black),
+		Spectators: NewTeam(Spectators),
+	}
+}
+
 // Board data type with information about the board and its control
 type Board struct {
 	White      *Team `json:"white"`
@@ -13,19 +21,19 @@ type Board struct {
 }
 
 // NewBoard making a new board
-func (board *Board) NewBoard() {
-	err := board.White.setStartPosition()
+func (b *Board) NewBoard() {
+	err := b.White.setStartPosition()
 	if err != nil {
 		log.Println(err)
 	}
-	err = board.Black.setStartPosition()
+	err = b.Black.setStartPosition()
 	if err != nil {
 		log.Println(err)
 	}
 }
 
 // ExportJSON getting data about all the Figures on the board in JSON format
-func (board *Board) ExportJSON() []byte {
-	request := nrp.Simple{Post: "board", Body: board}
+func (b *Board) ExportJSON() []byte {
+	request := nrp.Simple{Post: "board", Body: b}
 	return request.Export()
 }

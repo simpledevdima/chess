@@ -14,8 +14,8 @@ type Queen struct {
 }
 
 // DetectionOfPossibleMove return slice of Position with coords for possible moves
-func (q *Queen) DetectionOfPossibleMove() []Position {
-	var possibleMoves []Position
+func (q *Queen) DetectionOfPossibleMove() []*Position {
+	var possibleMoves []*Position
 	for _, position := range q.detectionOfBrokenFields() {
 		if !q.team.FigureExist(position.X, position.Y) && !q.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
@@ -25,8 +25,8 @@ func (q *Queen) DetectionOfPossibleMove() []Position {
 }
 
 // detectionOfBrokenFields return a slice of Positions with broken fields
-func (q *Queen) detectionOfBrokenFields() []Position {
-	var data []Position
+func (q *Queen) detectionOfBrokenFields() []*Position {
+	var data []*Position
 
 	directions := struct {
 		top         bool
@@ -40,28 +40,28 @@ func (q *Queen) detectionOfBrokenFields() []Position {
 	}{true, true, true, true, true, true, true, true}
 	for i := 1; i <= 7; i++ {
 		if directions.top && q.coordsOnBoard(q.X, q.Y+i) {
-			data = append(data, Position{X: q.X, Y: q.Y + i})
+			data = append(data, NewPosition(q.X, q.Y+i))
 		}
 		if directions.rightTop && q.coordsOnBoard(q.X+i, q.Y+i) {
-			data = append(data, Position{X: q.X + i, Y: q.Y + i})
+			data = append(data, NewPosition(q.X+i, q.Y+i))
 		}
 		if directions.right && q.coordsOnBoard(q.X+i, q.Y) {
-			data = append(data, Position{X: q.X + i, Y: q.Y})
+			data = append(data, NewPosition(q.X+i, q.Y))
 		}
 		if directions.rightBottom && q.coordsOnBoard(q.X+i, q.Y-i) {
-			data = append(data, Position{X: q.X + i, Y: q.Y - i})
+			data = append(data, NewPosition(q.X+i, q.Y-i))
 		}
 		if directions.bottom && q.coordsOnBoard(q.X, q.Y-i) {
-			data = append(data, Position{X: q.X, Y: q.Y - i})
+			data = append(data, NewPosition(q.X, q.Y-i))
 		}
 		if directions.leftBottom && q.coordsOnBoard(q.X-i, q.Y-i) {
-			data = append(data, Position{X: q.X - i, Y: q.Y - i})
+			data = append(data, NewPosition(q.X-i, q.Y-i))
 		}
 		if directions.left && q.coordsOnBoard(q.X-i, q.Y) {
-			data = append(data, Position{X: q.X - i, Y: q.Y})
+			data = append(data, NewPosition(q.X-i, q.Y))
 		}
 		if directions.leftTop && q.coordsOnBoard(q.X-i, q.Y+i) {
-			data = append(data, Position{X: q.X - i, Y: q.Y + i})
+			data = append(data, NewPosition(q.X-i, q.Y+i))
 		}
 		if q.team.FigureExist(q.X, q.Y+i) ||
 			q.team.enemy.FigureExist(q.X, q.Y+i) ||

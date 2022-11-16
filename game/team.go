@@ -201,7 +201,7 @@ func (t *Team) ImportFigures(figuresJSON []byte) {
 }
 
 // PossibleMoves data type with possible moves of pieces
-type PossibleMoves map[int][]Position
+type PossibleMoves map[int][]*Position
 
 // GetPossibleMoves returns a map with the keys of the team's shapes and the slices of coordinates that those shapes can make
 func (t *Team) GetPossibleMoves() PossibleMoves {

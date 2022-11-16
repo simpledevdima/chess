@@ -14,8 +14,8 @@ type Rook struct {
 }
 
 // DetectionOfPossibleMove return slice of Position with coords for possible moves
-func (r *Rook) DetectionOfPossibleMove() []Position {
-	var possibleMoves []Position
+func (r *Rook) DetectionOfPossibleMove() []*Position {
+	var possibleMoves []*Position
 	for _, position := range r.detectionOfBrokenFields() {
 		if !r.team.FigureExist(position.X, position.Y) && !r.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
@@ -25,8 +25,8 @@ func (r *Rook) DetectionOfPossibleMove() []Position {
 }
 
 // detectionOfBrokenFields return a slice of Positions with broken fields
-func (r *Rook) detectionOfBrokenFields() []Position {
-	var data []Position
+func (r *Rook) detectionOfBrokenFields() []*Position {
+	var data []*Position
 	directions := struct {
 		top    bool
 		right  bool
@@ -35,16 +35,16 @@ func (r *Rook) detectionOfBrokenFields() []Position {
 	}{true, true, true, true}
 	for i := 1; i <= 7; i++ {
 		if directions.top && r.coordsOnBoard(r.X, r.Y+i) {
-			data = append(data, Position{X: r.X, Y: r.Y + i})
+			data = append(data, NewPosition(r.X, r.Y+i))
 		}
 		if directions.right && r.coordsOnBoard(r.X+i, r.Y) {
-			data = append(data, Position{X: r.X + i, Y: r.Y})
+			data = append(data, NewPosition(r.X+i, r.Y))
 		}
 		if directions.bottom && r.coordsOnBoard(r.X, r.Y-i) {
-			data = append(data, Position{X: r.X, Y: r.Y - i})
+			data = append(data, NewPosition(r.X, r.Y-i))
 		}
 		if directions.left && r.coordsOnBoard(r.X-i, r.Y) {
-			data = append(data, Position{X: r.X - i, Y: r.Y})
+			data = append(data, NewPosition(r.X-i, r.Y))
 		}
 		if r.team.FigureExist(r.X, r.Y+i) ||
 			r.team.enemy.FigureExist(r.X, r.Y+i) ||

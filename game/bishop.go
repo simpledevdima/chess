@@ -14,8 +14,8 @@ type Bishop struct {
 }
 
 // DetectionOfPossibleMove return slice of Position with coords for possible moves
-func (b *Bishop) DetectionOfPossibleMove() []Position {
-	var possibleMoves []Position
+func (b *Bishop) DetectionOfPossibleMove() []*Position {
+	var possibleMoves []*Position
 	for _, position := range b.detectionOfBrokenFields() {
 		if !b.team.FigureExist(position.X, position.Y) && !b.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
@@ -25,8 +25,8 @@ func (b *Bishop) DetectionOfPossibleMove() []Position {
 }
 
 // detectionOfBrokenFields return a slice of Positions with broken fields
-func (b *Bishop) detectionOfBrokenFields() []Position {
-	var data []Position
+func (b *Bishop) detectionOfBrokenFields() []*Position {
+	var data []*Position
 	directions := struct {
 		rightTop    bool
 		rightBottom bool
@@ -35,16 +35,16 @@ func (b *Bishop) detectionOfBrokenFields() []Position {
 	}{true, true, true, true}
 	for i := 1; i <= 7; i++ {
 		if directions.rightTop && b.coordsOnBoard(b.X+i, b.Y+i) {
-			data = append(data, Position{X: b.X + i, Y: b.Y + i})
+			data = append(data, NewPosition(b.X+i, b.Y+i))
 		}
 		if directions.rightBottom && b.coordsOnBoard(b.X+i, b.Y-i) {
-			data = append(data, Position{X: b.X + i, Y: b.Y - i})
+			data = append(data, NewPosition(b.X+i, b.Y-i))
 		}
 		if directions.leftBottom && b.coordsOnBoard(b.X-i, b.Y-i) {
-			data = append(data, Position{X: b.X - i, Y: b.Y - i})
+			data = append(data, NewPosition(b.X-i, b.Y-i))
 		}
 		if directions.leftTop && b.coordsOnBoard(b.X-i, b.Y+i) {
-			data = append(data, Position{X: b.X - i, Y: b.Y + i})
+			data = append(data, NewPosition(b.X-i, b.Y+i))
 		}
 		if b.team.FigureExist(b.X+i, b.Y+i) ||
 			b.team.enemy.FigureExist(b.X+i, b.Y+i) ||

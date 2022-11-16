@@ -14,8 +14,8 @@ type Knight struct {
 }
 
 // DetectionOfPossibleMove return slice of Position with coords for possible moves
-func (k *Knight) DetectionOfPossibleMove() []Position {
-	var possibleMoves []Position
+func (k *Knight) DetectionOfPossibleMove() []*Position {
+	var possibleMoves []*Position
 	for _, position := range k.detectionOfBrokenFields() {
 		if !k.team.FigureExist(position.X, position.Y) && !k.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
@@ -25,32 +25,32 @@ func (k *Knight) DetectionOfPossibleMove() []Position {
 }
 
 // detectionOfBrokenFields return a slice of Positions with broken fields
-func (k *Knight) detectionOfBrokenFields() []Position {
-	var data []Position
+func (k *Knight) detectionOfBrokenFields() []*Position {
+	var data []*Position
 
 	if k.coordsOnBoard(k.X+1, k.Y+2) {
-		data = append(data, Position{X: k.X + 1, Y: k.Y + 2})
+		data = append(data, NewPosition(k.X+1, k.Y+2))
 	}
 	if k.coordsOnBoard(k.X+2, k.Y+1) {
-		data = append(data, Position{X: k.X + 2, Y: k.Y + 1})
+		data = append(data, NewPosition(k.X+2, k.Y+1))
 	}
 	if k.coordsOnBoard(k.X+2, k.Y-1) {
-		data = append(data, Position{X: k.X + 2, Y: k.Y - 1})
+		data = append(data, NewPosition(k.X+2, k.Y-1))
 	}
 	if k.coordsOnBoard(k.X+1, k.Y-2) {
-		data = append(data, Position{X: k.X + 1, Y: k.Y - 2})
+		data = append(data, NewPosition(k.X+1, k.Y-2))
 	}
 	if k.coordsOnBoard(k.X-1, k.Y-2) {
-		data = append(data, Position{X: k.X - 1, Y: k.Y - 2})
+		data = append(data, NewPosition(k.X-1, k.Y-2))
 	}
 	if k.coordsOnBoard(k.X-2, k.Y-1) {
-		data = append(data, Position{X: k.X - 2, Y: k.Y - 1})
+		data = append(data, NewPosition(k.X-2, k.Y-1))
 	}
 	if k.coordsOnBoard(k.X-2, k.Y+1) {
-		data = append(data, Position{X: k.X - 2, Y: k.Y + 1})
+		data = append(data, NewPosition(k.X-2, k.Y+1))
 	}
 	if k.coordsOnBoard(k.X-1, k.Y+2) {
-		data = append(data, Position{X: k.X - 1, Y: k.Y + 2})
+		data = append(data, NewPosition(k.X-1, k.Y+2))
 	}
 
 	return data

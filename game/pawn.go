@@ -16,15 +16,15 @@ type Pawn struct {
 }
 
 // DetectionOfPossibleMove return slice of Position with coords for possible moves
-func (p *Pawn) DetectionOfPossibleMove() []Position {
-	var data []Position
+func (p *Pawn) DetectionOfPossibleMove() []*Position {
+	var data []*Position
 	switch p.team.Name {
 	case White:
 		if p.coordsOnBoard(p.X, p.Y+1) &&
 			!p.kingOnTheBeatenFieldAfterMove(p.X, p.Y+1) &&
 			!p.team.FigureExist(p.X, p.Y+1) &&
 			!p.team.enemy.FigureExist(p.X, p.Y+1) {
-			data = append(data, Position{X: p.X, Y: p.Y + 1})
+			data = append(data, NewPosition(p.X, p.Y+1))
 		}
 		if p.coordsOnBoard(p.X, p.Y+2) &&
 			!p.kingOnTheBeatenFieldAfterMove(p.X, p.Y+2) &&
@@ -33,14 +33,14 @@ func (p *Pawn) DetectionOfPossibleMove() []Position {
 			!p.team.FigureExist(p.X, p.Y+2) &&
 			!p.team.enemy.FigureExist(p.X, p.Y+1) &&
 			!p.team.enemy.FigureExist(p.X, p.Y+2) {
-			data = append(data, Position{X: p.X, Y: p.Y + 2})
+			data = append(data, NewPosition(p.X, p.Y+2))
 		}
 	case Black:
 		if p.coordsOnBoard(p.X, p.Y-1) &&
 			!p.kingOnTheBeatenFieldAfterMove(p.X, p.Y-1) &&
 			!p.team.FigureExist(p.X, p.Y-1) &&
 			!p.team.enemy.FigureExist(p.X, p.Y-1) {
-			data = append(data, Position{X: p.X, Y: p.Y - 1})
+			data = append(data, NewPosition(p.X, p.Y-1))
 		}
 		if p.coordsOnBoard(p.X, p.Y-2) &&
 			!p.kingOnTheBeatenFieldAfterMove(p.X, p.Y-2) &&
@@ -49,7 +49,7 @@ func (p *Pawn) DetectionOfPossibleMove() []Position {
 			!p.team.FigureExist(p.X, p.Y-2) &&
 			!p.team.enemy.FigureExist(p.X, p.Y-1) &&
 			!p.team.enemy.FigureExist(p.X, p.Y-2) {
-			data = append(data, Position{X: p.X, Y: p.Y - 2})
+			data = append(data, NewPosition(p.X, p.Y-2))
 		}
 	}
 	for _, position := range p.detectionOfBrokenFields() {
@@ -63,22 +63,22 @@ func (p *Pawn) DetectionOfPossibleMove() []Position {
 }
 
 // detectionOfBrokenFields return a slice of Positions with broken fields
-func (p *Pawn) detectionOfBrokenFields() []Position {
-	var data []Position
+func (p *Pawn) detectionOfBrokenFields() []*Position {
+	var data []*Position
 	switch p.team.Name {
 	case White:
 		if p.coordsOnBoard(p.X+1, p.Y+1) {
-			data = append(data, Position{X: p.X + 1, Y: p.Y + 1})
+			data = append(data, NewPosition(p.X+1, p.Y+1))
 		}
 		if p.coordsOnBoard(p.X-1, p.Y+1) {
-			data = append(data, Position{X: p.X - 1, Y: p.Y + 1})
+			data = append(data, NewPosition(p.X-1, p.Y+1))
 		}
 	case Black:
 		if p.coordsOnBoard(p.X+1, p.Y-1) {
-			data = append(data, Position{X: p.X + 1, Y: p.Y - 1})
+			data = append(data, NewPosition(p.X+1, p.Y-1))
 		}
 		if p.coordsOnBoard(p.X-1, p.Y-1) {
-			data = append(data, Position{X: p.X - 1, Y: p.Y - 1})
+			data = append(data, NewPosition(p.X-1, p.Y-1))
 		}
 	}
 	return data

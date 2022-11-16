@@ -16,8 +16,8 @@ type Figure interface {
 	SetTeam(*Team)
 	coordsOnBoard(int, int) bool
 	kingOnTheBeatenFieldAfterMove(int, int) bool
-	detectionOfBrokenFields() []Position
-	DetectionOfPossibleMove() []Position
+	detectionOfBrokenFields() []*Position
+	DetectionOfPossibleMove() []*Position
 	IsAlreadyMove() bool
 	setAlreadyMove(bool)
 }

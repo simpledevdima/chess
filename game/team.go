@@ -206,17 +206,25 @@ type PossibleMoves map[int][]Position
 // GetPossibleMoves returns a map with the keys of the team's shapes and the slices of coordinates that those shapes can make
 func (t *Team) GetPossibleMoves() PossibleMoves {
 	possibleMoves := make(PossibleMoves)
-	fmt.Println(t.Name.String())
 	for index, figure := range t.Figures {
 		moves := figure.DetectionOfPossibleMove()
 		if len(moves) > 0 {
 			possibleMoves[index] = moves
 		}
-		x, y := figure.GetPosition()
-		fmt.Println(figure.GetName(), x, y, moves)
 	}
-	fmt.Println("-------------")
 	return possibleMoves
+}
+
+// ShowPossibleMoves displays the possible moves of each piece of the team
+func (t *Team) ShowPossibleMoves() {
+	fmt.Println("Team:", t.Name.String())
+	for index, figure := range t.Figures {
+		fields := figure.DetectionOfPossibleMove()
+		if len(fields) > 0 {
+			x, y := figure.GetPosition()
+			fmt.Println(index, figure.GetName(), x, y, fields)
+		}
+	}
 }
 
 // ShowBrokenFields displays the squares that beat the figures of the team

@@ -17,7 +17,7 @@ type Queen struct {
 func (q *Queen) DetectionOfPossibleMove() []Position {
 	var possibleMoves []Position
 	for _, position := range q.detectionOfBrokenFields() {
-		if !q.team.FigureExist(position.X, position.Y) {
+		if !q.team.FigureExist(position.X, position.Y) && !q.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}

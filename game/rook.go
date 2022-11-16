@@ -17,7 +17,7 @@ type Rook struct {
 func (r *Rook) DetectionOfPossibleMove() []Position {
 	var possibleMoves []Position
 	for _, position := range r.detectionOfBrokenFields() {
-		if !r.team.FigureExist(position.X, position.Y) {
+		if !r.team.FigureExist(position.X, position.Y) && !r.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}

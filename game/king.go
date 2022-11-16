@@ -17,7 +17,7 @@ type King struct {
 func (k *King) DetectionOfPossibleMove() []Position {
 	var possibleMoves []Position
 	for _, position := range k.detectionOfBrokenFields() {
-		if !k.team.FigureExist(position.X, position.Y) {
+		if !k.team.FigureExist(position.X, position.Y) && !k.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}

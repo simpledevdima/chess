@@ -100,10 +100,11 @@ func (f *figureData) MoveFigure(x int, y int) {
 		}
 	}
 
-	//f.team.GetBrokenFields()
-	//f.team.enemy.GetBrokenFields()
-	//f.team.GetPossibleMoves()
-	//f.team.enemy.GetPossibleMoves()
+	// Debug
+	//f.team.ShowBrokenFields()
+	//f.team.enemy.ShowBrokenFields()
+	//f.team.ShowPossibleMoves()
+	//f.team.enemy.ShowPossibleMoves()
 }
 
 // SetPosition set Position to coords from argument

@@ -53,7 +53,9 @@ func (p *Pawn) DetectionOfPossibleMove() []Position {
 		}
 	}
 	for _, position := range p.detectionOfBrokenFields() {
-		if p.team.enemy.FigureExist(position.X, position.Y) || p.team.enemy.pawnDoubleMove.isTakeOnThePass(position.X, position.Y) {
+		if (p.team.enemy.FigureExist(position.X, position.Y) ||
+			p.team.enemy.pawnDoubleMove.isTakeOnThePass(position.X, position.Y)) &&
+			!p.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			data = append(data, position)
 		}
 	}

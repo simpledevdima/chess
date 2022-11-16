@@ -17,7 +17,7 @@ type Bishop struct {
 func (b *Bishop) DetectionOfPossibleMove() []Position {
 	var possibleMoves []Position
 	for _, position := range b.detectionOfBrokenFields() {
-		if !b.team.FigureExist(position.X, position.Y) {
+		if !b.team.FigureExist(position.X, position.Y) && !b.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}

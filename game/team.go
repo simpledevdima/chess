@@ -218,3 +218,13 @@ func (t *Team) GetPossibleMoves() PossibleMoves {
 	fmt.Println("-------------")
 	return possibleMoves
 }
+
+// ShowBrokenFields displays the squares that beat the figures of the team
+func (t *Team) ShowBrokenFields() {
+	fmt.Println("Team:", t.Name.String())
+	for index, figure := range t.Figures {
+		fields := figure.detectionOfBrokenFields()
+		x, y := figure.GetPosition()
+		fmt.Println(index, figure.GetName(), x, y, fields)
+	}
+}

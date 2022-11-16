@@ -100,6 +100,8 @@ func (f *figureData) MoveFigure(x int, y int) {
 		}
 	}
 
+	//f.team.GetBrokenFields()
+	//f.team.enemy.GetBrokenFields()
 	//f.team.GetPossibleMoves()
 	//f.team.enemy.GetPossibleMoves()
 }

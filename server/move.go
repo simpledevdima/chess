@@ -52,30 +52,37 @@ func (m *move) isValid() (bool, string) {
 
 // exec executes the current move and sends the data to the broadcast
 func (m *move) exec() {
-	figureID, err := m.client.team.GetFigureID(m.From.Position.X, m.From.Position.Y)
-	if err != nil {
-		log.Println(err)
+	figure := m.client.team.GetFigureByCoords(m.From.Position.X, m.From.Position.Y)
+	if m.isCastling(figure) {
+		m.makeRookMoveInCastling()
 	}
-	// castling
-	if !m.client.team.Figures[figureID].IsAlreadyMove() && m.From.Position.X == 5 && (m.From.Position.Y == 1 || m.From.Position.Y == 8) && (m.To.Position.X == 3 || m.To.Position.X == 7) {
-		var m2 move
-		m2.From.Position.Y = m.From.Position.Y
-		m2.To.Position.Y = m.To.Position.Y
-		switch m.To.Position.X {
-		case 3:
-			m2.From.Position.X = 1
-			m2.To.Position.X = 4
-		case 7:
-			m2.From.Position.X = 8
-			m2.To.Position.X = 6
-		}
-		m2.setClient(m.client)
-		m2.exec()
-	}
-
-	m.client.team.Figures[figureID].Move(m.To.Position.X, m.To.Position.Y)
+	figure.Move(m.To.Position.X, m.To.Position.Y)
 	event := nrp.Simple{Post: "move", Body: &m}
 	m.client.server.broadcast <- event.Export()
+}
+
+// isCastling returns true if the move is castling otherwise returns false
+func (m *move) isCastling(figure game.Figure) bool {
+	if figure.GetName() == "king" && !figure.IsAlreadyMove() && (m.To.Position.X == 3 || m.To.Position.X == 7) {
+		return true
+	}
+	return false
+}
+
+// makeCastling creates a rook move and makes it
+func (m *move) makeRookMoveInCastling() {
+	moveRook := NewMove(m.client)
+	moveRook.From.Position.Y = m.From.Position.Y
+	moveRook.To.Position.Y = m.To.Position.Y
+	switch m.To.Position.X {
+	case 3:
+		moveRook.From.Position.X = 1
+		moveRook.To.Position.X = 4
+	case 7:
+		moveRook.From.Position.X = 8
+		moveRook.To.Position.X = 6
+	}
+	moveRook.exec()
 }
 
 // exportJSON get data of current type in JSON format

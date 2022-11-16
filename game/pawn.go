@@ -1,8 +1,6 @@
 package game
 
-import (
-	"log"
-)
+import "log"
 
 func NewPawn(x, y int, t *Team) *Pawn {
 	f := &Pawn{}
@@ -119,10 +117,12 @@ func (p *Pawn) Move(x int, y int) {
 	p.team.enemy.pawnDoubleMove.pawnTakeOnThePass(x, y)
 	p.team.pawnDoubleMove.clearPawnDoubleMove()
 	p.team.pawnDoubleMove.pawnMakesDoubleMove(p, &Position{X: p.X, Y: p.Y}, &Position{X: x, Y: y})
-
 	p.MoveFigure(x, y)
+	p.transformPawnTOQueen(x, y)
+}
 
-	// transform pawn to queen
+// transformPawnToQueen promote a pawn to a queen
+func (p *Pawn) transformPawnTOQueen(x, y int) {
 	if p.Y == 1 || p.Y == 8 {
 		figureID, err := p.team.GetFigureID(x, y)
 		if err != nil {

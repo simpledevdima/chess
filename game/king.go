@@ -1,9 +1,5 @@
 package game
 
-import (
-	"log"
-)
-
 func NewKing(x, y int, t *Team) *King {
 	f := &King{}
 	f.SetName("king")
@@ -82,11 +78,7 @@ func (k *King) Validation(x int, y int) (bool, string) {
 				!k.team.FigureExist(k.X-2, k.Y) && !k.team.enemy.FigureExist(k.X-2, k.Y) &&
 				!k.team.FigureExist(k.X-3, k.Y) && !k.team.enemy.FigureExist(k.X-3, k.Y) &&
 				k.team.FigureExist(k.X-4, k.Y) {
-				figureID, err := k.team.GetFigureID(k.X-4, k.Y)
-				if err != nil {
-					log.Println(err)
-				}
-				if !k.team.Figures[figureID].IsAlreadyMove() {
+				if !k.team.GetFigureByCoords(k.X-4, k.Y).IsAlreadyMove() {
 					return true, ""
 				}
 			}
@@ -95,11 +87,7 @@ func (k *King) Validation(x int, y int) (bool, string) {
 				!k.team.FigureExist(k.X+1, k.Y) && !k.team.enemy.FigureExist(k.X+1, k.Y) &&
 				!k.team.FigureExist(k.X+2, k.Y) && !k.team.enemy.FigureExist(k.X+2, k.Y) &&
 				k.team.FigureExist(k.X+3, k.Y) {
-				figureID, err := k.team.GetFigureID(k.X+3, k.Y)
-				if err != nil {
-					log.Println(err)
-				}
-				if !k.team.Figures[figureID].IsAlreadyMove() {
+				if !k.team.GetFigureByCoords(k.X+3, k.Y).IsAlreadyMove() {
 					return true, ""
 				}
 			}

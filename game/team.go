@@ -91,6 +91,18 @@ func (t *Team) GetFigureID(x int, y int) (int, error) {
 	return 0, errors.New("figure not exist")
 }
 
+// GetFigureByCoords return link to the figure by coords if found in team
+func (t *Team) GetFigureByCoords(x, y int) Figure {
+	for _, figure := range t.Figures {
+		fX, fY := figure.GetPosition()
+		if fX == x && fY == y {
+			return figure
+		}
+	}
+	log.Println(errors.New(fmt.Sprintf("figure by cords %d x %d not found in %s team\n", x, y, t.Name.String())))
+	return nil
+}
+
 // Eating figure on x, y coords move its figure from Figures map to Eaten map
 func (t *Team) Eating(x int, y int) error {
 	for id, figure := range t.Figures {

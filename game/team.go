@@ -92,7 +92,7 @@ func (t *Team) setStartPosition() error {
 	default:
 		return errors.New("undefined team name")
 	}
-	t.ClearFigures()
+	t.MakeFigures()
 	// paws
 	for x := 1; x <= 8; x++ {
 		t.Figures[x] = NewPawn(x, pawnLine, t)
@@ -113,15 +113,15 @@ func (t *Team) setStartPosition() error {
 	return nil
 }
 
-// ClearFigures remake Figures and Eaten map
-func (t *Team) ClearFigures() {
+// MakeFigures remake Figures and Eaten map
+func (t *Team) MakeFigures() {
 	t.Figures = make(Figures)
 	t.Eaten = make(Figures)
 }
 
 // ImportFigures sets the data received in JSON format from the argument to the command shapes
 func (t *Team) ImportFigures(figuresJSON []byte) {
-	t.ClearFigures()
+	t.MakeFigures()
 	var figures map[int]struct {
 		Name     string `json:"name"`
 		Position struct {

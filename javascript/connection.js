@@ -24,7 +24,7 @@ class Connection {
         // came message
         this.socket.onmessage = function (answer) {
             const data = JSON.parse(answer.data);
-            // console.log(data)
+            console.log(data)
             if (typeof data.body == "undefined" || typeof data.body.request_id == "undefined") {
                 // event
                 conn.onEvent(data)
@@ -51,7 +51,7 @@ class Connection {
             request.id = Math.floor(Math.random() * 1000000)
         } while (typeof this.requests[request.id] !== "undefined")
         this.requests[request.id] = {dt_create: Math.floor(Date.now() / 1000), type: type}
-        // console.log(request)
+        console.log(request)
         this.socket.send(JSON.stringify(request))
         return true
     }

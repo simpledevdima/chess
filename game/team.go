@@ -115,8 +115,8 @@ func (t *Team) setStartPosition() error {
 
 // ClearFigures remake Figures and Eaten map
 func (t *Team) ClearFigures() {
-	t.Figures.Clear()
-	t.Eaten.Clear()
+	t.Figures = make(Figures)
+	t.Eaten = make(Figures)
 }
 
 // ImportFigures sets the data received in JSON format from the argument to the command shapes

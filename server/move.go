@@ -33,8 +33,8 @@ func (m *move) setClient(client *client) {
 func (m *move) isValid() (bool, string) {
 	if m.client.server.status.isPlay() {
 		if m.client.server.turn.now() == m.client.team.Name {
-			if figureID, err := m.client.team.GetFigureID(m.From.Position.X, m.From.Position.Y); err == nil {
-				if ok, cause := m.client.team.Figures[figureID].Validation(m.To.Position.X, m.To.Position.Y); ok {
+			if m.client.team.Figures.ExistsByCoords(m.From.Position.X, m.From.Position.Y) {
+				if ok, cause := m.client.team.Figures.GetByCoords(m.From.Position.X, m.From.Position.Y).Validation(m.To.Position.X, m.To.Position.Y); ok {
 					return true, ""
 				} else {
 					return false, cause
@@ -52,7 +52,7 @@ func (m *move) isValid() (bool, string) {
 
 // exec executes the current move and sends the data to the broadcast
 func (m *move) exec() {
-	figure := m.client.team.GetFigureByCoords(m.From.Position.X, m.From.Position.Y)
+	figure := m.client.team.Figures.GetByCoords(m.From.Position.X, m.From.Position.Y)
 	if m.isCastling(figure) {
 		m.makeRookMoveInCastling()
 	}

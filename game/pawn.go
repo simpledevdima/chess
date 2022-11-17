@@ -1,7 +1,5 @@
 package game
 
-import "log"
-
 func NewPawn(x, y int, t *Team) *Pawn {
 	f := &Pawn{}
 	f.SetName("pawn")
@@ -22,38 +20,38 @@ func (p *Pawn) DetectionOfPossibleMove() []*Position {
 	case White:
 		if p.coordsOnBoard(p.X, p.Y+1) &&
 			!p.kingOnTheBeatenFieldAfterMove(p.X, p.Y+1) &&
-			!p.team.FigureExist(p.X, p.Y+1) &&
-			!p.team.enemy.FigureExist(p.X, p.Y+1) {
+			!p.team.Figures.ExistsByCoords(p.X, p.Y+1) &&
+			!p.team.enemy.Figures.ExistsByCoords(p.X, p.Y+1) {
 			data = append(data, NewPosition(p.X, p.Y+1))
 		}
 		if p.coordsOnBoard(p.X, p.Y+2) &&
 			!p.kingOnTheBeatenFieldAfterMove(p.X, p.Y+2) &&
 			!p.IsAlreadyMove() &&
-			!p.team.FigureExist(p.X, p.Y+1) &&
-			!p.team.FigureExist(p.X, p.Y+2) &&
-			!p.team.enemy.FigureExist(p.X, p.Y+1) &&
-			!p.team.enemy.FigureExist(p.X, p.Y+2) {
+			!p.team.Figures.ExistsByCoords(p.X, p.Y+1) &&
+			!p.team.Figures.ExistsByCoords(p.X, p.Y+2) &&
+			!p.team.enemy.Figures.ExistsByCoords(p.X, p.Y+1) &&
+			!p.team.enemy.Figures.ExistsByCoords(p.X, p.Y+2) {
 			data = append(data, NewPosition(p.X, p.Y+2))
 		}
 	case Black:
 		if p.coordsOnBoard(p.X, p.Y-1) &&
 			!p.kingOnTheBeatenFieldAfterMove(p.X, p.Y-1) &&
-			!p.team.FigureExist(p.X, p.Y-1) &&
-			!p.team.enemy.FigureExist(p.X, p.Y-1) {
+			!p.team.Figures.ExistsByCoords(p.X, p.Y-1) &&
+			!p.team.enemy.Figures.ExistsByCoords(p.X, p.Y-1) {
 			data = append(data, NewPosition(p.X, p.Y-1))
 		}
 		if p.coordsOnBoard(p.X, p.Y-2) &&
 			!p.kingOnTheBeatenFieldAfterMove(p.X, p.Y-2) &&
 			!p.IsAlreadyMove() &&
-			!p.team.FigureExist(p.X, p.Y-1) &&
-			!p.team.FigureExist(p.X, p.Y-2) &&
-			!p.team.enemy.FigureExist(p.X, p.Y-1) &&
-			!p.team.enemy.FigureExist(p.X, p.Y-2) {
+			!p.team.Figures.ExistsByCoords(p.X, p.Y-1) &&
+			!p.team.Figures.ExistsByCoords(p.X, p.Y-2) &&
+			!p.team.enemy.Figures.ExistsByCoords(p.X, p.Y-1) &&
+			!p.team.enemy.Figures.ExistsByCoords(p.X, p.Y-2) {
 			data = append(data, NewPosition(p.X, p.Y-2))
 		}
 	}
 	for _, position := range p.detectionOfBrokenFields() {
-		if (p.team.enemy.FigureExist(position.X, position.Y) ||
+		if (p.team.enemy.Figures.ExistsByCoords(position.X, position.Y) ||
 			p.team.enemy.pawnDoubleMove.isTakeOnThePass(position.X, position.Y)) &&
 			!p.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			data = append(data, position)
@@ -92,7 +90,7 @@ func (p *Pawn) Validation(x int, y int) (bool, string) {
 	if p.X == x && p.Y == y {
 		return false, "can't walk around"
 	}
-	if p.team.FigureExist(x, y) {
+	if p.team.Figures.ExistsByCoords(x, y) {
 		return false, "this place is occupied by your figure"
 	}
 	if p.kingOnTheBeatenFieldAfterMove(x, y) {
@@ -101,7 +99,7 @@ func (p *Pawn) Validation(x int, y int) (bool, string) {
 	// detect Position for eat and check it for input data eat coords
 	for _, position := range p.detectionOfBrokenFields() {
 		if position.X == x && position.Y == y &&
-			(p.team.enemy.FigureExist(x, y) || p.team.enemy.pawnDoubleMove.isTakeOnThePass(x, y)) {
+			(p.team.enemy.Figures.ExistsByCoords(x, y) || p.team.enemy.pawnDoubleMove.isTakeOnThePass(x, y)) {
 			return true, ""
 		}
 	}
@@ -126,12 +124,9 @@ func (p *Pawn) Move(x int, y int) {
 // transformPawnToQueen promote a pawn to a queen
 func (p *Pawn) transformPawnTOQueen(x, y int) {
 	if p.Y == 1 || p.Y == 8 {
-		figureID, err := p.team.GetFigureID(x, y)
-		if err != nil {
-			log.Println(err)
-		}
+		figureID := p.team.Figures.GetIndexByCoords(x, y)
 		// replace pawn to queen
-		p.team.Figures[figureID] = NewQueen(x, y, p.team)
-		p.team.Figures[figureID].setAlreadyMove(true)
+		p.team.Figures.Set(figureID, NewQueen(x, y, p.team))
+		p.team.Figures.Get(figureID).setAlreadyMove(true)
 	}
 }

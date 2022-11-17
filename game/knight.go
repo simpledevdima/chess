@@ -17,7 +17,7 @@ type Knight struct {
 func (k *Knight) DetectionOfPossibleMove() []*Position {
 	var possibleMoves []*Position
 	for _, position := range k.detectionOfBrokenFields() {
-		if !k.team.FigureExist(position.X, position.Y) && !k.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
+		if !k.team.Figures.ExistsByCoords(position.X, position.Y) && !k.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}
@@ -64,7 +64,7 @@ func (k *Knight) Validation(x int, y int) (bool, string) {
 	if k.X == x && k.Y == y {
 		return false, "can't walk around"
 	}
-	if k.team.FigureExist(x, y) {
+	if k.team.Figures.ExistsByCoords(x, y) {
 		return false, "this place is occupied by your figure"
 	}
 	if k.kingOnTheBeatenFieldAfterMove(x, y) {

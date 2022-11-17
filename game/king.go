@@ -17,7 +17,7 @@ type King struct {
 func (k *King) DetectionOfPossibleMove() []*Position {
 	var possibleMoves []*Position
 	for _, position := range k.detectionOfBrokenFields() {
-		if !k.team.FigureExist(position.X, position.Y) && !k.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
+		if !k.team.Figures.ExistsByCoords(position.X, position.Y) && !k.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}
@@ -64,7 +64,7 @@ func (k *King) Validation(x int, y int) (bool, string) {
 	if k.X == x && k.Y == y {
 		return false, "can't walk around"
 	}
-	if k.team.FigureExist(x, y) {
+	if k.team.Figures.ExistsByCoords(x, y) {
 		return false, "this place is occupied by your figure"
 	}
 	if k.kingOnTheBeatenFieldAfterMove(x, y) {
@@ -74,20 +74,20 @@ func (k *King) Validation(x int, y int) (bool, string) {
 	if !k.alreadyMove {
 		if x == 3 {
 			if !k.team.CheckingCheck() &&
-				!k.team.FigureExist(k.X-1, k.Y) && !k.team.enemy.FigureExist(k.X-1, k.Y) &&
-				!k.team.FigureExist(k.X-2, k.Y) && !k.team.enemy.FigureExist(k.X-2, k.Y) &&
-				!k.team.FigureExist(k.X-3, k.Y) && !k.team.enemy.FigureExist(k.X-3, k.Y) &&
-				k.team.FigureExist(k.X-4, k.Y) {
-				if !k.team.GetFigureByCoords(k.X-4, k.Y).IsAlreadyMove() {
+				!k.team.Figures.ExistsByCoords(k.X-1, k.Y) && !k.team.enemy.Figures.ExistsByCoords(k.X-1, k.Y) &&
+				!k.team.Figures.ExistsByCoords(k.X-2, k.Y) && !k.team.enemy.Figures.ExistsByCoords(k.X-2, k.Y) &&
+				!k.team.Figures.ExistsByCoords(k.X-3, k.Y) && !k.team.enemy.Figures.ExistsByCoords(k.X-3, k.Y) &&
+				k.team.Figures.ExistsByCoords(k.X-4, k.Y) {
+				if !k.team.Figures.GetByCoords(k.X-4, k.Y).IsAlreadyMove() {
 					return true, ""
 				}
 			}
 		} else if x == 7 {
 			if !k.team.CheckingCheck() &&
-				!k.team.FigureExist(k.X+1, k.Y) && !k.team.enemy.FigureExist(k.X+1, k.Y) &&
-				!k.team.FigureExist(k.X+2, k.Y) && !k.team.enemy.FigureExist(k.X+2, k.Y) &&
-				k.team.FigureExist(k.X+3, k.Y) {
-				if !k.team.GetFigureByCoords(k.X+3, k.Y).IsAlreadyMove() {
+				!k.team.Figures.ExistsByCoords(k.X+1, k.Y) && !k.team.enemy.Figures.ExistsByCoords(k.X+1, k.Y) &&
+				!k.team.Figures.ExistsByCoords(k.X+2, k.Y) && !k.team.enemy.Figures.ExistsByCoords(k.X+2, k.Y) &&
+				k.team.Figures.ExistsByCoords(k.X+3, k.Y) {
+				if !k.team.Figures.GetByCoords(k.X+3, k.Y).IsAlreadyMove() {
 					return true, ""
 				}
 			}

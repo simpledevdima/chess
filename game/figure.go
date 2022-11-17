@@ -58,12 +58,12 @@ func (f *figureData) kingOnTheBeatenFieldAfterMove(x int, y int) bool {
 		f.SetPosition(curX, curY)
 	}
 	undoEating := func() {}
-	if f.team.enemy.FigureExist(x, y) {
-		eatenID, _ := f.team.enemy.GetFigureID(x, y)
-		eatenFigure := f.team.enemy.Figures[eatenID]
-		delete(f.team.enemy.Figures, eatenID)
+	if f.team.enemy.Figures.ExistsByCoords(x, y) {
+		eatenID := f.team.enemy.Figures.GetIndexByCoords(x, y)
+		eatenFigure := f.team.enemy.Figures.Get(eatenID)
+		f.team.enemy.Figures.RemoveByIndex(eatenID)
 		undoEating = func() {
-			f.team.enemy.Figures[eatenID] = eatenFigure
+			f.team.enemy.Figures.Set(eatenID, eatenFigure)
 		}
 	}
 	check := f.team.CheckingCheck()
@@ -92,7 +92,7 @@ func (f *figureData) SetTeam(team *Team) {
 func (f *figureData) MoveFigure(x int, y int) {
 	f.SetPosition(x, y)
 	f.setAlreadyMove(true)
-	if f.team.enemy != nil && f.team.enemy.FigureExist(x, y) {
+	if f.team.enemy != nil && f.team.enemy.Figures.ExistsByCoords(x, y) {
 		// eat enemy figure
 		err := f.team.enemy.Eating(x, y)
 		if err != nil {

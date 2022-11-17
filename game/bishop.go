@@ -17,7 +17,7 @@ type Bishop struct {
 func (b *Bishop) DetectionOfPossibleMove() []*Position {
 	var possibleMoves []*Position
 	for _, position := range b.detectionOfBrokenFields() {
-		if !b.team.FigureExist(position.X, position.Y) && !b.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
+		if !b.team.Figures.ExistsByCoords(position.X, position.Y) && !b.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}
@@ -46,23 +46,23 @@ func (b *Bishop) detectionOfBrokenFields() []*Position {
 		if directions.leftTop && b.coordsOnBoard(b.X-i, b.Y+i) {
 			data = append(data, NewPosition(b.X-i, b.Y+i))
 		}
-		if b.team.FigureExist(b.X+i, b.Y+i) ||
-			b.team.enemy.FigureExist(b.X+i, b.Y+i) ||
+		if b.team.Figures.ExistsByCoords(b.X+i, b.Y+i) ||
+			b.team.enemy.Figures.ExistsByCoords(b.X+i, b.Y+i) ||
 			!b.coordsOnBoard(b.X+i, b.Y+i) {
 			directions.rightTop = false
 		}
-		if b.team.FigureExist(b.X+i, b.Y-i) ||
-			b.team.enemy.FigureExist(b.X+i, b.Y-i) ||
+		if b.team.Figures.ExistsByCoords(b.X+i, b.Y-i) ||
+			b.team.enemy.Figures.ExistsByCoords(b.X+i, b.Y-i) ||
 			!b.coordsOnBoard(b.X+i, b.Y-i) {
 			directions.rightBottom = false
 		}
-		if b.team.FigureExist(b.X-i, b.Y-i) ||
-			b.team.enemy.FigureExist(b.X-i, b.Y-i) ||
+		if b.team.Figures.ExistsByCoords(b.X-i, b.Y-i) ||
+			b.team.enemy.Figures.ExistsByCoords(b.X-i, b.Y-i) ||
 			!b.coordsOnBoard(b.X-i, b.Y-i) {
 			directions.leftBottom = false
 		}
-		if b.team.FigureExist(b.X-i, b.Y+i) ||
-			b.team.enemy.FigureExist(b.X-i, b.Y+i) ||
+		if b.team.Figures.ExistsByCoords(b.X-i, b.Y+i) ||
+			b.team.enemy.Figures.ExistsByCoords(b.X-i, b.Y+i) ||
 			!b.coordsOnBoard(b.X-i, b.Y+i) {
 			directions.leftTop = false
 		}
@@ -78,7 +78,7 @@ func (b *Bishop) Validation(x int, y int) (bool, string) {
 	if b.X == x && b.Y == y {
 		return false, "can't walk around"
 	}
-	if b.team.FigureExist(x, y) {
+	if b.team.Figures.ExistsByCoords(x, y) {
 		return false, "this place is occupied by your figure"
 	}
 	if b.kingOnTheBeatenFieldAfterMove(x, y) {

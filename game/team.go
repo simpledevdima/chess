@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"reflect"
-	"strings"
 )
 
 func NewTeam(n TeamName) *Team {
@@ -16,8 +14,8 @@ func NewTeam(n TeamName) *Team {
 // Team data type for white or black team
 type Team struct {
 	Name           TeamName
-	Figures        map[int]Figure `json:"figures"`
-	Eaten          map[int]Figure
+	Figures        Figures `json:"figures"`
+	Eaten          Figures
 	enemy          *Team
 	pawnDoubleMove pawnDoubleMove // taking on the pass
 }
@@ -55,11 +53,8 @@ func (t *Team) HavePossibleMove() bool {
 
 // CheckingCheck returns true if the king is on a beaten field otherwise returns false
 func (t *Team) CheckingCheck() bool {
-	kingID, err := t.getFigureIDByName("king")
-	if err != nil {
-		log.Println(err)
-	}
-	x, y := t.Figures[kingID].GetPosition()
+	king := t.Figures.GetByName("king")
+	x, y := king.GetPosition()
 	for _, figure := range t.enemy.Figures {
 		for _, position := range figure.detectionOfBrokenFields() {
 			if position.X == x && position.Y == y {
@@ -68,39 +63,6 @@ func (t *Team) CheckingCheck() bool {
 		}
 	}
 	return false
-}
-
-// getFigureIDByName get figure by name and return ID and error
-func (t *Team) getFigureIDByName(name string) (int, error) {
-	for id, figure := range t.Figures {
-		if strings.ToLower(reflect.TypeOf(figure).Elem().Name()) == name && figure.GetName() == name {
-			return id, nil
-		}
-	}
-	return 0, errors.New(fmt.Sprintf("figure \"%s\" not forund", name))
-}
-
-// GetFigureID return ID and error by coords
-func (t *Team) GetFigureID(x int, y int) (int, error) {
-	for id, figure := range t.Figures {
-		figX, figY := figure.GetPosition()
-		if figX == x && figY == y {
-			return id, nil
-		}
-	}
-	return 0, errors.New("figure not exist")
-}
-
-// GetFigureByCoords return link to the figure by coords if found in team
-func (t *Team) GetFigureByCoords(x, y int) Figure {
-	for _, figure := range t.Figures {
-		fX, fY := figure.GetPosition()
-		if fX == x && fY == y {
-			return figure
-		}
-	}
-	log.Println(errors.New(fmt.Sprintf("figure by cords %d x %d not found in %s team\n", x, y, t.Name.String())))
-	return nil
 }
 
 // Eating figure on x, y coords move its figure from Figures map to Eaten map
@@ -114,17 +76,6 @@ func (t *Team) Eating(x int, y int) error {
 		}
 	}
 	return errors.New(fmt.Sprintf("we cant eat figure because no figure in: %vx%v coords", x, y))
-}
-
-// FigureExist check Figures of the team and return true if figure exist on take arguments coords else return false
-func (t *Team) FigureExist(x int, y int) bool {
-	for _, figure := range t.Figures {
-		figX, figY := figure.GetPosition()
-		if figX == x && figY == y {
-			return true
-		}
-	}
-	return false
 }
 
 // setStartPosition method setup start team positions for all Figures
@@ -164,8 +115,8 @@ func (t *Team) setStartPosition() error {
 
 // ClearFigures remake Figures and Eaten map
 func (t *Team) ClearFigures() {
-	t.Figures = make(map[int]Figure)
-	t.Eaten = make(map[int]Figure)
+	t.Figures = make(Figures)
+	t.Eaten = make(Figures)
 }
 
 // ImportFigures sets the data received in JSON format from the argument to the command shapes

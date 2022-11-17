@@ -17,7 +17,7 @@ type Rook struct {
 func (r *Rook) DetectionOfPossibleMove() []*Position {
 	var possibleMoves []*Position
 	for _, position := range r.detectionOfBrokenFields() {
-		if !r.team.FigureExist(position.X, position.Y) && !r.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
+		if !r.team.Figures.ExistsByCoords(position.X, position.Y) && !r.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}
@@ -46,23 +46,23 @@ func (r *Rook) detectionOfBrokenFields() []*Position {
 		if directions.left && r.coordsOnBoard(r.X-i, r.Y) {
 			data = append(data, NewPosition(r.X-i, r.Y))
 		}
-		if r.team.FigureExist(r.X, r.Y+i) ||
-			r.team.enemy.FigureExist(r.X, r.Y+i) ||
+		if r.team.Figures.ExistsByCoords(r.X, r.Y+i) ||
+			r.team.enemy.Figures.ExistsByCoords(r.X, r.Y+i) ||
 			!r.coordsOnBoard(r.X, r.Y+i) {
 			directions.top = false
 		}
-		if r.team.FigureExist(r.X+i, r.Y) ||
-			r.team.enemy.FigureExist(r.X+i, r.Y) ||
+		if r.team.Figures.ExistsByCoords(r.X+i, r.Y) ||
+			r.team.enemy.Figures.ExistsByCoords(r.X+i, r.Y) ||
 			!r.coordsOnBoard(r.X+i, r.Y) {
 			directions.right = false
 		}
-		if r.team.FigureExist(r.X, r.Y-i) ||
-			r.team.enemy.FigureExist(r.X, r.Y-i) ||
+		if r.team.Figures.ExistsByCoords(r.X, r.Y-i) ||
+			r.team.enemy.Figures.ExistsByCoords(r.X, r.Y-i) ||
 			!r.coordsOnBoard(r.X, r.Y-i) {
 			directions.bottom = false
 		}
-		if r.team.FigureExist(r.X-i, r.Y) ||
-			r.team.enemy.FigureExist(r.X-i, r.Y) ||
+		if r.team.Figures.ExistsByCoords(r.X-i, r.Y) ||
+			r.team.enemy.Figures.ExistsByCoords(r.X-i, r.Y) ||
 			!r.coordsOnBoard(r.X-i, r.Y) {
 			directions.left = false
 		}
@@ -78,7 +78,7 @@ func (r *Rook) Validation(x int, y int) (bool, string) {
 	if r.X == x && r.Y == y {
 		return false, "can't walk around"
 	}
-	if r.team.FigureExist(x, y) {
+	if r.team.Figures.ExistsByCoords(x, y) {
 		return false, "this place is occupied by your figure"
 	}
 	if r.kingOnTheBeatenFieldAfterMove(x, y) {

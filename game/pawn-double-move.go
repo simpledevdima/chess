@@ -1,9 +1,5 @@
 package game
 
-import (
-	"log"
-)
-
 // pawnDoubleMove data type containing data and methods for capturing a pawn on the pass
 type pawnDoubleMove struct {
 	Position Position
@@ -22,12 +18,9 @@ func (p *pawnDoubleMove) isTakeOnThePass(x, y int) bool {
 func (p *pawnDoubleMove) pawnTakeOnThePass(x, y int) {
 	if p.Position.X == x && p.Position.Y == y {
 		// eat figure
-		figureID, err := p.pawn.team.GetFigureID(p.pawn.Position.X, p.pawn.Position.Y)
-		if err != nil {
-			log.Println(err)
-		}
-		p.pawn.team.Eaten[figureID] = p.pawn.team.Figures[figureID]
-		delete(p.pawn.team.Figures, figureID)
+		figureID, figure := p.pawn.team.Figures.GetIndexAndFigureByCoords(p.pawn.Position.X, p.pawn.Position.Y)
+		p.pawn.team.Eaten.Set(figureID, figure)
+		p.pawn.team.Figures.RemoveByIndex(figureID)
 	}
 }
 

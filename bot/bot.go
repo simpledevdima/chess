@@ -182,7 +182,7 @@ func (bot *Bot) wait() {
 func (bot *Bot) getRandomMove() *move {
 	possibleMoves := bot.team.GetPossibleMoves()
 	figuresKeys := reflect.ValueOf(possibleMoves).MapKeys()
-	index := int(figuresKeys[rand.Intn(len(figuresKeys))].Int())
+	index := game.FigureIndex(int(figuresKeys[rand.Intn(len(figuresKeys))].Int()))
 	to := possibleMoves[index][rand.Intn(len(possibleMoves[index]))]
 	fx, fy := bot.team.Figures[index].GetPosition()
 	return NewMove(bot, game.NewPosition(fx, fy), game.NewPosition(to.X, to.Y))

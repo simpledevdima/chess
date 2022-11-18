@@ -6,8 +6,10 @@ import (
 	"log"
 )
 
+type FigureIndex int
+
 // Figures interface map referencing figures
-type Figures map[int]Figure
+type Figures map[FigureIndex]Figure
 
 // Clear remove all Figures from the map
 func (f *Figures) Clear() {
@@ -17,12 +19,12 @@ func (f *Figures) Clear() {
 }
 
 // Set sets the figure's interface to the map at the specified index
-func (f *Figures) Set(index int, figure Figure) {
+func (f *Figures) Set(index FigureIndex, figure Figure) {
 	(*f)[index] = figure
 }
 
 // Get returns the figure interface by index in map
-func (f *Figures) Get(index int) Figure {
+func (f *Figures) Get(index FigureIndex) Figure {
 	figure := (*f)[index]
 	if figure == nil {
 		log.Println(errors.New(fmt.Sprintf("figure with index %d not found", index)))
@@ -31,7 +33,7 @@ func (f *Figures) Get(index int) Figure {
 }
 
 // RemoveByIndex remove figure interface from map at specified index
-func (f *Figures) RemoveByIndex(index int) {
+func (f *Figures) RemoveByIndex(index FigureIndex) {
 	if (*f)[index] == nil {
 		log.Println(errors.New(fmt.Sprintf("figure with index %d not found", index)))
 	} else {
@@ -40,7 +42,7 @@ func (f *Figures) RemoveByIndex(index int) {
 }
 
 // GetIndexAndFigureByCoords returns the index and the figure interface of the figure interface at the specified coordinates
-func (f *Figures) GetIndexAndFigureByCoords(x, y int) (int, Figure) {
+func (f *Figures) GetIndexAndFigureByCoords(x, y int) (FigureIndex, Figure) {
 	for index, figure := range *f {
 		fx, fy := figure.GetPosition()
 		if fx == x && fy == y {
@@ -75,7 +77,7 @@ func (f *Figures) GetByName(name string) Figure {
 }
 
 // GetIndexByName returns the first figure interface index found by figure name
-func (f *Figures) GetIndexByName(name string) int {
+func (f *Figures) GetIndexByName(name string) FigureIndex {
 	for index, figure := range *f {
 		if name == figure.GetName() {
 			return index
@@ -86,7 +88,7 @@ func (f *Figures) GetIndexByName(name string) int {
 }
 
 // GetIndexByCoords returns the index of the figure interface at the specified coordinates
-func (f *Figures) GetIndexByCoords(x, y int) int {
+func (f *Figures) GetIndexByCoords(x, y int) FigureIndex {
 	for index, figure := range *f {
 		fx, fy := figure.GetPosition()
 		if fx == x && fy == y {

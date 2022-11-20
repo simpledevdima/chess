@@ -80,8 +80,8 @@ func (t *Team) Eating(eatPos *Position) error {
 
 // setStartPosition method setup start team positions for all Figures
 func (t *Team) setStartPosition() error {
-	var figuresLine int
-	var pawnLine int
+	var figuresLine uint8
+	var pawnLine uint8
 	switch t.Name {
 	case White:
 		figuresLine = 1
@@ -94,7 +94,7 @@ func (t *Team) setStartPosition() error {
 	}
 	t.MakeFigures()
 	// paws
-	for x := 1; x <= 8; x++ {
+	for x := uint8(1); x <= 8; x++ {
 		t.Figures[FigureIndex(x)] = NewPawn(NewPosition(x, pawnLine), t)
 	}
 	// rooks
@@ -134,7 +134,7 @@ func (t *Team) ImportFigures(figuresJSON []byte) {
 		log.Println(err)
 	}
 	for index, figure := range figures {
-		pos := NewPosition(figure.Position.X, figure.Position.Y)
+		pos := NewPosition(uint8(figure.Position.X), uint8(figure.Position.Y))
 		switch figure.Name {
 		case "pawn":
 			t.Figures[index] = NewPawn(pos, t)

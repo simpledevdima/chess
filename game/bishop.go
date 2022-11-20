@@ -33,7 +33,7 @@ func (b *Bishop) detectionOfBrokenFields() []*Position {
 		leftBottom  bool
 		leftTop     bool
 	}{true, true, true, true}
-	for i := 1; i <= 7; i++ {
+	for i := uint8(1); i <= 7; i++ {
 		pos := NewPosition(b.X+i, b.Y+i)
 		if directions.rightTop && b.positionOnBoard(pos) {
 			data = append(data, pos)

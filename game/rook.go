@@ -33,7 +33,7 @@ func (r *Rook) detectionOfBrokenFields() []*Position {
 		bottom bool
 		left   bool
 	}{true, true, true, true}
-	for i := 1; i <= 7; i++ {
+	for i := uint8(1); i <= 7; i++ {
 		pos := NewPosition(r.X, r.Y+i)
 		if directions.top && r.positionOnBoard(pos) {
 			data = append(data, pos)

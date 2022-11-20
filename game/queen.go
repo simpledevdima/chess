@@ -38,7 +38,7 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 		left        bool
 		leftTop     bool
 	}{true, true, true, true, true, true, true, true}
-	for i := 1; i <= 7; i++ {
+	for i := uint8(1); i <= 7; i++ {
 		pos := NewPosition(q.X, q.Y+i)
 		if directions.top && q.positionOnBoard(pos) {
 			data = append(data, pos)

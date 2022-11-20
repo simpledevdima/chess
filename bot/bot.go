@@ -135,7 +135,7 @@ func (bot *Bot) read() {
 			bot.team.SetName(bot.status.teamName)
 			bot.enemy.SetName(bot.status.enemyName)
 		case "move":
-			m := NewMove(bot, nil, nil)
+			m := newMove(bot, nil, nil)
 			request.BodyToVariable(&m)
 			m.exec()
 		case "board":
@@ -182,10 +182,10 @@ func (bot *Bot) wait() {
 func (bot *Bot) getRandomMove() *move {
 	possibleMoves := bot.team.GetPossibleMoves()
 	figuresKeys := reflect.ValueOf(possibleMoves).MapKeys()
-	index := game.FigureIndex(int(figuresKeys[rand.Intn(len(figuresKeys))].Int()))
+	index := game.FigurerIndex(int(figuresKeys[rand.Intn(len(figuresKeys))].Int()))
 	to := possibleMoves[index][rand.Intn(len(possibleMoves[index]))]
-	fx, fy := bot.team.Figures[index].GetPosition()
-	return NewMove(bot, game.NewPosition(fx, fy), game.NewPosition(to.X, to.Y))
+	pos := bot.team.Figures[index].GetPosition()
+	return newMove(bot, pos, game.NewPosition(to.X, to.Y))
 }
 
 func (bot *Bot) move() {
@@ -195,53 +195,3 @@ func (bot *Bot) move() {
 	randomMove := bot.getRandomMove()
 	randomMove.send()
 }
-
-//func (bot *Bot) ShowMoves(t *game.Team) {
-//	fmt.Println(t.Name.String())
-//	for index, figure := range t.Figures {
-//		x, y := figure.GetPosition()
-//		moves := figure.DetectionOfPossibleMove()
-//		fmt.Println(index, figure.GetName(), x, y)
-//		for _, m := range moves {
-//			x, y := m.Get()
-//			fmt.Print(x, y, " | ")
-//		}
-//		fmt.Println()
-//	}
-//}
-
-//
-//func (bot *Bot) sendTestRequest() {
-//	// test send data
-//	type request struct{
-//		Id int
-//		Post string
-//		Body interface{}
-//	}
-//	var req request
-//	req.Id = 328748324
-//	req.Post = "setup"
-//	req.Body = struct{}{}
-//	dataJSON, err := json.Marshal(req)
-//	if err != nil {
-//		log.Println(err)
-//	}
-//	fmt.Println(string(dataJSON))
-//	bot.send <- dataJSON
-//}
-
-//fmt.Println(possibleMoves)
-//fmt.Println("figureID", index)
-//fmt.Println("from", fx, fy)
-//fmt.Println("to", to.X, to.Y)
-
-//fmt.Println(bot.data.isAllDataLoaded())
-//fmt.Println(bot.data.isPlay())
-//fmt.Println(!bot.data.isOver())
-//fmt.Println(bot.data.yourTurn())
-//if bot.data.isPlay() && !bot.data.isOver() && bot.data.yourTurn() {
-//	fmt.Println("game play")
-//	//bot.data.move()
-//} else {
-//	fmt.Println("game stop")
-//}

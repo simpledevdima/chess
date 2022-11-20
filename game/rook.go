@@ -13,20 +13,22 @@ type Rook struct {
 	Figure
 }
 
-// DetectionOfPossibleMove return slice of Position with coords for possible moves
-func (r *Rook) DetectionOfPossibleMove() []*Position {
-	var possibleMoves []*Position
-	for _, position := range r.detectionOfBrokenFields() {
+// GetPossibleMoves return slice of Position with coords for possible moves
+func (r *Rook) GetPossibleMoves() *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
+	for _, position := range *r.GetBrokenFields() {
 		if !r.team.Figures.ExistsByPosition(position) && !r.kingOnTheBeatenFieldAfterMove(position) {
-			possibleMoves = append(possibleMoves, position)
+			pi = poss.Set(pi, position)
 		}
 	}
-	return possibleMoves
+	return &poss
 }
 
-// detectionOfBrokenFields return a slice of Positions with broken fields
-func (r *Rook) detectionOfBrokenFields() []*Position {
-	var data []*Position
+// GetBrokenFields return a slice of Positions with broken fields
+func (r *Rook) GetBrokenFields() *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
 	directions := struct {
 		top    bool
 		right  bool
@@ -36,7 +38,7 @@ func (r *Rook) detectionOfBrokenFields() []*Position {
 	for i := uint8(1); i <= 7; i++ {
 		pos := NewPosition(r.X, r.Y+i)
 		if directions.top && r.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if r.team.Figures.ExistsByPosition(pos) ||
 			r.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -46,7 +48,7 @@ func (r *Rook) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(r.X+i, r.Y)
 		if directions.right && r.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if r.team.Figures.ExistsByPosition(pos) ||
 			r.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -56,7 +58,7 @@ func (r *Rook) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(r.X, r.Y-i)
 		if directions.bottom && r.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if r.team.Figures.ExistsByPosition(pos) ||
 			r.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -66,7 +68,7 @@ func (r *Rook) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(r.X-i, r.Y)
 		if directions.left && r.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if r.team.Figures.ExistsByPosition(pos) ||
 			r.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -74,7 +76,7 @@ func (r *Rook) detectionOfBrokenFields() []*Position {
 			directions.left = false
 		}
 	}
-	return data
+	return &poss
 }
 
 // Validation return true if this move are valid or return false
@@ -96,7 +98,7 @@ func (r *Rook) Validation(pos *Position) (bool, string) {
 		return false, "rook doesn't walk like that"
 	}
 	// detect Position for move and check it for input data move coords
-	for _, position := range r.detectionOfBrokenFields() {
+	for _, position := range *r.GetBrokenFields() {
 		if *position == *pos {
 			return true, ""
 		}

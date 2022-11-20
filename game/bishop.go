@@ -13,20 +13,22 @@ type Bishop struct {
 	Figure
 }
 
-// DetectionOfPossibleMove return slice of Position with coords for possible moves
-func (b *Bishop) DetectionOfPossibleMove() []*Position {
-	var possibleMoves []*Position
-	for _, position := range b.detectionOfBrokenFields() {
+// GetPossibleMoves return slice of Position with coords for possible moves
+func (b *Bishop) GetPossibleMoves() *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
+	for _, position := range *b.GetBrokenFields() {
 		if !b.team.Figures.ExistsByPosition(position) && !b.kingOnTheBeatenFieldAfterMove(position) {
-			possibleMoves = append(possibleMoves, position)
+			pi = poss.Set(pi, position)
 		}
 	}
-	return possibleMoves
+	return &poss
 }
 
-// detectionOfBrokenFields return a slice of Positions with broken fields
-func (b *Bishop) detectionOfBrokenFields() []*Position {
-	var data []*Position
+// GetBrokenFields return a slice of Positions with broken fields
+func (b *Bishop) GetBrokenFields() *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
 	directions := struct {
 		rightTop    bool
 		rightBottom bool
@@ -36,7 +38,7 @@ func (b *Bishop) detectionOfBrokenFields() []*Position {
 	for i := uint8(1); i <= 7; i++ {
 		pos := NewPosition(b.X+i, b.Y+i)
 		if directions.rightTop && b.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if b.team.Figures.ExistsByPosition(pos) ||
 			b.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -46,7 +48,7 @@ func (b *Bishop) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(b.X+i, b.Y-i)
 		if directions.rightBottom && b.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if b.team.Figures.ExistsByPosition(pos) ||
 			b.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -56,7 +58,7 @@ func (b *Bishop) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(b.X-i, b.Y-i)
 		if directions.leftBottom && b.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if b.team.Figures.ExistsByPosition(pos) ||
 			b.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -66,7 +68,7 @@ func (b *Bishop) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(b.X-i, b.Y+i)
 		if directions.leftTop && b.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if b.team.Figures.ExistsByPosition(pos) ||
 			b.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -74,7 +76,7 @@ func (b *Bishop) detectionOfBrokenFields() []*Position {
 			directions.leftTop = false
 		}
 	}
-	return data
+	return &poss
 }
 
 // Validation return true if this move are valid or return false
@@ -100,7 +102,7 @@ func (b *Bishop) Validation(pos *Position) (bool, string) {
 		return false, "bishop doesn't walk like that"
 	}
 	// detect Positions for move and check it for input data move coords
-	for _, position := range b.detectionOfBrokenFields() {
+	for _, position := range *b.GetBrokenFields() {
 		if *position == *pos {
 			// this move is valid
 			return true, ""

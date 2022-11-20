@@ -10,8 +10,16 @@ type Figure struct {
 	*Position     `json:"position"`
 	alreadyMove   bool
 	team          *Team
-	possibleMoves Positions
-	brokenFields  Positions
+	possibleMoves *Positions
+	brokenFields  *Positions
+}
+
+func (f *Figure) SetPossibleMoves(poss *Positions) {
+	f.possibleMoves = poss
+}
+
+func (f *Figure) SetBrokenFields(poss *Positions) {
+	f.brokenFields = poss
 }
 
 // GetName get name from figure

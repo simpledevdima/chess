@@ -13,9 +13,10 @@ type Pawn struct {
 	Figure
 }
 
-// DetectionOfPossibleMove return slice of Position with coords for possible moves
-func (p *Pawn) DetectionOfPossibleMove() []*Position {
-	var data []*Position
+// GetPossibleMoves return slice of Position with coords for possible moves
+func (p *Pawn) GetPossibleMoves() *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
 	switch p.team.Name {
 	case White:
 		pos1 := NewPosition(p.X, p.Y+1)
@@ -23,7 +24,7 @@ func (p *Pawn) DetectionOfPossibleMove() []*Position {
 			!p.kingOnTheBeatenFieldAfterMove(pos1) &&
 			!p.team.Figures.ExistsByPosition(pos1) &&
 			!p.team.enemy.Figures.ExistsByPosition(pos1) {
-			data = append(data, pos1)
+			pi = poss.Set(pi, pos1)
 		}
 		pos2 := NewPosition(p.X, p.Y+2)
 		if p.positionOnBoard(pos2) &&
@@ -33,7 +34,7 @@ func (p *Pawn) DetectionOfPossibleMove() []*Position {
 			!p.team.Figures.ExistsByPosition(pos2) &&
 			!p.team.enemy.Figures.ExistsByPosition(pos1) &&
 			!p.team.enemy.Figures.ExistsByPosition(pos2) {
-			data = append(data, pos2)
+			pi = poss.Set(pi, pos2)
 		}
 	case Black:
 		pos1 := NewPosition(p.X, p.Y-1)
@@ -41,7 +42,7 @@ func (p *Pawn) DetectionOfPossibleMove() []*Position {
 			!p.kingOnTheBeatenFieldAfterMove(pos1) &&
 			!p.team.Figures.ExistsByPosition(pos1) &&
 			!p.team.enemy.Figures.ExistsByPosition(pos1) {
-			data = append(data, pos1)
+			pi = poss.Set(pi, pos1)
 		}
 		pos2 := NewPosition(p.X, p.Y-2)
 		if p.positionOnBoard(pos2) &&
@@ -51,43 +52,44 @@ func (p *Pawn) DetectionOfPossibleMove() []*Position {
 			!p.team.Figures.ExistsByPosition(pos2) &&
 			!p.team.enemy.Figures.ExistsByPosition(pos1) &&
 			!p.team.enemy.Figures.ExistsByPosition(pos2) {
-			data = append(data, pos2)
+			pi = poss.Set(pi, pos2)
 		}
 	}
-	for _, position := range p.detectionOfBrokenFields() {
+	for _, position := range *p.GetBrokenFields() {
 		if (p.team.enemy.Figures.ExistsByPosition(position) ||
 			p.team.enemy.pawnDoubleMove.isTakeOnThePass(position)) &&
 			!p.kingOnTheBeatenFieldAfterMove(position) {
-			data = append(data, position)
+			pi = poss.Set(pi, position)
 		}
 	}
-	return data
+	return &poss
 }
 
-// detectionOfBrokenFields return a slice of Positions with broken fields
-func (p *Pawn) detectionOfBrokenFields() []*Position {
-	var data []*Position
+// GetBrokenFields return a slice of Positions with broken fields
+func (p *Pawn) GetBrokenFields() *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
 	switch p.team.Name {
 	case White:
 		pos := NewPosition(p.X+1, p.Y+1)
 		if p.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		pos = NewPosition(p.X-1, p.Y+1)
 		if p.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 	case Black:
 		pos := NewPosition(p.X+1, p.Y-1)
 		if p.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		pos = NewPosition(p.X-1, p.Y-1)
 		if p.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 	}
-	return data
+	return &poss
 }
 
 // Validation return true if this move are valid or return false
@@ -105,14 +107,14 @@ func (p *Pawn) Validation(pos *Position) (bool, string) {
 		return false, "your king stands on a beaten field"
 	}
 	// detect Position for eat and check it for input data eat coords
-	for _, position := range p.detectionOfBrokenFields() {
+	for _, position := range *p.GetBrokenFields() {
 		if *position == *pos &&
 			(p.team.enemy.Figures.ExistsByPosition(pos) || p.team.enemy.pawnDoubleMove.isTakeOnThePass(pos)) {
 			return true, ""
 		}
 	}
 	// move pawn
-	for _, position := range p.DetectionOfPossibleMove() {
+	for _, position := range *p.GetPossibleMoves() {
 		if *position == *pos {
 			return true, ""
 		}

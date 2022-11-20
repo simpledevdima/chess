@@ -11,8 +11,10 @@ type Figurer interface {
 	SetTeam(*Team)
 	positionOnBoard(*Position) bool
 	kingOnTheBeatenFieldAfterMove(*Position) bool
-	detectionOfBrokenFields() []*Position
-	DetectionOfPossibleMove() []*Position
+	GetBrokenFields() *Positions
+	GetPossibleMoves() *Positions
+	SetBrokenFields(*Positions)
+	SetPossibleMoves(*Positions)
 	IsAlreadyMove() bool
 	setAlreadyMove(bool)
 }

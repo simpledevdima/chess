@@ -13,20 +13,22 @@ type Queen struct {
 	Figure
 }
 
-// DetectionOfPossibleMove return slice of Position with coords for possible moves
-func (q *Queen) DetectionOfPossibleMove() []*Position {
-	var possibleMoves []*Position
-	for _, position := range q.detectionOfBrokenFields() {
+// GetPossibleMoves return slice of Position with coords for possible moves
+func (q *Queen) GetPossibleMoves() *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
+	for _, position := range *q.GetBrokenFields() {
 		if !q.team.Figures.ExistsByPosition(position) && !q.kingOnTheBeatenFieldAfterMove(position) {
-			possibleMoves = append(possibleMoves, position)
+			pi = poss.Set(pi, position)
 		}
 	}
-	return possibleMoves
+	return &poss
 }
 
-// detectionOfBrokenFields return a slice of Positions with broken fields
-func (q *Queen) detectionOfBrokenFields() []*Position {
-	var data []*Position
+// GetBrokenFields return a slice of Positions with broken fields
+func (q *Queen) GetBrokenFields() *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
 
 	directions := struct {
 		top         bool
@@ -41,7 +43,7 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 	for i := uint8(1); i <= 7; i++ {
 		pos := NewPosition(q.X, q.Y+i)
 		if directions.top && q.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if q.team.Figures.ExistsByPosition(pos) ||
 			q.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -51,7 +53,7 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(q.X+i, q.Y+i)
 		if directions.rightTop && q.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if q.team.Figures.ExistsByPosition(pos) ||
 			q.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -61,7 +63,7 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(q.X+i, q.Y)
 		if directions.right && q.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if q.team.Figures.ExistsByPosition(pos) ||
 			q.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -71,7 +73,7 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(q.X+i, q.Y-i)
 		if directions.rightBottom && q.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if q.team.Figures.ExistsByPosition(pos) ||
 			q.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -81,7 +83,7 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(q.X, q.Y-i)
 		if directions.bottom && q.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if q.team.Figures.ExistsByPosition(pos) ||
 			q.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -91,7 +93,7 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(q.X-i, q.Y-i)
 		if directions.leftBottom && q.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if q.team.Figures.ExistsByPosition(pos) ||
 			q.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -101,7 +103,7 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(q.X-i, q.Y)
 		if directions.left && q.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if q.team.Figures.ExistsByPosition(pos) ||
 			q.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -111,7 +113,7 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 
 		pos = NewPosition(q.X-i, q.Y+i)
 		if directions.leftTop && q.positionOnBoard(pos) {
-			data = append(data, pos)
+			pi = poss.Set(pi, pos)
 		}
 		if q.team.Figures.ExistsByPosition(pos) ||
 			q.team.enemy.Figures.ExistsByPosition(pos) ||
@@ -120,7 +122,7 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 		}
 	}
 
-	return data
+	return &poss
 }
 
 // Validation return true if this move are valid or return false
@@ -146,7 +148,7 @@ func (q *Queen) Validation(pos *Position) (bool, string) {
 		return false, "queen doesn't walk like that"
 	}
 	// detect Position for move and check it for input data move coords
-	for _, position := range q.detectionOfBrokenFields() {
+	for _, position := range *q.GetBrokenFields() {
 		if position.X == x && position.Y == y {
 			// this move is valid
 			return true, ""

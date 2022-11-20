@@ -20,6 +20,18 @@ type Team struct {
 	pawnDoubleMove pawnDoubleMove // taking on the pass
 }
 
+func (t *Team) SetBrokenFields() {
+	for _, figure := range t.Figures {
+		figure.SetBrokenFields(figure.GetBrokenFields())
+	}
+}
+
+func (t *Team) SetPossibleMoves() {
+	for _, figure := range t.Figures {
+		figure.SetPossibleMoves(figure.GetPossibleMoves())
+	}
+}
+
 // SetName exported method of setting the command name by the string from the argument
 func (t *Team) SetName(teamName string) {
 	switch teamName {
@@ -42,7 +54,7 @@ func (t *Team) SetEnemy(enemy *Team) {
 // HavePossibleMove return true if team can make move
 func (t *Team) HavePossibleMove() bool {
 	for _, figure := range t.Figures {
-		for _, position := range figure.DetectionOfPossibleMove() {
+		for _, position := range *figure.GetPossibleMoves() {
 			if ok, _ := figure.Validation(position); ok {
 				return true
 			}
@@ -56,7 +68,7 @@ func (t *Team) CheckingCheck() bool {
 	king := t.Figures.GetByName("king")
 	kingPos := king.GetPosition()
 	for _, figure := range t.enemy.Figures {
-		for _, figPos := range figure.detectionOfBrokenFields() {
+		for _, figPos := range *figure.GetBrokenFields() {
 			if *figPos == *kingPos {
 				return true
 			}
@@ -153,14 +165,14 @@ func (t *Team) ImportFigures(figuresJSON []byte) {
 }
 
 // PossibleMoves data type with possible moves of pieces
-type PossibleMoves map[FigurerIndex][]*Position
+type PossibleMoves map[FigurerIndex]*Positions
 
 // GetPossibleMoves returns a map with the keys of the team's shapes and the slices of coordinates that those shapes can make
 func (t *Team) GetPossibleMoves() PossibleMoves {
 	possibleMoves := make(PossibleMoves)
 	for index, figure := range t.Figures {
-		moves := figure.DetectionOfPossibleMove()
-		if len(moves) > 0 {
+		moves := figure.GetPossibleMoves()
+		if len(*moves) > 0 {
 			possibleMoves[index] = moves
 		}
 	}
@@ -171,8 +183,8 @@ func (t *Team) GetPossibleMoves() PossibleMoves {
 func (t *Team) ShowPossibleMoves() {
 	fmt.Println("Team:", t.Name.String())
 	for index, figure := range t.Figures {
-		fields := figure.DetectionOfPossibleMove()
-		if len(fields) > 0 {
+		fields := figure.GetPossibleMoves()
+		if len(*fields) > 0 {
 			x, y := figure.GetPosition().Get()
 			fmt.Println(index, figure.GetName(), x, y, fields)
 		}
@@ -183,7 +195,7 @@ func (t *Team) ShowPossibleMoves() {
 func (t *Team) ShowBrokenFields() {
 	fmt.Println("Team:", t.Name.String())
 	for index, figure := range t.Figures {
-		fields := figure.detectionOfBrokenFields()
+		fields := figure.GetBrokenFields()
 		pos := figure.GetPosition()
 		fmt.Println(index, figure.GetName(), pos.X, pos.Y, fields)
 	}

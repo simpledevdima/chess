@@ -13,62 +13,64 @@ type King struct {
 	Figure
 }
 
-// DetectionOfPossibleMove return slice of Position with coords for possible moves
-func (k *King) DetectionOfPossibleMove() []*Position {
-	var possibleMoves []*Position
-	for _, position := range k.detectionOfBrokenFields() {
+// GetPossibleMoves return slice of Position with coords for possible moves
+func (k *King) GetPossibleMoves() *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
+	for _, position := range *k.GetBrokenFields() {
 		if !k.team.Figures.ExistsByPosition(position) && !k.kingOnTheBeatenFieldAfterMove(position) {
-			possibleMoves = append(possibleMoves, position)
+			pi = poss.Set(pi, position)
 		}
 	}
-	return possibleMoves
+	return &poss
 }
 
-// detectionOfBrokenFields return a slice of Positions with broken fields
-func (k *King) detectionOfBrokenFields() []*Position {
-	var data []*Position
+// GetBrokenFields return a slice of Positions with broken fields
+func (k *King) GetBrokenFields() *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
 
 	pos := NewPosition(k.X, k.Y+1)
 	if k.positionOnBoard(pos) {
-		data = append(data, pos)
+		pi = poss.Set(pi, pos)
 	}
 
 	pos = NewPosition(k.X+1, k.Y+1)
 	if k.positionOnBoard(pos) {
-		data = append(data, pos)
+		pi = poss.Set(pi, pos)
 	}
 
 	pos = NewPosition(k.X+1, k.Y)
 	if k.positionOnBoard(pos) {
-		data = append(data, pos)
+		pi = poss.Set(pi, pos)
 	}
 
 	pos = NewPosition(k.X+1, k.Y-1)
 	if k.positionOnBoard(pos) {
-		data = append(data, NewPosition(k.X+1, k.Y-1))
+		pi = poss.Set(pi, pos)
 	}
 
 	pos = NewPosition(k.X, k.Y-1)
 	if k.positionOnBoard(pos) {
-		data = append(data, pos)
+		pi = poss.Set(pi, pos)
 	}
 
 	pos = NewPosition(k.X-1, k.Y-1)
 	if k.positionOnBoard(pos) {
-		data = append(data, pos)
+		pi = poss.Set(pi, pos)
 	}
 
 	pos = NewPosition(k.X-1, k.Y)
 	if k.positionOnBoard(pos) {
-		data = append(data, pos)
+		pi = poss.Set(pi, pos)
 	}
 
 	pos = NewPosition(k.X-1, k.Y+1)
 	if k.positionOnBoard(pos) {
-		data = append(data, pos)
+		pi = poss.Set(pi, pos)
 	}
 
-	return data
+	return &poss
 }
 
 // Validation return true if this move are valid or return false
@@ -109,7 +111,7 @@ func (k *King) Validation(pos *Position) (bool, string) {
 		}
 	}
 	// detect Position for move and check it for input data move coords
-	for _, position := range k.detectionOfBrokenFields() {
+	for _, position := range *k.GetBrokenFields() {
 		if *position == *pos {
 			return true, ""
 		}

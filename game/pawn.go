@@ -19,10 +19,6 @@ func (p *Pawn) DetectionOfPossibleMove() []*Position {
 	switch p.team.Name {
 	case White:
 		pos1 := NewPosition(p.X, p.Y+1)
-		//fmt.Println(p.positionOnBoard(pos1))
-		//fmt.Println(p.kingOnTheBeatenFieldAfterMove(pos1))
-		//fmt.Println(p.team.Figures.ExistsByPosition(pos1))
-		//fmt.Println(p.team.enemy.Figures.ExistsByPosition(pos1))
 		if p.positionOnBoard(pos1) &&
 			!p.kingOnTheBeatenFieldAfterMove(pos1) &&
 			!p.team.Figures.ExistsByPosition(pos1) &&

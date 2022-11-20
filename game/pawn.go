@@ -10,7 +10,7 @@ func NewPawn(pos *Position, t *Team) *Pawn {
 
 // Pawn is data type of chess figure
 type Pawn struct {
-	figureData
+	Figure
 }
 
 // DetectionOfPossibleMove return slice of Position with coords for possible moves

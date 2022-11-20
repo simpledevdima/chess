@@ -10,7 +10,7 @@ func NewKnight(pos *Position, t *Team) *Knight {
 
 // Knight is data type of chess figure
 type Knight struct {
-	figureData
+	Figure
 }
 
 // DetectionOfPossibleMove return slice of Position with coords for possible moves

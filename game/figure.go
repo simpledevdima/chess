@@ -4,8 +4,8 @@ import (
 	"log"
 )
 
-// figureData information about each figure
-type figureData struct {
+// Figure information about each figure
+type Figure struct {
 	Name        string `json:"name"`
 	*Position   `json:"position"`
 	alreadyMove bool
@@ -13,27 +13,27 @@ type figureData struct {
 }
 
 // GetName get name from figure
-func (f *figureData) GetName() string {
+func (f *Figure) GetName() string {
 	return f.Name
 }
 
 // SetName set name to the figure
-func (f *figureData) SetName(name string) {
+func (f *Figure) SetName(name string) {
 	f.Name = name
 }
 
 // IsAlreadyMove returns true if the figure has moved in the current match otherwise returns false
-func (f *figureData) IsAlreadyMove() bool {
+func (f *Figure) IsAlreadyMove() bool {
 	return f.alreadyMove
 }
 
 // setAlreadyMove setting a value about moving a figure in the current match
-func (f *figureData) setAlreadyMove(flag bool) {
+func (f *Figure) setAlreadyMove(flag bool) {
 	f.alreadyMove = flag
 }
 
 // kingOnTheBeatenFieldAfterMove returns true if your king is on the beaten square after the move otherwise return false
-func (f *figureData) kingOnTheBeatenFieldAfterMove(pos *Position) bool {
+func (f *Figure) kingOnTheBeatenFieldAfterMove(pos *Position) bool {
 	curPos := f.Position
 	f.SetPosition(pos)
 	undoMove := func() {
@@ -58,7 +58,7 @@ func (f *figureData) kingOnTheBeatenFieldAfterMove(pos *Position) bool {
 }
 
 // positionOnBoard returns true if the coordinates are within the board, otherwise return false
-func (f *figureData) positionOnBoard(pos *Position) bool {
+func (f *Figure) positionOnBoard(pos *Position) bool {
 	x, y := pos.Get()
 	if x >= 1 && x <= 8 && y >= 1 && y <= 8 {
 		return true
@@ -67,12 +67,12 @@ func (f *figureData) positionOnBoard(pos *Position) bool {
 }
 
 // SetTeam set links to your team for current figure
-func (f *figureData) SetTeam(team *Team) {
+func (f *Figure) SetTeam(team *Team) {
 	f.team = team
 }
 
 // MoveFigure to new coords and eat enemy figure if you need that
-func (f *figureData) MoveFigure(position *Position) {
+func (f *Figure) MoveFigure(position *Position) {
 	f.SetPosition(position)
 	f.setAlreadyMove(true)
 	if f.team.enemy != nil && f.team.enemy.Figures.ExistsByPosition(position) {
@@ -91,11 +91,11 @@ func (f *figureData) MoveFigure(position *Position) {
 }
 
 // SetPosition set Position to coords from argument
-func (f *figureData) SetPosition(p *Position) {
+func (f *Figure) SetPosition(p *Position) {
 	f.Position = p
 }
 
 // GetPosition return current Position of Figure
-func (f *figureData) GetPosition() *Position {
+func (f *Figure) GetPosition() *Position {
 	return f.Position
 }

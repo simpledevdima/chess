@@ -10,7 +10,7 @@ func NewBishop(pos *Position, t *Team) *Bishop {
 
 // Bishop is data type of chess figure
 type Bishop struct {
-	figureData
+	Figure
 }
 
 // DetectionOfPossibleMove return slice of Position with coords for possible moves

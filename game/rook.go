@@ -10,7 +10,7 @@ func NewRook(pos *Position, t *Team) *Rook {
 
 // Rook is data type of chess figure
 type Rook struct {
-	figureData
+	Figure
 }
 
 // DetectionOfPossibleMove return slice of Position with coords for possible moves

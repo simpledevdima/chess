@@ -10,7 +10,7 @@ func NewQueen(pos *Position, t *Team) *Queen {
 
 // Queen is data type of chess figure
 type Queen struct {
-	figureData
+	Figure
 }
 
 // DetectionOfPossibleMove return slice of Position with coords for possible moves

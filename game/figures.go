@@ -6,10 +6,10 @@ import (
 	"log"
 )
 
-type FigureIndex int
+type FigurerIndex int
 
 // Figures interface map referencing figures
-type Figures map[FigureIndex]Figure
+type Figures map[FigurerIndex]Figurer
 
 // Clear remove all Figures from the map
 func (f *Figures) Clear() {
@@ -19,12 +19,12 @@ func (f *Figures) Clear() {
 }
 
 // Set sets the figure's interface to the map at the specified index
-func (f *Figures) Set(index FigureIndex, figure Figure) {
+func (f *Figures) Set(index FigurerIndex, figure Figurer) {
 	(*f)[index] = figure
 }
 
 // Get returns the figure interface by index in map
-func (f *Figures) Get(index FigureIndex) Figure {
+func (f *Figures) Get(index FigurerIndex) Figurer {
 	figure := (*f)[index]
 	if figure == nil {
 		log.Println(errors.New(fmt.Sprintf("figure with index %d not found", index)))
@@ -33,7 +33,7 @@ func (f *Figures) Get(index FigureIndex) Figure {
 }
 
 // RemoveByIndex remove figure interface from map at specified index
-func (f *Figures) RemoveByIndex(index FigureIndex) {
+func (f *Figures) RemoveByIndex(index FigurerIndex) {
 	if (*f)[index] == nil {
 		log.Println(errors.New(fmt.Sprintf("figure with index %d not found", index)))
 	} else {
@@ -42,7 +42,7 @@ func (f *Figures) RemoveByIndex(index FigureIndex) {
 }
 
 // GetIndexAndFigureByPosition returns the index and the figure interface of the figure interface at the specified coordinates
-func (f *Figures) GetIndexAndFigureByPosition(pos *Position) (FigureIndex, Figure) {
+func (f *Figures) GetIndexAndFigureByPosition(pos *Position) (FigurerIndex, Figurer) {
 	for index, figure := range *f {
 		if *figure.GetPosition() == *pos {
 			return index, figure
@@ -53,7 +53,7 @@ func (f *Figures) GetIndexAndFigureByPosition(pos *Position) (FigureIndex, Figur
 }
 
 // GetByPosition returns the figure interface at the specified coordinates
-func (f *Figures) GetByPosition(pos *Position) Figure {
+func (f *Figures) GetByPosition(pos *Position) Figurer {
 	for _, figure := range *f {
 		figPos := figure.GetPosition()
 		if *figPos == *pos {
@@ -65,7 +65,7 @@ func (f *Figures) GetByPosition(pos *Position) Figure {
 }
 
 // GetByName returns the first figure interface found by shape name
-func (f *Figures) GetByName(name string) Figure {
+func (f *Figures) GetByName(name string) Figurer {
 	for _, figure := range *f {
 		if name == figure.GetName() {
 			return figure
@@ -76,7 +76,7 @@ func (f *Figures) GetByName(name string) Figure {
 }
 
 // GetIndexByName returns the first figure interface index found by figure name
-func (f *Figures) GetIndexByName(name string) FigureIndex {
+func (f *Figures) GetIndexByName(name string) FigurerIndex {
 	for index, figure := range *f {
 		if name == figure.GetName() {
 			return index
@@ -87,7 +87,7 @@ func (f *Figures) GetIndexByName(name string) FigureIndex {
 }
 
 // GetIndexByPosition returns the index of the figure interface at the specified coordinates
-func (f *Figures) GetIndexByPosition(pos *Position) FigureIndex {
+func (f *Figures) GetIndexByPosition(pos *Position) FigurerIndex {
 	for index, figure := range *f {
 		figPos := figure.GetPosition()
 		if *figPos == *pos {

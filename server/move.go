@@ -62,7 +62,7 @@ func (m *move) exec() {
 }
 
 // isCastling returns true if the move is castling otherwise returns false
-func (m *move) isCastling(figure game.Figure) bool {
+func (m *move) isCastling(figure game.Figurer) bool {
 	if figure.GetName() == "king" && !figure.IsAlreadyMove() && (m.To.Position.X == 3 || m.To.Position.X == 7) {
 		return true
 	}

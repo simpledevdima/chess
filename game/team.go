@@ -95,7 +95,7 @@ func (t *Team) setStartPosition() error {
 	t.MakeFigures()
 	// paws
 	for x := uint8(1); x <= 8; x++ {
-		t.Figures[FigureIndex(x)] = NewPawn(NewPosition(x, pawnLine), t)
+		t.Figures[FigurerIndex(x)] = NewPawn(NewPosition(x, pawnLine), t)
 	}
 	// rooks
 	t.Figures[9] = NewRook(NewPosition(1, figuresLine), t)
@@ -122,7 +122,7 @@ func (t *Team) MakeFigures() {
 // ImportFigures sets the data received in JSON format from the argument to the command shapes
 func (t *Team) ImportFigures(figuresJSON []byte) {
 	t.MakeFigures()
-	var figures map[FigureIndex]struct {
+	var figures map[FigurerIndex]struct {
 		Name     string `json:"name"`
 		Position struct {
 			X int `json:"x"`
@@ -153,7 +153,7 @@ func (t *Team) ImportFigures(figuresJSON []byte) {
 }
 
 // PossibleMoves data type with possible moves of pieces
-type PossibleMoves map[FigureIndex][]*Position
+type PossibleMoves map[FigurerIndex][]*Position
 
 // GetPossibleMoves returns a map with the keys of the team's shapes and the slices of coordinates that those shapes can make
 func (t *Team) GetPossibleMoves() PossibleMoves {

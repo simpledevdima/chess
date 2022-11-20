@@ -20,7 +20,7 @@ func (p *pawnDoubleMove) pawnTakeOnThePass(pos *Position) {
 		// eat figure
 		figureID, figure := p.pawn.team.Figures.GetIndexAndFigureByPosition(p.pawn.GetPosition())
 		p.pawn.team.Eaten.Set(figureID, figure)
-		p.pawn.team.Figures.RemoveByIndex(figureID)
+		p.pawn.team.Figures.Remove(figureID)
 	}
 }
 

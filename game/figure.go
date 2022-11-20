@@ -6,10 +6,12 @@ import (
 
 // Figure information about each figure
 type Figure struct {
-	Name        string `json:"name"`
-	*Position   `json:"position"`
-	alreadyMove bool
-	team        *Team
+	Name          string `json:"name"`
+	*Position     `json:"position"`
+	alreadyMove   bool
+	team          *Team
+	possibleMoves Positions
+	brokenFields  Positions
 }
 
 // GetName get name from figure
@@ -43,7 +45,7 @@ func (f *Figure) kingOnTheBeatenFieldAfterMove(pos *Position) bool {
 	if f.team.enemy.Figures.ExistsByPosition(pos) {
 		eatenID := f.team.enemy.Figures.GetIndexByPosition(pos)
 		eatenFigure := f.team.enemy.Figures.Get(eatenID)
-		f.team.enemy.Figures.RemoveByIndex(eatenID)
+		f.team.enemy.Figures.Remove(eatenID)
 		undoEating = func() {
 			f.team.enemy.Figures.Set(eatenID, eatenFigure)
 		}

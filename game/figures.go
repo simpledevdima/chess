@@ -32,8 +32,8 @@ func (f *Figures) Get(index FigurerIndex) Figurer {
 	return figure
 }
 
-// RemoveByIndex remove figure interface from map at specified index
-func (f *Figures) RemoveByIndex(index FigurerIndex) {
+// Remove delete figure interface from map at specified index
+func (f *Figures) Remove(index FigurerIndex) {
 	if (*f)[index] == nil {
 		log.Println(errors.New(fmt.Sprintf("figure with index %d not found", index)))
 	} else {

@@ -116,9 +116,3 @@ func (k *King) Validation(pos *Position) (bool, string) {
 	}
 	return false, "this figure cant make that move"
 }
-
-// Move change Position of figure to Position from arguments
-func (k *King) Move(pos *Position) {
-	k.team.pawnDoubleMove.clearPawnDoubleMove()
-	k.MoveFigure(pos)
-}

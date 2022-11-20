@@ -123,22 +123,3 @@ func (p *Pawn) Validation(pos *Position) (bool, string) {
 	}
 	return false, "this figure cant make that move"
 }
-
-// Move change Position of figure to Position from arguments
-func (p *Pawn) Move(pos *Position) {
-	p.team.enemy.pawnDoubleMove.pawnTakeOnThePass(pos)
-	p.team.pawnDoubleMove.clearPawnDoubleMove()
-	p.team.pawnDoubleMove.pawnMakesDoubleMove(p, p.GetPosition(), pos)
-	p.MoveFigure(pos)
-	p.transformPawnTOQueen(pos)
-}
-
-// transformPawnToQueen promote a pawn to a queen
-func (p *Pawn) transformPawnTOQueen(pos *Position) {
-	if p.Y == 1 || p.Y == 8 {
-		figureID := p.team.Figures.GetIndexByPosition(pos)
-		// replace pawn to queen
-		p.team.Figures.Set(figureID, NewQueen(pos, p.team))
-		p.team.Figures.Get(figureID).setAlreadyMove(true)
-	}
-}

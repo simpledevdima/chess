@@ -108,9 +108,3 @@ func (b *Bishop) Validation(pos *Position) (bool, string) {
 	}
 	return false, "this figure cant make that move"
 }
-
-// Move change Position of figure to Position from arguments
-func (b *Bishop) Move(pos *Position) {
-	b.team.pawnDoubleMove.clearPawnDoubleMove()
-	b.MoveFigure(pos)
-}

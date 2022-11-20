@@ -7,7 +7,6 @@ type Figurer interface {
 	SetPosition(*Position)
 	GetPosition() *Position
 	Move(*Position)
-	MoveFigure(*Position)
 	Validation(*Position) (bool, string)
 	SetTeam(*Team)
 	positionOnBoard(*Position) bool

@@ -3,7 +3,7 @@ package game
 // pawnDoubleMove data type containing data and methods for capturing a pawn on the pass
 type pawnDoubleMove struct {
 	*Position
-	pawn *Pawn
+	pawn *Figure
 }
 
 // isTakeOnThePass returns true if it is possible to capture on the pass otherwise returns false
@@ -31,7 +31,8 @@ func (p *pawnDoubleMove) clearPawnDoubleMove() {
 }
 
 // pawnMakesDoubleMove remember data about double pawn move
-func (p *pawnDoubleMove) pawnMakesDoubleMove(pawn *Pawn, from, to *Position) {
+func (p *pawnDoubleMove) pawnMakesDoubleMove(pawn *Figure, from, to *Position) {
+	p.clearPawnDoubleMove()
 	if to.Y == from.Y+2 || to.Y == from.Y-2 {
 		p.pawn = pawn
 		p.Position = NewPosition(to.X, (to.Y+from.Y)/2)

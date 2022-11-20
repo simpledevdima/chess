@@ -103,9 +103,3 @@ func (r *Rook) Validation(pos *Position) (bool, string) {
 	}
 	return false, "this figure cant make that move"
 }
-
-// Move change Position of figure to Position from arguments
-func (r *Rook) Move(pos *Position) {
-	r.team.pawnDoubleMove.clearPawnDoubleMove()
-	r.MoveFigure(pos)
-}

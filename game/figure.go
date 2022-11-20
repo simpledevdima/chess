@@ -71,23 +71,43 @@ func (f *Figure) SetTeam(team *Team) {
 	f.team = team
 }
 
-// MoveFigure to new coords and eat enemy figure if you need that
-func (f *Figure) MoveFigure(position *Position) {
-	f.SetPosition(position)
+// Move to new position and eat enemy figure if you need that
+func (f *Figure) Move(pos *Position) {
+	// pawn double move
+	if f.GetName() == "pawn" {
+		f.team.enemy.pawnDoubleMove.pawnTakeOnThePass(pos)
+		f.team.pawnDoubleMove.pawnMakesDoubleMove(f, f.GetPosition(), pos)
+	} else {
+		f.team.pawnDoubleMove.clearPawnDoubleMove()
+	}
+
+	f.SetPosition(pos)
 	f.setAlreadyMove(true)
-	if f.team.enemy != nil && f.team.enemy.Figures.ExistsByPosition(position) {
+	if f.team.enemy != nil && f.team.enemy.Figures.ExistsByPosition(pos) {
 		// eat enemy figure
-		err := f.team.enemy.Eating(position)
+		err := f.team.enemy.Eating(pos)
 		if err != nil {
 			log.Println(err)
 		}
 	}
+
+	f.transformPawnTOQueen(pos)
 
 	// Debug
 	//f.team.ShowBrokenFields()
 	//f.team.enemy.ShowBrokenFields()
 	//f.team.ShowPossibleMoves()
 	//f.team.enemy.ShowPossibleMoves()
+}
+
+// transformPawnToQueen promote a pawn to a queen
+func (f *Figure) transformPawnTOQueen(pos *Position) {
+	if f.GetName() == "pawn" && (f.Y == 1 || f.Y == 8) {
+		figureID := f.team.Figures.GetIndexByPosition(pos)
+		// replace pawn to queen
+		f.team.Figures.Set(figureID, NewQueen(pos, f.team))
+		f.team.Figures.Get(figureID).setAlreadyMove(true)
+	}
 }
 
 // SetPosition set Position to coords from argument

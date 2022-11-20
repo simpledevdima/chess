@@ -1,11 +1,11 @@
 package game
 
-func NewKing(x, y int, t *Team) *King {
-	f := &King{}
-	f.SetName("king")
-	f.SetPosition(x, y)
-	f.SetTeam(t)
-	return f
+func NewKing(pos *Position, t *Team) *King {
+	k := &King{}
+	k.SetName("king")
+	k.Position = pos
+	k.SetTeam(t)
+	return k
 }
 
 // King is data type of chess figure

@@ -54,10 +54,10 @@ func (t *Team) HavePossibleMove() bool {
 // CheckingCheck returns true if the king is on a beaten field otherwise returns false
 func (t *Team) CheckingCheck() bool {
 	king := t.Figures.GetByName("king")
-	x, y := king.GetPosition()
+	kingPos := king.GetPosition()
 	for _, figure := range t.enemy.Figures {
-		for _, position := range figure.detectionOfBrokenFields() {
-			if position.X == x && position.Y == y {
+		for _, figPos := range figure.detectionOfBrokenFields() {
+			if *figPos == *kingPos {
 				return true
 			}
 		}
@@ -67,9 +67,10 @@ func (t *Team) CheckingCheck() bool {
 
 // Eating figure on x, y coords move its figure from Figures map to Eaten map
 func (t *Team) Eating(x int, y int) error {
+	eatPos := NewPosition(x, y)
 	for id, figure := range t.Figures {
-		figX, figY := figure.GetPosition()
-		if figX == x && figY == y {
+		figPos := figure.GetPosition()
+		if *figPos == *eatPos {
 			t.Eaten[id] = figure
 			delete(t.Figures, id)
 			return nil
@@ -95,21 +96,21 @@ func (t *Team) setStartPosition() error {
 	t.MakeFigures()
 	// paws
 	for x := 1; x <= 8; x++ {
-		t.Figures[FigureIndex(x)] = NewPawn(x, pawnLine, t)
+		t.Figures[FigureIndex(x)] = NewPawn(NewPosition(x, pawnLine), t)
 	}
 	// rooks
-	t.Figures[9] = NewRook(1, figuresLine, t)
-	t.Figures[16] = NewRook(8, figuresLine, t)
+	t.Figures[9] = NewRook(NewPosition(1, figuresLine), t)
+	t.Figures[16] = NewRook(NewPosition(8, figuresLine), t)
 	// knights
-	t.Figures[10] = NewKnight(2, figuresLine, t)
-	t.Figures[15] = NewKnight(7, figuresLine, t)
+	t.Figures[10] = NewKnight(NewPosition(2, figuresLine), t)
+	t.Figures[15] = NewKnight(NewPosition(7, figuresLine), t)
 	// bishops
-	t.Figures[11] = NewBishop(3, figuresLine, t)
-	t.Figures[14] = NewBishop(6, figuresLine, t)
+	t.Figures[11] = NewBishop(NewPosition(3, figuresLine), t)
+	t.Figures[14] = NewBishop(NewPosition(6, figuresLine), t)
 	// king
-	t.Figures[12] = NewKing(5, figuresLine, t)
+	t.Figures[12] = NewKing(NewPosition(5, figuresLine), t)
 	// queen
-	t.Figures[13] = NewQueen(4, figuresLine, t)
+	t.Figures[13] = NewQueen(NewPosition(4, figuresLine), t)
 	return nil
 }
 
@@ -134,19 +135,20 @@ func (t *Team) ImportFigures(figuresJSON []byte) {
 		log.Println(err)
 	}
 	for index, figure := range figures {
+		pos := NewPosition(figure.Position.X, figure.Position.Y)
 		switch figure.Name {
 		case "pawn":
-			t.Figures[index] = NewPawn(figure.Position.X, figure.Position.Y, t)
+			t.Figures[index] = NewPawn(pos, t)
 		case "knight":
-			t.Figures[index] = NewKnight(figure.Position.X, figure.Position.Y, t)
+			t.Figures[index] = NewKnight(pos, t)
 		case "bishop":
-			t.Figures[index] = NewBishop(figure.Position.X, figure.Position.Y, t)
+			t.Figures[index] = NewBishop(pos, t)
 		case "rook":
-			t.Figures[index] = NewRook(figure.Position.X, figure.Position.Y, t)
+			t.Figures[index] = NewRook(pos, t)
 		case "queen":
-			t.Figures[index] = NewQueen(figure.Position.X, figure.Position.Y, t)
+			t.Figures[index] = NewQueen(pos, t)
 		case "king":
-			t.Figures[index] = NewKing(figure.Position.X, figure.Position.Y, t)
+			t.Figures[index] = NewKing(pos, t)
 		}
 	}
 }
@@ -172,7 +174,7 @@ func (t *Team) ShowPossibleMoves() {
 	for index, figure := range t.Figures {
 		fields := figure.DetectionOfPossibleMove()
 		if len(fields) > 0 {
-			x, y := figure.GetPosition()
+			x, y := figure.GetPosition().Get()
 			fmt.Println(index, figure.GetName(), x, y, fields)
 		}
 	}
@@ -183,7 +185,7 @@ func (t *Team) ShowBrokenFields() {
 	fmt.Println("Team:", t.Name.String())
 	for index, figure := range t.Figures {
 		fields := figure.detectionOfBrokenFields()
-		x, y := figure.GetPosition()
-		fmt.Println(index, figure.GetName(), x, y, fields)
+		pos := figure.GetPosition()
+		fmt.Println(index, figure.GetName(), pos.X, pos.Y, fields)
 	}
 }

@@ -8,8 +8,8 @@ import (
 type Figure interface {
 	GetName() string
 	SetName(string)
-	SetPosition(int, int)
-	GetPosition() (int, int)
+	SetPosition(*Position)
+	GetPosition() *Position
 	Move(int, int)
 	MoveFigure(int, int)
 	Validation(int, int) (bool, string)
@@ -25,7 +25,7 @@ type Figure interface {
 // figureData information about each figure
 type figureData struct {
 	Name        string `json:"name"`
-	Position    `json:"position"`
+	*Position   `json:"position"`
 	alreadyMove bool
 	team        *Team
 }
@@ -53,9 +53,9 @@ func (f *figureData) setAlreadyMove(flag bool) {
 // kingOnTheBeatenFieldAfterMove returns true if your king is on the beaten square after the move otherwise return false
 func (f *figureData) kingOnTheBeatenFieldAfterMove(x int, y int) bool {
 	curX, curY := f.Position.Get()
-	f.SetPosition(x, y)
+	f.Position.Set(x, y)
 	undoMove := func() {
-		f.SetPosition(curX, curY)
+		f.Position.Set(curX, curY)
 	}
 	undoEating := func() {}
 	if f.team.enemy.Figures.ExistsByCoords(x, y) {
@@ -88,9 +88,9 @@ func (f *figureData) SetTeam(team *Team) {
 	f.team = team
 }
 
-// MoveFigure to new coords and eat enemy figure if need that
+// MoveFigure to new coords and eat enemy figure if you need that
 func (f *figureData) MoveFigure(x int, y int) {
-	f.SetPosition(x, y)
+	f.Position.Set(x, y)
 	f.setAlreadyMove(true)
 	if f.team.enemy != nil && f.team.enemy.Figures.ExistsByCoords(x, y) {
 		// eat enemy figure
@@ -108,11 +108,11 @@ func (f *figureData) MoveFigure(x int, y int) {
 }
 
 // SetPosition set Position to coords from argument
-func (f *figureData) SetPosition(x, y int) {
-	f.Position.Set(x, y)
+func (f *figureData) SetPosition(p *Position) {
+	f.Position = p
 }
 
 // GetPosition return current Position of Figure
-func (f *figureData) GetPosition() (int, int) {
-	return f.Position.Get()
+func (f *figureData) GetPosition() *Position {
+	return f.Position
 }

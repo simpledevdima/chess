@@ -1,11 +1,11 @@
 package game
 
-func NewPawn(x, y int, t *Team) *Pawn {
-	f := &Pawn{}
-	f.SetName("pawn")
-	f.SetPosition(x, y)
-	f.SetTeam(t)
-	return f
+func NewPawn(pos *Position, t *Team) *Pawn {
+	p := &Pawn{}
+	p.Position = pos
+	p.SetName("pawn")
+	p.SetTeam(t)
+	return p
 }
 
 // Pawn is data type of chess figure
@@ -126,7 +126,7 @@ func (p *Pawn) transformPawnTOQueen(x, y int) {
 	if p.Y == 1 || p.Y == 8 {
 		figureID := p.team.Figures.GetIndexByCoords(x, y)
 		// replace pawn to queen
-		p.team.Figures.Set(figureID, NewQueen(x, y, p.team))
+		p.team.Figures.Set(figureID, NewQueen(NewPosition(x, y), p.team))
 		p.team.Figures.Get(figureID).setAlreadyMove(true)
 	}
 }

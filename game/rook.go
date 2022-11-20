@@ -1,11 +1,11 @@
 package game
 
-func NewRook(x, y int, t *Team) *Rook {
-	f := &Rook{}
-	f.SetName("rook")
-	f.SetPosition(x, y)
-	f.SetTeam(t)
-	return f
+func NewRook(pos *Position, t *Team) *Rook {
+	r := &Rook{}
+	r.SetName("rook")
+	r.Position = pos
+	r.SetTeam(t)
+	return r
 }
 
 // Rook is data type of chess figure

@@ -1,11 +1,11 @@
 package game
 
-func NewBishop(x, y int, t *Team) *Bishop {
-	f := &Bishop{}
-	f.SetName("bishop")
-	f.SetPosition(x, y)
-	f.SetTeam(t)
-	return f
+func NewBishop(pos *Position, t *Team) *Bishop {
+	b := &Bishop{}
+	b.Position = pos
+	b.SetName("bishop")
+	b.SetTeam(t)
+	return b
 }
 
 // Bishop is data type of chess figure

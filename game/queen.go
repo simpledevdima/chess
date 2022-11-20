@@ -1,11 +1,11 @@
 package game
 
-func NewQueen(x, y int, t *Team) *Queen {
-	f := &Queen{}
-	f.SetName("queen")
-	f.SetPosition(x, y)
-	f.SetTeam(t)
-	return f
+func NewQueen(pos *Position, t *Team) *Queen {
+	q := &Queen{}
+	q.SetName("queen")
+	q.Position = pos
+	q.SetTeam(t)
+	return q
 }
 
 // Queen is data type of chess figure

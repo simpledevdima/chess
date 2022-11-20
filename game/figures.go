@@ -44,7 +44,7 @@ func (f *Figures) RemoveByIndex(index FigureIndex) {
 // GetIndexAndFigureByCoords returns the index and the figure interface of the figure interface at the specified coordinates
 func (f *Figures) GetIndexAndFigureByCoords(x, y int) (FigureIndex, Figure) {
 	for index, figure := range *f {
-		fx, fy := figure.GetPosition()
+		fx, fy := figure.GetPosition().Get()
 		if fx == x && fy == y {
 			return index, figure
 		}
@@ -56,7 +56,7 @@ func (f *Figures) GetIndexAndFigureByCoords(x, y int) (FigureIndex, Figure) {
 // GetByCoords returns the figure interface at the specified coordinates
 func (f *Figures) GetByCoords(x, y int) Figure {
 	for _, figure := range *f {
-		fx, fy := figure.GetPosition()
+		fx, fy := figure.GetPosition().Get()
 		if fx == x && fy == y {
 			return figure
 		}
@@ -90,7 +90,7 @@ func (f *Figures) GetIndexByName(name string) FigureIndex {
 // GetIndexByCoords returns the index of the figure interface at the specified coordinates
 func (f *Figures) GetIndexByCoords(x, y int) FigureIndex {
 	for index, figure := range *f {
-		fx, fy := figure.GetPosition()
+		fx, fy := figure.GetPosition().Get()
 		if fx == x && fy == y {
 			return index
 		}
@@ -102,7 +102,7 @@ func (f *Figures) GetIndexByCoords(x, y int) FigureIndex {
 // ExistsByCoords returns true if the shape interface exists in the map at the specified coordinates, otherwise returns false
 func (f *Figures) ExistsByCoords(x int, y int) bool {
 	for _, figure := range *f {
-		figX, figY := figure.GetPosition()
+		figX, figY := figure.GetPosition().Get()
 		if figX == x && figY == y {
 			return true
 		}

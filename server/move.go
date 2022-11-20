@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-func NewMove(c *client) *move {
+func newMove(c *client) *move {
 	m := &move{}
 	m.setClient(c)
 	return m
@@ -16,10 +16,10 @@ func NewMove(c *client) *move {
 // move data type containing the processing of the movement of the figure
 type move struct {
 	From struct {
-		game.Position `json:"position"`
+		*game.Position `json:"position"`
 	} `json:"from"`
 	To struct {
-		game.Position `json:"position"`
+		*game.Position `json:"position"`
 	} `json:"to"`
 	client *client
 }
@@ -33,8 +33,8 @@ func (m *move) setClient(client *client) {
 func (m *move) isValid() (bool, string) {
 	if m.client.server.status.isPlay() {
 		if m.client.server.turn.now() == m.client.team.Name {
-			if m.client.team.Figures.ExistsByCoords(m.From.Position.X, m.From.Position.Y) {
-				if ok, cause := m.client.team.Figures.GetByCoords(m.From.Position.X, m.From.Position.Y).Validation(m.To.Position.X, m.To.Position.Y); ok {
+			if m.client.team.Figures.ExistsByPosition(m.From.Position) {
+				if ok, cause := m.client.team.Figures.GetByPosition(m.From.Position).Validation(m.To.Position); ok {
 					return true, ""
 				} else {
 					return false, cause
@@ -52,11 +52,11 @@ func (m *move) isValid() (bool, string) {
 
 // exec executes the current move and sends the data to the broadcast
 func (m *move) exec() {
-	figure := m.client.team.Figures.GetByCoords(m.From.Position.X, m.From.Position.Y)
+	figure := m.client.team.Figures.GetByPosition(m.From.Position)
 	if m.isCastling(figure) {
 		m.makeRookMoveInCastling()
 	}
-	figure.Move(m.To.Position.X, m.To.Position.Y)
+	figure.Move(m.To.Position)
 	event := nrp.Simple{Post: "move", Body: &m}
 	m.client.server.broadcast <- event.Export()
 }
@@ -71,7 +71,7 @@ func (m *move) isCastling(figure game.Figure) bool {
 
 // makeCastling creates a rook move and makes it
 func (m *move) makeRookMoveInCastling() {
-	moveRook := NewMove(m.client)
+	moveRook := newMove(m.client)
 	moveRook.From.Position.Y = m.From.Position.Y
 	moveRook.To.Position.Y = m.To.Position.Y
 	switch m.To.Position.X {

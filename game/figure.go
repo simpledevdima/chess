@@ -10,12 +10,12 @@ type Figure interface {
 	SetName(string)
 	SetPosition(*Position)
 	GetPosition() *Position
-	Move(int, int)
-	MoveFigure(int, int)
-	Validation(int, int) (bool, string)
+	Move(*Position)
+	MoveFigure(*Position)
+	Validation(*Position) (bool, string)
 	SetTeam(*Team)
-	coordsOnBoard(int, int) bool
-	kingOnTheBeatenFieldAfterMove(int, int) bool
+	positionOnBoard(*Position) bool
+	kingOnTheBeatenFieldAfterMove(*Position) bool
 	detectionOfBrokenFields() []*Position
 	DetectionOfPossibleMove() []*Position
 	IsAlreadyMove() bool
@@ -51,15 +51,15 @@ func (f *figureData) setAlreadyMove(flag bool) {
 }
 
 // kingOnTheBeatenFieldAfterMove returns true if your king is on the beaten square after the move otherwise return false
-func (f *figureData) kingOnTheBeatenFieldAfterMove(x int, y int) bool {
-	curX, curY := f.Position.Get()
-	f.Position.Set(x, y)
+func (f *figureData) kingOnTheBeatenFieldAfterMove(pos *Position) bool {
+	curPos := f.Position
+	f.SetPosition(pos)
 	undoMove := func() {
-		f.Position.Set(curX, curY)
+		f.SetPosition(curPos)
 	}
 	undoEating := func() {}
-	if f.team.enemy.Figures.ExistsByCoords(x, y) {
-		eatenID := f.team.enemy.Figures.GetIndexByCoords(x, y)
+	if f.team.enemy.Figures.ExistsByPosition(pos) {
+		eatenID := f.team.enemy.Figures.GetIndexByPosition(pos)
 		eatenFigure := f.team.enemy.Figures.Get(eatenID)
 		f.team.enemy.Figures.RemoveByIndex(eatenID)
 		undoEating = func() {
@@ -75,8 +75,9 @@ func (f *figureData) kingOnTheBeatenFieldAfterMove(x int, y int) bool {
 	return false
 }
 
-// coordsOnBoard returns true if the coordinates are within the board, otherwise return false
-func (f *figureData) coordsOnBoard(x int, y int) bool {
+// positionOnBoard returns true if the coordinates are within the board, otherwise return false
+func (f *figureData) positionOnBoard(pos *Position) bool {
+	x, y := pos.Get()
 	if x >= 1 && x <= 8 && y >= 1 && y <= 8 {
 		return true
 	}
@@ -89,12 +90,12 @@ func (f *figureData) SetTeam(team *Team) {
 }
 
 // MoveFigure to new coords and eat enemy figure if you need that
-func (f *figureData) MoveFigure(x int, y int) {
-	f.Position.Set(x, y)
+func (f *figureData) MoveFigure(position *Position) {
+	f.SetPosition(position)
 	f.setAlreadyMove(true)
-	if f.team.enemy != nil && f.team.enemy.Figures.ExistsByCoords(x, y) {
+	if f.team.enemy != nil && f.team.enemy.Figures.ExistsByPosition(position) {
 		// eat enemy figure
-		err := f.team.enemy.Eating(x, y)
+		err := f.team.enemy.Eating(position)
 		if err != nil {
 			log.Println(err)
 		}

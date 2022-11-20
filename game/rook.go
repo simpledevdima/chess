@@ -17,7 +17,7 @@ type Rook struct {
 func (r *Rook) DetectionOfPossibleMove() []*Position {
 	var possibleMoves []*Position
 	for _, position := range r.detectionOfBrokenFields() {
-		if !r.team.Figures.ExistsByCoords(position.X, position.Y) && !r.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
+		if !r.team.Figures.ExistsByPosition(position) && !r.kingOnTheBeatenFieldAfterMove(position) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}
@@ -34,36 +34,43 @@ func (r *Rook) detectionOfBrokenFields() []*Position {
 		left   bool
 	}{true, true, true, true}
 	for i := 1; i <= 7; i++ {
-		if directions.top && r.coordsOnBoard(r.X, r.Y+i) {
-			data = append(data, NewPosition(r.X, r.Y+i))
+		pos := NewPosition(r.X, r.Y+i)
+		if directions.top && r.positionOnBoard(pos) {
+			data = append(data, pos)
 		}
-		if directions.right && r.coordsOnBoard(r.X+i, r.Y) {
-			data = append(data, NewPosition(r.X+i, r.Y))
-		}
-		if directions.bottom && r.coordsOnBoard(r.X, r.Y-i) {
-			data = append(data, NewPosition(r.X, r.Y-i))
-		}
-		if directions.left && r.coordsOnBoard(r.X-i, r.Y) {
-			data = append(data, NewPosition(r.X-i, r.Y))
-		}
-		if r.team.Figures.ExistsByCoords(r.X, r.Y+i) ||
-			r.team.enemy.Figures.ExistsByCoords(r.X, r.Y+i) ||
-			!r.coordsOnBoard(r.X, r.Y+i) {
+		if r.team.Figures.ExistsByPosition(pos) ||
+			r.team.enemy.Figures.ExistsByPosition(pos) ||
+			!r.positionOnBoard(pos) {
 			directions.top = false
 		}
-		if r.team.Figures.ExistsByCoords(r.X+i, r.Y) ||
-			r.team.enemy.Figures.ExistsByCoords(r.X+i, r.Y) ||
-			!r.coordsOnBoard(r.X+i, r.Y) {
+
+		pos = NewPosition(r.X+i, r.Y)
+		if directions.right && r.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if r.team.Figures.ExistsByPosition(pos) ||
+			r.team.enemy.Figures.ExistsByPosition(pos) ||
+			!r.positionOnBoard(pos) {
 			directions.right = false
 		}
-		if r.team.Figures.ExistsByCoords(r.X, r.Y-i) ||
-			r.team.enemy.Figures.ExistsByCoords(r.X, r.Y-i) ||
-			!r.coordsOnBoard(r.X, r.Y-i) {
+
+		pos = NewPosition(r.X, r.Y-i)
+		if directions.bottom && r.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if r.team.Figures.ExistsByPosition(pos) ||
+			r.team.enemy.Figures.ExistsByPosition(pos) ||
+			!r.positionOnBoard(pos) {
 			directions.bottom = false
 		}
-		if r.team.Figures.ExistsByCoords(r.X-i, r.Y) ||
-			r.team.enemy.Figures.ExistsByCoords(r.X-i, r.Y) ||
-			!r.coordsOnBoard(r.X-i, r.Y) {
+
+		pos = NewPosition(r.X-i, r.Y)
+		if directions.left && r.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if r.team.Figures.ExistsByPosition(pos) ||
+			r.team.enemy.Figures.ExistsByPosition(pos) ||
+			!r.positionOnBoard(pos) {
 			directions.left = false
 		}
 	}
@@ -71,26 +78,26 @@ func (r *Rook) detectionOfBrokenFields() []*Position {
 }
 
 // Validation return true if this move are valid or return false
-func (r *Rook) Validation(x int, y int) (bool, string) {
-	if !r.coordsOnBoard(x, y) {
+func (r *Rook) Validation(pos *Position) (bool, string) {
+	if !r.positionOnBoard(pos) {
 		return false, "attempt to go out the board"
 	}
-	if r.X == x && r.Y == y {
+	if *r.GetPosition() == *pos {
 		return false, "can't walk around"
 	}
-	if r.team.Figures.ExistsByCoords(x, y) {
+	if r.team.Figures.ExistsByPosition(pos) {
 		return false, "this place is occupied by your figure"
 	}
-	if r.kingOnTheBeatenFieldAfterMove(x, y) {
+	if r.kingOnTheBeatenFieldAfterMove(pos) {
 		return false, "your king stands on a beaten field"
 	}
 	// if change x && y is not valid for rook
-	if r.X != x && r.Y != y {
+	if r.X != pos.X && r.Y != pos.Y {
 		return false, "rook doesn't walk like that"
 	}
 	// detect Position for move and check it for input data move coords
 	for _, position := range r.detectionOfBrokenFields() {
-		if position.X == x && position.Y == y {
+		if *position == *pos {
 			return true, ""
 		}
 	}
@@ -98,7 +105,7 @@ func (r *Rook) Validation(x int, y int) (bool, string) {
 }
 
 // Move change Position of figure to Position from arguments
-func (r *Rook) Move(x int, y int) {
+func (r *Rook) Move(pos *Position) {
 	r.team.pawnDoubleMove.clearPawnDoubleMove()
-	r.MoveFigure(x, y)
+	r.MoveFigure(pos)
 }

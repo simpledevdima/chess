@@ -96,7 +96,7 @@ func (c *client) response(id int, valid bool, cause string) {
 
 // postToMove if a request for a move came
 func (c *client) postToMove(request *nrp.Simple) {
-	m := NewMove(c)
+	m := newMove(c)
 	request.BodyToVariable(&m)
 	valid, cause := m.isValid()
 	c.response(request.Id, valid, cause)

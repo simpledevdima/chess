@@ -15,7 +15,7 @@ func NewTeam(n TeamName) *Team {
 type Team struct {
 	Name           TeamName
 	Figures        Figures `json:"figures"`
-	Eaten          Figures
+	Eaten          Figures `json:"eaten"`
 	enemy          *Team
 	pawnDoubleMove pawnDoubleMove // taking on the pass
 }
@@ -43,7 +43,7 @@ func (t *Team) SetEnemy(enemy *Team) {
 func (t *Team) HavePossibleMove() bool {
 	for _, figure := range t.Figures {
 		for _, position := range figure.DetectionOfPossibleMove() {
-			if ok, _ := figure.Validation(position.X, position.Y); ok {
+			if ok, _ := figure.Validation(position); ok {
 				return true
 			}
 		}
@@ -66,8 +66,7 @@ func (t *Team) CheckingCheck() bool {
 }
 
 // Eating figure on x, y coords move its figure from Figures map to Eaten map
-func (t *Team) Eating(x int, y int) error {
-	eatPos := NewPosition(x, y)
+func (t *Team) Eating(eatPos *Position) error {
 	for id, figure := range t.Figures {
 		figPos := figure.GetPosition()
 		if *figPos == *eatPos {
@@ -76,7 +75,7 @@ func (t *Team) Eating(x int, y int) error {
 			return nil
 		}
 	}
-	return errors.New(fmt.Sprintf("we cant eat figure because no figure in: %vx%v coords", x, y))
+	return errors.New(fmt.Sprintf("we cant eat figure because no figure in: %vx%v coords", eatPos.X, eatPos.Y))
 }
 
 // setStartPosition method setup start team positions for all Figures

@@ -17,7 +17,7 @@ type Queen struct {
 func (q *Queen) DetectionOfPossibleMove() []*Position {
 	var possibleMoves []*Position
 	for _, position := range q.detectionOfBrokenFields() {
-		if !q.team.Figures.ExistsByCoords(position.X, position.Y) && !q.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
+		if !q.team.Figures.ExistsByPosition(position) && !q.kingOnTheBeatenFieldAfterMove(position) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}
@@ -39,68 +39,83 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 		leftTop     bool
 	}{true, true, true, true, true, true, true, true}
 	for i := 1; i <= 7; i++ {
-		if directions.top && q.coordsOnBoard(q.X, q.Y+i) {
-			data = append(data, NewPosition(q.X, q.Y+i))
+		pos := NewPosition(q.X, q.Y+i)
+		if directions.top && q.positionOnBoard(pos) {
+			data = append(data, pos)
 		}
-		if directions.rightTop && q.coordsOnBoard(q.X+i, q.Y+i) {
-			data = append(data, NewPosition(q.X+i, q.Y+i))
-		}
-		if directions.right && q.coordsOnBoard(q.X+i, q.Y) {
-			data = append(data, NewPosition(q.X+i, q.Y))
-		}
-		if directions.rightBottom && q.coordsOnBoard(q.X+i, q.Y-i) {
-			data = append(data, NewPosition(q.X+i, q.Y-i))
-		}
-		if directions.bottom && q.coordsOnBoard(q.X, q.Y-i) {
-			data = append(data, NewPosition(q.X, q.Y-i))
-		}
-		if directions.leftBottom && q.coordsOnBoard(q.X-i, q.Y-i) {
-			data = append(data, NewPosition(q.X-i, q.Y-i))
-		}
-		if directions.left && q.coordsOnBoard(q.X-i, q.Y) {
-			data = append(data, NewPosition(q.X-i, q.Y))
-		}
-		if directions.leftTop && q.coordsOnBoard(q.X-i, q.Y+i) {
-			data = append(data, NewPosition(q.X-i, q.Y+i))
-		}
-		if q.team.Figures.ExistsByCoords(q.X, q.Y+i) ||
-			q.team.enemy.Figures.ExistsByCoords(q.X, q.Y+i) ||
-			!q.coordsOnBoard(q.X, q.Y+i) {
+		if q.team.Figures.ExistsByPosition(pos) ||
+			q.team.enemy.Figures.ExistsByPosition(pos) ||
+			!q.positionOnBoard(pos) {
 			directions.top = false
 		}
-		if q.team.Figures.ExistsByCoords(q.X+i, q.Y+i) ||
-			q.team.enemy.Figures.ExistsByCoords(q.X+i, q.Y+i) ||
-			!q.coordsOnBoard(q.X+i, q.Y+i) {
+
+		pos = NewPosition(q.X+i, q.Y+i)
+		if directions.rightTop && q.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if q.team.Figures.ExistsByPosition(pos) ||
+			q.team.enemy.Figures.ExistsByPosition(pos) ||
+			!q.positionOnBoard(pos) {
 			directions.rightTop = false
 		}
-		if q.team.Figures.ExistsByCoords(q.X+i, q.Y) ||
-			q.team.enemy.Figures.ExistsByCoords(q.X+i, q.Y) ||
-			!q.coordsOnBoard(q.X+i, q.Y) {
+
+		pos = NewPosition(q.X+i, q.Y)
+		if directions.right && q.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if q.team.Figures.ExistsByPosition(pos) ||
+			q.team.enemy.Figures.ExistsByPosition(pos) ||
+			!q.positionOnBoard(pos) {
 			directions.right = false
 		}
-		if q.team.Figures.ExistsByCoords(q.X+i, q.Y-i) ||
-			q.team.enemy.Figures.ExistsByCoords(q.X+i, q.Y-i) ||
-			!q.coordsOnBoard(q.X+i, q.Y-i) {
+
+		pos = NewPosition(q.X+i, q.Y-i)
+		if directions.rightBottom && q.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if q.team.Figures.ExistsByPosition(pos) ||
+			q.team.enemy.Figures.ExistsByPosition(pos) ||
+			!q.positionOnBoard(pos) {
 			directions.rightBottom = false
 		}
-		if q.team.Figures.ExistsByCoords(q.X, q.Y-i) ||
-			q.team.enemy.Figures.ExistsByCoords(q.X, q.Y-i) ||
-			!q.coordsOnBoard(q.X, q.Y-i) {
+
+		pos = NewPosition(q.X, q.Y-i)
+		if directions.bottom && q.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if q.team.Figures.ExistsByPosition(pos) ||
+			q.team.enemy.Figures.ExistsByPosition(pos) ||
+			!q.positionOnBoard(pos) {
 			directions.bottom = false
 		}
-		if q.team.Figures.ExistsByCoords(q.X-i, q.Y-i) ||
-			q.team.enemy.Figures.ExistsByCoords(q.X-i, q.Y-i) ||
-			!q.coordsOnBoard(q.X-i, q.Y-i) {
+
+		pos = NewPosition(q.X-i, q.Y-i)
+		if directions.leftBottom && q.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if q.team.Figures.ExistsByPosition(pos) ||
+			q.team.enemy.Figures.ExistsByPosition(pos) ||
+			!q.positionOnBoard(pos) {
 			directions.leftBottom = false
 		}
-		if q.team.Figures.ExistsByCoords(q.X-i, q.Y) ||
-			q.team.enemy.Figures.ExistsByCoords(q.X-i, q.Y) ||
-			!q.coordsOnBoard(q.X-i, q.Y) {
+
+		pos = NewPosition(q.X-i, q.Y)
+		if directions.left && q.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if q.team.Figures.ExistsByPosition(pos) ||
+			q.team.enemy.Figures.ExistsByPosition(pos) ||
+			!q.positionOnBoard(pos) {
 			directions.left = false
 		}
-		if q.team.Figures.ExistsByCoords(q.X-i, q.Y+i) ||
-			q.team.enemy.Figures.ExistsByCoords(q.X-i, q.Y+i) ||
-			!q.coordsOnBoard(q.X-i, q.Y+i) {
+
+		pos = NewPosition(q.X-i, q.Y+i)
+		if directions.leftTop && q.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if q.team.Figures.ExistsByPosition(pos) ||
+			q.team.enemy.Figures.ExistsByPosition(pos) ||
+			!q.positionOnBoard(pos) {
 			directions.leftTop = false
 		}
 	}
@@ -109,19 +124,20 @@ func (q *Queen) detectionOfBrokenFields() []*Position {
 }
 
 // Validation return true if this move are valid or return false
-func (q *Queen) Validation(x int, y int) (bool, string) {
-	if !q.coordsOnBoard(x, y) {
+func (q *Queen) Validation(pos *Position) (bool, string) {
+	if !q.positionOnBoard(pos) {
 		return false, "attempt to go out the board"
 	}
-	if q.X == x && q.Y == y {
+	if *q.GetPosition() == *pos {
 		return false, "can't walk around"
 	}
-	if q.team.Figures.ExistsByCoords(x, y) {
+	if q.team.Figures.ExistsByPosition(pos) {
 		return false, "this place is occupied by your figure"
 	}
-	if q.kingOnTheBeatenFieldAfterMove(x, y) {
+	if q.kingOnTheBeatenFieldAfterMove(pos) {
 		return false, "your king stands on a beaten field"
 	}
+	x, y := pos.Get()
 	// if change x && y is not valid for queen
 	if (q.X != x && q.Y != y && x < q.X && y < q.Y && q.X-x != q.Y-y) ||
 		(q.X != x && q.Y != y && x < q.X && y > q.Y && q.X-x != y-q.Y) ||
@@ -140,7 +156,7 @@ func (q *Queen) Validation(x int, y int) (bool, string) {
 }
 
 // Move change Position of figure to Position from arguments
-func (q *Queen) Move(x int, y int) {
+func (q *Queen) Move(pos *Position) {
 	q.team.pawnDoubleMove.clearPawnDoubleMove()
-	q.MoveFigure(x, y)
+	q.MoveFigure(pos)
 }

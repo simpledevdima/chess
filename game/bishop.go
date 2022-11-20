@@ -17,7 +17,7 @@ type Bishop struct {
 func (b *Bishop) DetectionOfPossibleMove() []*Position {
 	var possibleMoves []*Position
 	for _, position := range b.detectionOfBrokenFields() {
-		if !b.team.Figures.ExistsByCoords(position.X, position.Y) && !b.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
+		if !b.team.Figures.ExistsByPosition(position) && !b.kingOnTheBeatenFieldAfterMove(position) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}
@@ -34,36 +34,43 @@ func (b *Bishop) detectionOfBrokenFields() []*Position {
 		leftTop     bool
 	}{true, true, true, true}
 	for i := 1; i <= 7; i++ {
-		if directions.rightTop && b.coordsOnBoard(b.X+i, b.Y+i) {
-			data = append(data, NewPosition(b.X+i, b.Y+i))
+		pos := NewPosition(b.X+i, b.Y+i)
+		if directions.rightTop && b.positionOnBoard(pos) {
+			data = append(data, pos)
 		}
-		if directions.rightBottom && b.coordsOnBoard(b.X+i, b.Y-i) {
-			data = append(data, NewPosition(b.X+i, b.Y-i))
-		}
-		if directions.leftBottom && b.coordsOnBoard(b.X-i, b.Y-i) {
-			data = append(data, NewPosition(b.X-i, b.Y-i))
-		}
-		if directions.leftTop && b.coordsOnBoard(b.X-i, b.Y+i) {
-			data = append(data, NewPosition(b.X-i, b.Y+i))
-		}
-		if b.team.Figures.ExistsByCoords(b.X+i, b.Y+i) ||
-			b.team.enemy.Figures.ExistsByCoords(b.X+i, b.Y+i) ||
-			!b.coordsOnBoard(b.X+i, b.Y+i) {
+		if b.team.Figures.ExistsByPosition(pos) ||
+			b.team.enemy.Figures.ExistsByPosition(pos) ||
+			!b.positionOnBoard(pos) {
 			directions.rightTop = false
 		}
-		if b.team.Figures.ExistsByCoords(b.X+i, b.Y-i) ||
-			b.team.enemy.Figures.ExistsByCoords(b.X+i, b.Y-i) ||
-			!b.coordsOnBoard(b.X+i, b.Y-i) {
+
+		pos = NewPosition(b.X+i, b.Y-i)
+		if directions.rightBottom && b.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if b.team.Figures.ExistsByPosition(pos) ||
+			b.team.enemy.Figures.ExistsByPosition(pos) ||
+			!b.positionOnBoard(pos) {
 			directions.rightBottom = false
 		}
-		if b.team.Figures.ExistsByCoords(b.X-i, b.Y-i) ||
-			b.team.enemy.Figures.ExistsByCoords(b.X-i, b.Y-i) ||
-			!b.coordsOnBoard(b.X-i, b.Y-i) {
+
+		pos = NewPosition(b.X-i, b.Y-i)
+		if directions.leftBottom && b.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if b.team.Figures.ExistsByPosition(pos) ||
+			b.team.enemy.Figures.ExistsByPosition(pos) ||
+			!b.positionOnBoard(pos) {
 			directions.leftBottom = false
 		}
-		if b.team.Figures.ExistsByCoords(b.X-i, b.Y+i) ||
-			b.team.enemy.Figures.ExistsByCoords(b.X-i, b.Y+i) ||
-			!b.coordsOnBoard(b.X-i, b.Y+i) {
+
+		pos = NewPosition(b.X-i, b.Y+i)
+		if directions.leftTop && b.positionOnBoard(pos) {
+			data = append(data, pos)
+		}
+		if b.team.Figures.ExistsByPosition(pos) ||
+			b.team.enemy.Figures.ExistsByPosition(pos) ||
+			!b.positionOnBoard(pos) {
 			directions.leftTop = false
 		}
 	}
@@ -71,20 +78,21 @@ func (b *Bishop) detectionOfBrokenFields() []*Position {
 }
 
 // Validation return true if this move are valid or return false
-func (b *Bishop) Validation(x int, y int) (bool, string) {
-	if !b.coordsOnBoard(x, y) {
+func (b *Bishop) Validation(pos *Position) (bool, string) {
+	if !b.positionOnBoard(pos) {
 		return false, "attempt to go out the board"
 	}
-	if b.X == x && b.Y == y {
+	if *b.GetPosition() == *pos {
 		return false, "can't walk around"
 	}
-	if b.team.Figures.ExistsByCoords(x, y) {
+	if b.team.Figures.ExistsByPosition(pos) {
 		return false, "this place is occupied by your figure"
 	}
-	if b.kingOnTheBeatenFieldAfterMove(x, y) {
+	if b.kingOnTheBeatenFieldAfterMove(pos) {
 		return false, "your king stands on a beaten field"
 	}
 	// if is not valid for bishop
+	x, y := pos.Get()
 	if (x < b.X && y < b.Y && b.X-x != b.Y-y) ||
 		(x < b.X && y > b.Y && b.X-x != y-b.Y) ||
 		(x > b.X && y < b.Y && x-b.X != b.Y-y) ||
@@ -93,7 +101,7 @@ func (b *Bishop) Validation(x int, y int) (bool, string) {
 	}
 	// detect Positions for move and check it for input data move coords
 	for _, position := range b.detectionOfBrokenFields() {
-		if position.X == x && position.Y == y {
+		if *position == *pos {
 			// this move is valid
 			return true, ""
 		}
@@ -102,7 +110,7 @@ func (b *Bishop) Validation(x int, y int) (bool, string) {
 }
 
 // Move change Position of figure to Position from arguments
-func (b *Bishop) Move(x int, y int) {
+func (b *Bishop) Move(pos *Position) {
 	b.team.pawnDoubleMove.clearPawnDoubleMove()
-	b.MoveFigure(x, y)
+	b.MoveFigure(pos)
 }

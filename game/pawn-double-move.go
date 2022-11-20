@@ -2,23 +2,23 @@ package game
 
 // pawnDoubleMove data type containing data and methods for capturing a pawn on the pass
 type pawnDoubleMove struct {
-	Position Position
-	pawn     *Pawn
+	*Position
+	pawn *Pawn
 }
 
 // isTakeOnThePass returns true if it is possible to capture on the pass otherwise returns false
-func (p *pawnDoubleMove) isTakeOnThePass(x, y int) bool {
-	if p.pawn != nil && p.Position.X == x && p.Position.Y == y {
+func (p *pawnDoubleMove) isTakeOnThePass(pos *Position) bool {
+	if p.pawn != nil && *p.Position == *pos {
 		return true
 	}
 	return false
 }
 
 // pawnTakeOnThePass makes a pawn take on the pass
-func (p *pawnDoubleMove) pawnTakeOnThePass(x, y int) {
-	if p.Position.X == x && p.Position.Y == y {
+func (p *pawnDoubleMove) pawnTakeOnThePass(pos *Position) {
+	if p.Position != nil && *p.Position == *pos {
 		// eat figure
-		figureID, figure := p.pawn.team.Figures.GetIndexAndFigureByCoords(p.pawn.Position.X, p.pawn.Position.Y)
+		figureID, figure := p.pawn.team.Figures.GetIndexAndFigureByPosition(p.pawn.GetPosition())
 		p.pawn.team.Eaten.Set(figureID, figure)
 		p.pawn.team.Figures.RemoveByIndex(figureID)
 	}
@@ -26,7 +26,7 @@ func (p *pawnDoubleMove) pawnTakeOnThePass(x, y int) {
 
 // clearPawnDoubleMove clear data about double pawn move
 func (p *pawnDoubleMove) clearPawnDoubleMove() {
-	p.Position = Position{}
+	p.Position = nil
 	p.pawn = nil
 }
 
@@ -34,7 +34,6 @@ func (p *pawnDoubleMove) clearPawnDoubleMove() {
 func (p *pawnDoubleMove) pawnMakesDoubleMove(pawn *Pawn, from, to *Position) {
 	if to.Y == from.Y+2 || to.Y == from.Y-2 {
 		p.pawn = pawn
-		p.Position.X = to.X
-		p.Position.Y = (to.Y + from.Y) / 2
+		p.Position = NewPosition(to.X, (to.Y+from.Y)/2)
 	}
 }

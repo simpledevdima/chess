@@ -41,27 +41,26 @@ func (f *Figures) RemoveByIndex(index FigureIndex) {
 	}
 }
 
-// GetIndexAndFigureByCoords returns the index and the figure interface of the figure interface at the specified coordinates
-func (f *Figures) GetIndexAndFigureByCoords(x, y int) (FigureIndex, Figure) {
+// GetIndexAndFigureByPosition returns the index and the figure interface of the figure interface at the specified coordinates
+func (f *Figures) GetIndexAndFigureByPosition(pos *Position) (FigureIndex, Figure) {
 	for index, figure := range *f {
-		fx, fy := figure.GetPosition().Get()
-		if fx == x && fy == y {
+		if *figure.GetPosition() == *pos {
 			return index, figure
 		}
 	}
-	log.Println(errors.New(fmt.Sprintf("figure with coordinates %dx%d not found", x, y)))
+	log.Println(errors.New(fmt.Sprintf("figure with coordinates %dx%d not found", pos.X, pos.Y)))
 	return 0, nil
 }
 
-// GetByCoords returns the figure interface at the specified coordinates
-func (f *Figures) GetByCoords(x, y int) Figure {
+// GetByPosition returns the figure interface at the specified coordinates
+func (f *Figures) GetByPosition(pos *Position) Figure {
 	for _, figure := range *f {
-		fx, fy := figure.GetPosition().Get()
-		if fx == x && fy == y {
+		figPos := figure.GetPosition()
+		if *figPos == *pos {
 			return figure
 		}
 	}
-	log.Println(errors.New(fmt.Sprintf("figure with coordinates %dx%d not found", x, y)))
+	log.Println(errors.New(fmt.Sprintf("figure with coordinates %dx%d not found", pos.X, pos.Y)))
 	return nil
 }
 
@@ -87,23 +86,22 @@ func (f *Figures) GetIndexByName(name string) FigureIndex {
 	return 0
 }
 
-// GetIndexByCoords returns the index of the figure interface at the specified coordinates
-func (f *Figures) GetIndexByCoords(x, y int) FigureIndex {
+// GetIndexByPosition returns the index of the figure interface at the specified coordinates
+func (f *Figures) GetIndexByPosition(pos *Position) FigureIndex {
 	for index, figure := range *f {
-		fx, fy := figure.GetPosition().Get()
-		if fx == x && fy == y {
+		figPos := figure.GetPosition()
+		if *figPos == *pos {
 			return index
 		}
 	}
-	log.Println(errors.New(fmt.Sprintf("figure with coordinates %dx%d not found", x, y)))
+	log.Println(errors.New(fmt.Sprintf("figure with coordinates %dx%d not found", pos.X, pos.Y)))
 	return 0
 }
 
-// ExistsByCoords returns true if the shape interface exists in the map at the specified coordinates, otherwise returns false
-func (f *Figures) ExistsByCoords(x int, y int) bool {
+// ExistsByPosition returns true if the shape interface exists in the map at the specified coordinates, otherwise returns false
+func (f *Figures) ExistsByPosition(pos *Position) bool {
 	for _, figure := range *f {
-		figX, figY := figure.GetPosition().Get()
-		if figX == x && figY == y {
+		if *figure.GetPosition() == *pos {
 			return true
 		}
 	}

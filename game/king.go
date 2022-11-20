@@ -17,7 +17,7 @@ type King struct {
 func (k *King) DetectionOfPossibleMove() []*Position {
 	var possibleMoves []*Position
 	for _, position := range k.detectionOfBrokenFields() {
-		if !k.team.Figures.ExistsByCoords(position.X, position.Y) && !k.kingOnTheBeatenFieldAfterMove(position.X, position.Y) {
+		if !k.team.Figures.ExistsByPosition(position) && !k.kingOnTheBeatenFieldAfterMove(position) {
 			possibleMoves = append(possibleMoves, position)
 		}
 	}
@@ -28,66 +28,81 @@ func (k *King) DetectionOfPossibleMove() []*Position {
 func (k *King) detectionOfBrokenFields() []*Position {
 	var data []*Position
 
-	if k.coordsOnBoard(k.X, k.Y+1) {
-		data = append(data, NewPosition(k.X, k.Y+1))
+	pos := NewPosition(k.X, k.Y+1)
+	if k.positionOnBoard(pos) {
+		data = append(data, pos)
 	}
-	if k.coordsOnBoard(k.X+1, k.Y+1) {
-		data = append(data, NewPosition(k.X+1, k.Y+1))
+
+	pos = NewPosition(k.X+1, k.Y+1)
+	if k.positionOnBoard(pos) {
+		data = append(data, pos)
 	}
-	if k.coordsOnBoard(k.X+1, k.Y) {
-		data = append(data, NewPosition(k.X+1, k.Y))
+
+	pos = NewPosition(k.X+1, k.Y)
+	if k.positionOnBoard(pos) {
+		data = append(data, pos)
 	}
-	if k.coordsOnBoard(k.X+1, k.Y-1) {
+
+	pos = NewPosition(k.X+1, k.Y-1)
+	if k.positionOnBoard(pos) {
 		data = append(data, NewPosition(k.X+1, k.Y-1))
 	}
-	if k.coordsOnBoard(k.X, k.Y-1) {
-		data = append(data, NewPosition(k.X, k.Y-1))
+
+	pos = NewPosition(k.X, k.Y-1)
+	if k.positionOnBoard(pos) {
+		data = append(data, pos)
 	}
-	if k.coordsOnBoard(k.X-1, k.Y-1) {
-		data = append(data, NewPosition(k.X-1, k.Y-1))
+
+	pos = NewPosition(k.X-1, k.Y-1)
+	if k.positionOnBoard(pos) {
+		data = append(data, pos)
 	}
-	if k.coordsOnBoard(k.X-1, k.Y) {
-		data = append(data, NewPosition(k.X-1, k.Y))
+
+	pos = NewPosition(k.X-1, k.Y)
+	if k.positionOnBoard(pos) {
+		data = append(data, pos)
 	}
-	if k.coordsOnBoard(k.X-1, k.Y+1) {
-		data = append(data, NewPosition(k.X-1, k.Y+1))
+
+	pos = NewPosition(k.X-1, k.Y+1)
+	if k.positionOnBoard(pos) {
+		data = append(data, pos)
 	}
 
 	return data
 }
 
 // Validation return true if this move are valid or return false
-func (k *King) Validation(x int, y int) (bool, string) {
-	if !k.coordsOnBoard(x, y) {
+func (k *King) Validation(pos *Position) (bool, string) {
+	if !k.positionOnBoard(pos) {
 		return false, "attempt to go out the board"
 	}
-	if k.X == x && k.Y == y {
+	if *k.GetPosition() == *pos {
 		return false, "can't walk around"
 	}
-	if k.team.Figures.ExistsByCoords(x, y) {
+	if k.team.Figures.ExistsByPosition(pos) {
 		return false, "this place is occupied by your figure"
 	}
-	if k.kingOnTheBeatenFieldAfterMove(x, y) {
+	if k.kingOnTheBeatenFieldAfterMove(pos) {
 		return false, "your king stands on a beaten field"
 	}
 	// castling
 	if !k.alreadyMove {
-		if x == 3 {
+		if pos.X == 3 {
 			if !k.team.CheckingCheck() &&
-				!k.team.Figures.ExistsByCoords(k.X-1, k.Y) && !k.team.enemy.Figures.ExistsByCoords(k.X-1, k.Y) &&
-				!k.team.Figures.ExistsByCoords(k.X-2, k.Y) && !k.team.enemy.Figures.ExistsByCoords(k.X-2, k.Y) &&
-				!k.team.Figures.ExistsByCoords(k.X-3, k.Y) && !k.team.enemy.Figures.ExistsByCoords(k.X-3, k.Y) &&
-				k.team.Figures.ExistsByCoords(k.X-4, k.Y) {
-				if !k.team.Figures.GetByCoords(k.X-4, k.Y).IsAlreadyMove() {
+				!k.team.Figures.ExistsByPosition(NewPosition(k.X-1, k.Y)) && !k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X-1, k.Y)) &&
+				!k.team.Figures.ExistsByPosition(NewPosition(k.X-2, k.Y)) && !k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X-2, k.Y)) &&
+				!k.team.Figures.ExistsByPosition(NewPosition(k.X-3, k.Y)) && !k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X-3, k.Y)) &&
+				k.team.Figures.ExistsByPosition(NewPosition(k.X-4, k.Y)) {
+				if !k.team.Figures.GetByPosition(NewPosition(k.X-4, k.Y)).IsAlreadyMove() {
 					return true, ""
 				}
 			}
-		} else if x == 7 {
+		} else if pos.X == 7 {
 			if !k.team.CheckingCheck() &&
-				!k.team.Figures.ExistsByCoords(k.X+1, k.Y) && !k.team.enemy.Figures.ExistsByCoords(k.X+1, k.Y) &&
-				!k.team.Figures.ExistsByCoords(k.X+2, k.Y) && !k.team.enemy.Figures.ExistsByCoords(k.X+2, k.Y) &&
-				k.team.Figures.ExistsByCoords(k.X+3, k.Y) {
-				if !k.team.Figures.GetByCoords(k.X+3, k.Y).IsAlreadyMove() {
+				!k.team.Figures.ExistsByPosition(NewPosition(k.X+1, k.Y)) && !k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X+1, k.Y)) &&
+				!k.team.Figures.ExistsByPosition(NewPosition(k.X+2, k.Y)) && !k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X+2, k.Y)) &&
+				k.team.Figures.ExistsByPosition(NewPosition(k.X+3, k.Y)) {
+				if !k.team.Figures.GetByPosition(NewPosition(k.X+3, k.Y)).IsAlreadyMove() {
 					return true, ""
 				}
 			}
@@ -95,7 +110,7 @@ func (k *King) Validation(x int, y int) (bool, string) {
 	}
 	// detect Position for move and check it for input data move coords
 	for _, position := range k.detectionOfBrokenFields() {
-		if position.X == x && position.Y == y {
+		if *position == *pos {
 			return true, ""
 		}
 	}
@@ -103,7 +118,7 @@ func (k *King) Validation(x int, y int) (bool, string) {
 }
 
 // Move change Position of figure to Position from arguments
-func (k *King) Move(x int, y int) {
+func (k *King) Move(pos *Position) {
 	k.team.pawnDoubleMove.clearPawnDoubleMove()
-	k.MoveFigure(x, y)
+	k.MoveFigure(pos)
 }

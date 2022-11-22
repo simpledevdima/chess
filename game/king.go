@@ -1,7 +1,10 @@
 package game
 
+import "fmt"
+
 func NewKing(pos *Position, t *Team) *King {
 	k := &King{}
+	k.figurer = k
 	k.SetName("king")
 	k.Position = pos
 	k.SetTeam(t)
@@ -13,108 +16,86 @@ type King struct {
 	Figure
 }
 
+// GetBrokenFields return a slice of Positions with broken fields
+func (k *King) GetBrokenFields() *Positions {
+	opened := map[Direction]bool{
+		top:         true,
+		topRight:    true,
+		right:       true,
+		rightBottom: true,
+		bottom:      true,
+		bottomLeft:  true,
+		left:        true,
+		leftTop:     true,
+	}
+	return k.GetPositionsByDirectionsAndMaxRemote(opened, 1)
+}
+
 // GetPossibleMoves return slice of Position with coords for possible moves
-func (k *King) GetPossibleMoves() *Positions {
+func (k *King) GetPossibleMoves(thereIs bool) *Positions {
 	poss := make(Positions)
 	var pi PositionIndex
+
+	// add castling to possible moves if those moves are possible
+	if !k.IsAlreadyMove() && !k.team.CheckingCheck() {
+		func() {
+			// in the long side
+			for x := uint8(1); x <= 3; x++ {
+				if k.team.Figures.ExistsByPosition(NewPosition(k.X-x, k.Y)) ||
+					k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X-x, k.Y)) {
+					return
+				}
+			}
+			pos := NewPosition(3, k.Y)
+			if !k.team.Figures.ExistsByPosition(NewPosition(k.X-4, k.Y)) ||
+				k.team.Figures.GetByPosition(NewPosition(k.X-4, k.Y)).IsAlreadyMove() ||
+				k.kingOnTheBeatenFieldAfterMove(pos) {
+				return
+			}
+			fmt.Println(*pos)
+			pi = poss.Set(pi, pos)
+		}()
+		if thereIs && len(poss) > 0 {
+			return &poss
+		}
+		func() {
+			// in the short side
+			for x := uint8(1); x <= 2; x++ {
+				if k.team.Figures.ExistsByPosition(NewPosition(k.X+x, k.Y)) ||
+					k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X+x, k.Y)) {
+					return
+				}
+			}
+			pos := NewPosition(7, k.Y)
+			if !k.team.Figures.ExistsByPosition(NewPosition(k.X+3, k.Y)) ||
+				k.team.Figures.GetByPosition(NewPosition(k.X+3, k.Y)).IsAlreadyMove() ||
+				k.kingOnTheBeatenFieldAfterMove(pos) {
+				return
+			}
+			fmt.Println(*pos)
+			pi = poss.Set(pi, pos)
+		}()
+		if thereIs && len(poss) > 0 {
+			return &poss
+		}
+	}
+
 	for _, position := range *k.GetBrokenFields() {
 		if !k.team.Figures.ExistsByPosition(position) && !k.kingOnTheBeatenFieldAfterMove(position) {
 			pi = poss.Set(pi, position)
+			if thereIs {
+				return &poss
+			}
 		}
 	}
 	return &poss
 }
 
-// GetBrokenFields return a slice of Positions with broken fields
-func (k *King) GetBrokenFields() *Positions {
-	poss := make(Positions)
-	var pi PositionIndex
-
-	pos := NewPosition(k.X, k.Y+1)
-	if k.positionOnBoard(pos) {
-		pi = poss.Set(pi, pos)
+// CanWalkLikeThat desc
+func (k *King) CanWalkLikeThat(pos *Position) bool {
+	if (k.X-1 == pos.X || k.X == pos.X || k.X+1 == pos.X) &&
+		(k.Y-1 == pos.Y || k.Y == pos.Y || k.Y+1 == pos.Y) {
+		return true
 	}
-
-	pos = NewPosition(k.X+1, k.Y+1)
-	if k.positionOnBoard(pos) {
-		pi = poss.Set(pi, pos)
-	}
-
-	pos = NewPosition(k.X+1, k.Y)
-	if k.positionOnBoard(pos) {
-		pi = poss.Set(pi, pos)
-	}
-
-	pos = NewPosition(k.X+1, k.Y-1)
-	if k.positionOnBoard(pos) {
-		pi = poss.Set(pi, pos)
-	}
-
-	pos = NewPosition(k.X, k.Y-1)
-	if k.positionOnBoard(pos) {
-		pi = poss.Set(pi, pos)
-	}
-
-	pos = NewPosition(k.X-1, k.Y-1)
-	if k.positionOnBoard(pos) {
-		pi = poss.Set(pi, pos)
-	}
-
-	pos = NewPosition(k.X-1, k.Y)
-	if k.positionOnBoard(pos) {
-		pi = poss.Set(pi, pos)
-	}
-
-	pos = NewPosition(k.X-1, k.Y+1)
-	if k.positionOnBoard(pos) {
-		pi = poss.Set(pi, pos)
-	}
-
-	return &poss
-}
-
-// Validation return true if this move are valid or return false
-func (k *King) Validation(pos *Position) (bool, string) {
-	if !k.positionOnBoard(pos) {
-		return false, "attempt to go out the board"
-	}
-	if *k.GetPosition() == *pos {
-		return false, "can't walk around"
-	}
-	if k.team.Figures.ExistsByPosition(pos) {
-		return false, "this place is occupied by your figure"
-	}
-	if k.kingOnTheBeatenFieldAfterMove(pos) {
-		return false, "your king stands on a beaten field"
-	}
-	// castling
-	if !k.alreadyMove {
-		if pos.X == 3 {
-			if !k.team.CheckingCheck() &&
-				!k.team.Figures.ExistsByPosition(NewPosition(k.X-1, k.Y)) && !k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X-1, k.Y)) &&
-				!k.team.Figures.ExistsByPosition(NewPosition(k.X-2, k.Y)) && !k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X-2, k.Y)) &&
-				!k.team.Figures.ExistsByPosition(NewPosition(k.X-3, k.Y)) && !k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X-3, k.Y)) &&
-				k.team.Figures.ExistsByPosition(NewPosition(k.X-4, k.Y)) {
-				if !k.team.Figures.GetByPosition(NewPosition(k.X-4, k.Y)).IsAlreadyMove() {
-					return true, ""
-				}
-			}
-		} else if pos.X == 7 {
-			if !k.team.CheckingCheck() &&
-				!k.team.Figures.ExistsByPosition(NewPosition(k.X+1, k.Y)) && !k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X+1, k.Y)) &&
-				!k.team.Figures.ExistsByPosition(NewPosition(k.X+2, k.Y)) && !k.team.enemy.Figures.ExistsByPosition(NewPosition(k.X+2, k.Y)) &&
-				k.team.Figures.ExistsByPosition(NewPosition(k.X+3, k.Y)) {
-				if !k.team.Figures.GetByPosition(NewPosition(k.X+3, k.Y)).IsAlreadyMove() {
-					return true, ""
-				}
-			}
-		}
-	}
-	// detect Position for move and check it for input data move coords
-	for _, position := range *k.GetBrokenFields() {
-		if *position == *pos {
-			return true, ""
-		}
-	}
-	return false, "this figure cant make that move"
+	return false
 }

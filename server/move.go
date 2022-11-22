@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/skvdmt/chess/game"
 	"github.com/skvdmt/nrp"
 	"log"
@@ -30,23 +31,23 @@ func (m *move) setClient(client *client) {
 }
 
 // isValid returns true and an empty string if it is possible to make a move otherwise returns false and a string with a value on which a move is not possible
-func (m *move) isValid() (bool, string) {
+func (m *move) isValid() (bool, error) {
 	if m.client.server.status.isPlay() {
 		if m.client.server.turn.now() == m.client.team.Name {
 			if m.client.team.Figures.ExistsByPosition(m.From.Position) {
 				if ok, cause := m.client.team.Figures.GetByPosition(m.From.Position).Validation(m.To.Position); ok {
-					return true, ""
+					return true, nil
 				} else {
 					return false, cause
 				}
 			} else {
-				return false, "wrong figure"
+				return false, errors.New("wrong figure")
 			}
 		} else {
-			return false, "now not your move"
+			return false, errors.New("now not your move")
 		}
 	} else {
-		return false, "game are stopped"
+		return false, errors.New("game are stopped")
 	}
 }
 
@@ -72,15 +73,13 @@ func (m *move) isCastling(figure game.Figurer) bool {
 // makeCastling creates a rook move and makes it
 func (m *move) makeRookMoveInCastling() {
 	moveRook := newMove(m.client)
-	moveRook.From.Position.Y = m.From.Position.Y
-	moveRook.To.Position.Y = m.To.Position.Y
 	switch m.To.Position.X {
 	case 3:
-		moveRook.From.Position.X = 1
-		moveRook.To.Position.X = 4
+		moveRook.From.Position = game.NewPosition(1, m.From.Position.Y)
+		moveRook.To.Position = game.NewPosition(4, m.From.Position.Y)
 	case 7:
-		moveRook.From.Position.X = 8
-		moveRook.To.Position.X = 6
+		moveRook.From.Position = game.NewPosition(8, m.From.Position.Y)
+		moveRook.To.Position = game.NewPosition(6, m.From.Position.Y)
 	}
 	moveRook.exec()
 }

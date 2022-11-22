@@ -1,25 +1,121 @@
 package game
 
 import (
+	"errors"
+	"fmt"
 	"log"
 )
 
 // Figure information about each figure
 type Figure struct {
-	Name          string `json:"name"`
-	*Position     `json:"position"`
-	alreadyMove   bool
-	team          *Team
-	possibleMoves *Positions
-	brokenFields  *Positions
+	figurer     Figurer
+	Name        string `json:"name"`
+	*Position   `json:"position"`
+	alreadyMove bool
+	team        *Team
 }
 
-func (f *Figure) SetPossibleMoves(poss *Positions) {
-	f.possibleMoves = poss
+// ErrorDetail desc
+func (f *Figure) ErrorDetail(pos *Position) error {
+	switch {
+	case !f.positionOnBoard(pos):
+		return errors.New("attempt to go out the board")
+	case *f.GetPosition() == *pos:
+		return errors.New("can't walk around")
+	case !f.figurer.CanWalkLikeThat(pos):
+		return errors.New(fmt.Sprintf("%s doesn't walk like that", f.GetName()))
+	case f.team.Figures.ExistsByPosition(pos):
+		return errors.New("this place is occupied by your figure")
+	case f.kingOnTheBeatenFieldAfterMove(pos):
+		return errors.New("your king stands on a beaten field")
+	default:
+		return errors.New("this figure cant make that move")
+	}
 }
 
-func (f *Figure) SetBrokenFields(poss *Positions) {
-	f.brokenFields = poss
+// Validation return true if this move are valid or return false
+func (f *Figure) Validation(pos *Position) (bool, error) {
+	for _, position := range *f.figurer.GetPossibleMoves(false) {
+		if *position == *pos {
+			return true, nil
+		}
+	}
+	return false, f.ErrorDetail(pos)
+}
+
+type Direction int
+
+const (
+	top Direction = iota
+	topRight
+	right
+	rightBottom
+	bottom
+	bottomLeft
+	left
+	leftTop
+)
+
+func (f *Figure) GetPositionsByDirectionsAndMaxRemote(opened map[Direction]bool, maxRemote uint8) *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
+	for remote := uint8(1); remote <= maxRemote; remote++ {
+		for dir := range opened {
+			if opened[dir] {
+				func() {
+					pos := f.GetPositionByDirectionAndRemote(dir, remote)
+					if !f.positionOnBoard(pos) {
+						opened[dir] = false
+						return
+					}
+					if f.team.Figures.ExistsByPosition(pos) ||
+						f.team.enemy.Figures.ExistsByPosition(pos) {
+						opened[dir] = false
+					}
+					pi = poss.Set(pi, pos)
+				}()
+			}
+		}
+	}
+	return &poss
+}
+
+func (f *Figure) GetPositionByDirectionAndRemote(dir Direction, remote uint8) *Position {
+	var pos *Position
+	switch dir {
+	case top:
+		pos = NewPosition(f.X, f.Y+remote)
+	case topRight:
+		pos = NewPosition(f.X+remote, f.Y+remote)
+	case right:
+		pos = NewPosition(f.X+remote, f.Y)
+	case rightBottom:
+		pos = NewPosition(f.X+remote, f.Y-remote)
+	case bottom:
+		pos = NewPosition(f.X, f.Y-remote)
+	case bottomLeft:
+		pos = NewPosition(f.X-remote, f.Y-remote)
+	case left:
+		pos = NewPosition(f.X-remote, f.Y)
+	case leftTop:
+		pos = NewPosition(f.X-remote, f.Y+remote)
+	}
+	return pos
+}
+
+// GetPossibleMoves return slice of Position with coords for possible moves
+func (f *Figure) GetPossibleMoves(thereIs bool) *Positions {
+	poss := make(Positions)
+	var pi PositionIndex
+	for _, position := range *f.figurer.GetBrokenFields() {
+		if !f.team.Figures.ExistsByPosition(position) && !f.kingOnTheBeatenFieldAfterMove(position) {
+			pi = poss.Set(pi, position)
+			if thereIs {
+				return &poss
+			}
+		}
+	}
+	return &poss
 }
 
 // GetName get name from figure
@@ -42,29 +138,48 @@ func (f *Figure) setAlreadyMove(flag bool) {
 	f.alreadyMove = flag
 }
 
+// SimulationMove makes a move, executes a callback and returns to the starting situation
+func (f *Figure) SimulationMove(pos *Position, callback func() bool) bool {
+	// move
+	curPos := f.GetPosition()
+	f.SetPosition(pos)
+	// undo move
+	defer func() {
+		f.SetPosition(curPos)
+	}()
+	// eating
+	if f.team.enemy.Figures.ExistsByPosition(pos) {
+		index, figure := f.team.enemy.Figures.GetIndexAndFigureByPosition(pos)
+		f.team.enemy.Eaten.Set(index, figure)
+		f.team.enemy.Figures.Remove(index)
+		// undo eating
+		defer func() {
+			if f.team.enemy.Eaten.ExistsByPosition(pos) {
+				index, figure := f.team.enemy.Eaten.GetIndexAndFigureByPosition(pos)
+				f.team.enemy.Figures.Set(index, figure)
+				f.team.enemy.Eaten.Remove(index)
+			}
+		}()
+	}
+	// take on the pass
+	if f.team.enemy.pawnDoubleMove.isTakeOnThePass(pos) && f.GetName() == "pawn" {
+		index, figure := f.team.enemy.Figures.GetIndexAndFigureByPosition(f.team.enemy.pawnDoubleMove.pawn.GetPosition())
+		f.team.enemy.Eaten.Set(index, figure)
+		f.team.enemy.Figures.Remove(index)
+		// undo take on the pass
+		defer func() {
+			f.team.enemy.Figures.Set(index, figure)
+			f.team.enemy.Eaten.Remove(index)
+		}()
+	}
+	return callback()
+}
+
 // kingOnTheBeatenFieldAfterMove returns true if your king is on the beaten square after the move otherwise return false
 func (f *Figure) kingOnTheBeatenFieldAfterMove(pos *Position) bool {
-	curPos := f.Position
-	f.SetPosition(pos)
-	undoMove := func() {
-		f.SetPosition(curPos)
-	}
-	undoEating := func() {}
-	if f.team.enemy.Figures.ExistsByPosition(pos) {
-		eatenID := f.team.enemy.Figures.GetIndexByPosition(pos)
-		eatenFigure := f.team.enemy.Figures.Get(eatenID)
-		f.team.enemy.Figures.Remove(eatenID)
-		undoEating = func() {
-			f.team.enemy.Figures.Set(eatenID, eatenFigure)
-		}
-	}
-	check := f.team.CheckingCheck()
-	undoMove()
-	undoEating()
-	if check {
-		return true
-	}
-	return false
+	return f.SimulationMove(pos, func() bool {
+		return f.team.CheckingCheck()
+	})
 }
 
 // positionOnBoard returns true if the coordinates are within the board, otherwise return false

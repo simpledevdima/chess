@@ -98,7 +98,11 @@ func (c *client) response(id int, valid bool, cause string) {
 func (c *client) postToMove(request *nrp.Simple) {
 	m := newMove(c)
 	request.BodyToVariable(&m)
-	valid, cause := m.isValid()
+	valid, err := m.isValid()
+	var cause string
+	if err != nil {
+		cause = err.Error()
+	}
 	c.response(request.Id, valid, cause)
 	if valid {
 		m.exec()

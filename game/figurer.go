@@ -7,14 +7,14 @@ type Figurer interface {
 	SetPosition(*Position)
 	GetPosition() *Position
 	Move(*Position)
-	Validation(*Position) (bool, string)
+	Validation(*Position) (bool, error)
 	SetTeam(*Team)
 	positionOnBoard(*Position) bool
 	kingOnTheBeatenFieldAfterMove(*Position) bool
+	GetPositionByDirectionAndRemote(Direction, uint8) *Position
 	GetBrokenFields() *Positions
-	GetPossibleMoves() *Positions
-	SetBrokenFields(*Positions)
-	SetPossibleMoves(*Positions)
+	GetPossibleMoves(thereIs bool) *Positions
+	CanWalkLikeThat(*Position) bool
 	IsAlreadyMove() bool
 	setAlreadyMove(bool)
 }

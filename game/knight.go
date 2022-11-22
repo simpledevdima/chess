@@ -2,6 +2,7 @@ package game
 
 func NewKnight(pos *Position, t *Team) *Knight {
 	k := &Knight{}
+	k.figurer = k
 	k.SetName("knight")
 	k.Position = pos
 	k.SetTeam(t)
@@ -11,18 +12,6 @@ func NewKnight(pos *Position, t *Team) *Knight {
 // Knight is data type of chess figure
 type Knight struct {
 	Figure
-}
-
-// GetPossibleMoves return slice of Position with coords for possible moves
-func (k *Knight) GetPossibleMoves() *Positions {
-	poss := make(Positions)
-	var pi PositionIndex
-	for _, position := range *k.GetBrokenFields() {
-		if !k.team.Figures.ExistsByPosition(position) && !k.kingOnTheBeatenFieldAfterMove(position) {
-			pi = poss.Set(pi, position)
-		}
-	}
-	return &poss
 }
 
 // GetBrokenFields return a slice of Positions with broken fields
@@ -73,25 +62,17 @@ func (k *Knight) GetBrokenFields() *Positions {
 	return &poss
 }
 
-// Validation return true if this move are valid or return false
-func (k *Knight) Validation(pos *Position) (bool, string) {
-	if !k.positionOnBoard(pos) {
-		return false, "attempt to go out the board"
+// CanWalkLikeThat desc
+func (k *Knight) CanWalkLikeThat(pos *Position) bool {
+	if (k.X+1 == pos.X && k.Y+2 == pos.Y) ||
+		(k.X+2 == pos.X && k.Y+1 == pos.Y) ||
+		(k.X-1 == pos.X && k.Y-2 == pos.Y) ||
+		(k.X-2 == pos.X && k.Y-1 == pos.Y) ||
+		(k.X+1 == pos.X && k.Y-2 == pos.Y) ||
+		(k.X+2 == pos.X && k.Y-1 == pos.Y) ||
+		(k.X-1 == pos.X && k.Y+2 == pos.Y) ||
+		(k.X-2 == pos.X && k.Y+1 == pos.Y) {
+		return true
 	}
-	if *k.GetPosition() == *pos {
-		return false, "can't walk around"
-	}
-	if k.team.Figures.ExistsByPosition(pos) {
-		return false, "this place is occupied by your figure"
-	}
-	if k.kingOnTheBeatenFieldAfterMove(pos) {
-		return false, "your king stands on a beaten field"
-	}
-	// detect Position for move and check it for input data move coords
-	for _, position := range *k.GetBrokenFields() {
-		if *position == *pos {
-			return true, ""
-		}
-	}
-	return false, "this figure cant make that move"
+	return false
 }

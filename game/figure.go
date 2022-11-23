@@ -155,7 +155,6 @@ func (f *Figure) SimulationMove(pos *Position, callback func() bool) bool {
 		// undo eating
 		defer func() {
 			if f.team.enemy.Eaten.ExistsByPosition(pos) {
-				index, figure := f.team.enemy.Eaten.GetIndexAndFigureByPosition(pos)
 				f.team.enemy.Figures.Set(index, figure)
 				f.team.enemy.Eaten.Remove(index)
 			}

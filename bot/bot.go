@@ -122,7 +122,7 @@ func (bot *Bot) read() {
 			bot.exitApp()
 			break
 		}
-		//fmt.Printf("recv: %s\n", dataJSON)
+		fmt.Printf("recv: %s\n", dataJSON)
 
 		request := nrp.Simple{}
 		request.Parse(dataJSON)
@@ -179,12 +179,17 @@ func (bot *Bot) wait() {
 	}
 }
 
+func (bot *Bot) getRandomIndexMap(m interface{}) int {
+	keys := reflect.ValueOf(m).MapKeys()
+	return int(keys[rand.Intn(len(keys))].Int())
+}
+
 func (bot *Bot) getRandomMove() *move {
 	possibleMoves := bot.team.GetPossibleMoves()
-	figuresKeys := reflect.ValueOf(possibleMoves).MapKeys()
-	index := game.FigurerIndex(int(figuresKeys[rand.Intn(len(figuresKeys))].Int()))
-	to := possibleMoves[index][rand.Intn(len(possibleMoves[index]))]
-	pos := bot.team.Figures[index].GetPosition()
+	indexFigure := game.FigurerIndex(bot.getRandomIndexMap(possibleMoves))
+	indexMove := game.PositionIndex(bot.getRandomIndexMap(*possibleMoves[indexFigure]))
+	to := (*possibleMoves[indexFigure])[indexMove]
+	pos := bot.team.Figures[indexFigure].GetPosition()
 	return newMove(bot, pos, game.NewPosition(to.X, to.Y))
 }
 

@@ -152,20 +152,20 @@ func (t *Team) ImportFigures(figuresJSON []byte) {
 	}
 }
 
-////PossibleMoves data type with possible moves of pieces
-//type PossibleMoves map[FigurerIndex]*Positions
-//
-//// GetPossibleMoves returns a map with the keys of the team's shapes and the slices of coordinates that those shapes can make
-//func (t *Team) GetPossibleMoves() PossibleMoves {
-//	possibleMoves := make(PossibleMoves)
-//	for index, figure := range t.Figures {
-//		moves := figure.GetPossibleMoves(true)
-//		if len(*moves) > 0 {
-//			possibleMoves[index] = moves
-//		}
-//	}
-//	return possibleMoves
-//}
+// PossibleMoves data type with possible moves of pieces
+type PossibleMoves map[FigurerIndex]*Positions
+
+// GetPossibleMoves returns a map with the keys of the team's shapes and the slices of coordinates that those shapes can make
+func (t *Team) GetPossibleMoves() PossibleMoves {
+	possibleMoves := make(PossibleMoves)
+	for index, figure := range t.Figures {
+		moves := figure.GetPossibleMoves(true)
+		if len(*moves) > 0 {
+			possibleMoves[index] = moves
+		}
+	}
+	return possibleMoves
+}
 
 //// ShowPossibleMoves displays the possible moves of each piece of the team
 //func (t *Team) ShowPossibleMoves() {

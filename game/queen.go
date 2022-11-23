@@ -32,6 +32,7 @@ func (q *Queen) GetBrokenFields() *Positions {
 }
 
 // CanWalkLikeThat returns true if the queen's move matches the rules for how she moves, otherwise returns false
+// this method does not check if the king hit the beaten field after it has been committed
 func (q *Queen) CanWalkLikeThat(pos *Position) bool {
 	if (q.X == pos.X || q.Y == pos.Y) ||
 		(pos.X < q.X && pos.Y < q.Y && q.X-pos.X == q.Y-pos.Y) ||

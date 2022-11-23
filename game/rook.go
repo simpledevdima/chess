@@ -28,6 +28,7 @@ func (r *Rook) GetBrokenFields() *Positions {
 }
 
 // CanWalkLikeThat returns true if the rook's move follows the rules for how it moves, otherwise it returns false
+// this method does not check if the king hit the beaten field after it has been committed
 func (r *Rook) CanWalkLikeThat(pos *Position) bool {
 	if r.X == pos.X || r.Y == pos.Y {
 		return true

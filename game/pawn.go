@@ -114,6 +114,7 @@ func (p *Pawn) GetPossibleMoves(has bool) *Positions {
 }
 
 // CanWalkLikeThat returns true if the pawn's move follows the rules for how it moves, otherwise it returns false
+// this method does not check if the king hit the beaten field after it has been committed
 func (p *Pawn) CanWalkLikeThat(pos *Position) bool {
 	switch p.team.Name {
 	case White:

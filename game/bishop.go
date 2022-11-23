@@ -28,6 +28,7 @@ func (b *Bishop) GetBrokenFields() *Positions {
 }
 
 // CanWalkLikeThat returns true if the bishop's move matches the rules for how he moves, otherwise returns false
+// this method does not check if the king hit the beaten field after it has been committed
 func (b *Bishop) CanWalkLikeThat(pos *Position) bool {
 	if (pos.X < b.X && pos.Y < b.Y && b.X-pos.X == b.Y-pos.Y) ||
 		(pos.X < b.X && pos.Y > b.Y && b.X-pos.X == pos.Y-b.Y) ||

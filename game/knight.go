@@ -65,6 +65,7 @@ func (k *Knight) GetBrokenFields() *Positions {
 }
 
 // CanWalkLikeThat returns true if the knight's move matches the rules for how it moves, otherwise it returns false
+// this method does not check if the king hit the beaten field after it has been committed
 func (k *Knight) CanWalkLikeThat(pos *Position) bool {
 	if (k.X+1 == pos.X && k.Y+2 == pos.Y) ||
 		(k.X+2 == pos.X && k.Y+1 == pos.Y) ||

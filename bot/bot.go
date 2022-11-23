@@ -122,7 +122,7 @@ func (bot *Bot) read() {
 			bot.exitApp()
 			break
 		}
-		fmt.Printf("recv: %s\n", dataJSON)
+		//fmt.Printf("recv: %s\n", dataJSON)
 
 		request := nrp.Simple{}
 		request.Parse(dataJSON)

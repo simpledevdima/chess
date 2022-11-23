@@ -1,7 +1,5 @@
 package game
 
-import "fmt"
-
 func NewKing(pos *Position, t *Team) *King {
 	k := &King{}
 	k.figurer = k
@@ -52,7 +50,6 @@ func (k *King) GetPossibleMoves(thereIs bool) *Positions {
 				k.kingOnTheBeatenFieldAfterMove(pos) {
 				return
 			}
-			fmt.Println(*pos)
 			pi = poss.Set(pi, pos)
 		}()
 		if thereIs && len(poss) > 0 {
@@ -72,7 +69,6 @@ func (k *King) GetPossibleMoves(thereIs bool) *Positions {
 				k.kingOnTheBeatenFieldAfterMove(pos) {
 				return
 			}
-			fmt.Println(*pos)
 			pi = poss.Set(pi, pos)
 		}()
 		if thereIs && len(poss) > 0 {

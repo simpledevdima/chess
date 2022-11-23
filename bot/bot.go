@@ -185,10 +185,10 @@ func (bot *Bot) getRandomIndexMap(m interface{}) int {
 }
 
 func (bot *Bot) getRandomMove() *move {
-	possibleMoves := bot.team.GetPossibleMoves()
-	indexFigure := game.FigurerIndex(bot.getRandomIndexMap(*possibleMoves))
-	indexMove := game.PositionIndex(bot.getRandomIndexMap((*possibleMoves)[indexFigure]))
-	to := (*(*possibleMoves)[indexFigure])[indexMove]
+	possibleMoves := *bot.team.GetPossibleMoves()
+	indexFigure := game.FigurerIndex(bot.getRandomIndexMap(possibleMoves))
+	indexMove := game.PositionIndex(bot.getRandomIndexMap(*possibleMoves[indexFigure]))
+	to := (*possibleMoves[indexFigure])[indexMove]
 	pos := bot.team.Figures[indexFigure].GetPosition()
 	return newMove(bot, pos, game.NewPosition(to.X, to.Y))
 }

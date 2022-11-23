@@ -167,27 +167,36 @@ func (t *Team) GetPossibleMoves() PossibleMoves {
 	return possibleMoves
 }
 
-//// ShowPossibleMoves displays the possible moves of each piece of the team
-//func (t *Team) ShowPossibleMoves() {
-//	fmt.Println("Team:", t.Name.String())
-//	for index, figure := range t.Figures {
-//		fields := figure.GetPossibleMoves()
-//		if len(*fields) > 0 {
-//			x, y := figure.GetPosition().Get()
-//			fmt.Println(index, figure.GetName(), x, y)
-//			for _, field := range *fields {
-//				fmt.Println(field)
-//			}
-//		}
-//	}
-//}
-//
-//// ShowBrokenFields displays the squares that beat the figures of the team
-//func (t *Team) ShowBrokenFields() {
-//	fmt.Println("Team:", t.Name.String())
-//	for index, figure := range t.Figures {
-//		fields := figure.GetBrokenFields()
-//		pos := figure.GetPosition()
-//		fmt.Println(index, figure.GetName(), pos.X, pos.Y, fields)
-//	}
-//}
+// ShowBrokenFields displays the squares that beat the figures of the team
+func (t *Team) ShowBrokenFields() {
+	fmt.Printf("broken fields, team: %s\n", t.Name.String())
+	for index, figure := range t.Figures {
+		fields := figure.GetBrokenFields()
+		if len(*fields) > 0 {
+			x, y := figure.GetPosition().Get()
+			fmt.Printf("i=%d n=%s p=%dx%d to", index, figure.GetName(), x, y)
+			for _, field := range *fields {
+				fmt.Printf(" %dx%d", field.X, field.Y)
+			}
+			fmt.Printf("\n")
+		}
+	}
+	fmt.Println()
+}
+
+// ShowPossibleMoves displays the possible moves of each piece of the team
+func (t *Team) ShowPossibleMoves() {
+	fmt.Printf("possible moves, team: %s\n", t.Name.String())
+	for index, figure := range t.Figures {
+		fields := figure.GetPossibleMoves(false)
+		if len(*fields) > 0 {
+			x, y := figure.GetPosition().Get()
+			fmt.Printf("i=%d n=%s p=%dx%d to", index, figure.GetName(), x, y)
+			for _, field := range *fields {
+				fmt.Printf(" %dx%d", field.X, field.Y)
+			}
+			fmt.Printf("\n")
+		}
+	}
+	fmt.Println()
+}

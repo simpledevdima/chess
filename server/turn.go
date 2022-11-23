@@ -7,7 +7,7 @@ import (
 
 func newTurn() *turn {
 	turn := &turn{}
-	turn.setDefault()
+	//turn.setDefault()
 	return turn
 }
 
@@ -41,6 +41,10 @@ func (t *turn) setServer(server *server) {
 // setDefault set default values for a new game
 func (t *turn) setDefault() {
 	t.teamName = game.White
+
+	// Debug
+	t.server.board.White.ShowBrokenFields()
+	t.server.board.White.ShowPossibleMoves()
 }
 
 // change transfers the turn to the opposing team
@@ -51,6 +55,11 @@ func (t *turn) change() {
 			t.server.timers.white.stop()
 			t.server.timers.white.reset()
 			if t.server.board.Black.HavePossibleMove() {
+
+				// Debug
+				t.server.board.Black.ShowBrokenFields()
+				t.server.board.Black.ShowPossibleMoves()
+
 				t.teamName = game.Black
 				go t.server.timers.black.play()
 				t.send(t.exportJSON())
@@ -65,6 +74,11 @@ func (t *turn) change() {
 			t.server.timers.black.stop()
 			t.server.timers.black.reset()
 			if t.server.board.White.HavePossibleMove() {
+
+				// Debug
+				t.server.board.White.ShowBrokenFields()
+				t.server.board.White.ShowPossibleMoves()
+
 				t.teamName = game.White
 				go t.server.timers.white.play()
 				t.send(t.exportJSON())

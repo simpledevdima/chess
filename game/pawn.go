@@ -47,9 +47,9 @@ func (p *Pawn) GetBrokenFields() *Positions {
 // has is a boolean variable passed as an argument
 // if set to true, returns the map with the first value found, interrupting further calculations
 // created in order to minimize the load in case you need to know that there are available moves
-func (p *Pawn) GetPossibleMoves(has bool) *Positions {
-	poss := make(Positions)
-	var pi PositionIndex
+func (p *Pawn) GetPossibleMoves(has bool) *Moves {
+	mvs := make(Moves)
+	var mi MoveIndex
 	switch p.team.Name {
 	case White:
 		pos1 := NewPosition(p.X, p.Y+1)
@@ -57,9 +57,9 @@ func (p *Pawn) GetPossibleMoves(has bool) *Positions {
 			!p.team.Figures.ExistsByPosition(pos1) &&
 			!p.team.enemy.Figures.ExistsByPosition(pos1) &&
 			!p.kingOnTheBeatenFieldAfterMove(pos1) {
-			pi = poss.Set(pi, pos1)
+			mi = mvs.Set(mi, NewMove(pos1))
 			if has {
-				return &poss
+				return &mvs
 			}
 		}
 		pos2 := NewPosition(p.X, p.Y+2)
@@ -70,9 +70,9 @@ func (p *Pawn) GetPossibleMoves(has bool) *Positions {
 			!p.team.enemy.Figures.ExistsByPosition(pos1) &&
 			!p.team.enemy.Figures.ExistsByPosition(pos2) &&
 			!p.kingOnTheBeatenFieldAfterMove(pos2) {
-			pi = poss.Set(pi, pos2)
+			mi = mvs.Set(mi, NewMove(pos2))
 			if has {
-				return &poss
+				return &mvs
 			}
 		}
 	case Black:
@@ -81,9 +81,9 @@ func (p *Pawn) GetPossibleMoves(has bool) *Positions {
 			!p.team.Figures.ExistsByPosition(pos1) &&
 			!p.team.enemy.Figures.ExistsByPosition(pos1) &&
 			!p.kingOnTheBeatenFieldAfterMove(pos1) {
-			pi = poss.Set(pi, pos1)
+			mi = mvs.Set(mi, NewMove(pos1))
 			if has {
-				return &poss
+				return &mvs
 			}
 		}
 		pos2 := NewPosition(p.X, p.Y-2)
@@ -94,9 +94,9 @@ func (p *Pawn) GetPossibleMoves(has bool) *Positions {
 			!p.team.enemy.Figures.ExistsByPosition(pos1) &&
 			!p.team.enemy.Figures.ExistsByPosition(pos2) &&
 			!p.kingOnTheBeatenFieldAfterMove(pos2) {
-			pi = poss.Set(pi, pos2)
+			mi = mvs.Set(mi, NewMove(pos2))
 			if has {
-				return &poss
+				return &mvs
 			}
 		}
 	}
@@ -104,13 +104,13 @@ func (p *Pawn) GetPossibleMoves(has bool) *Positions {
 		if (p.team.enemy.Figures.ExistsByPosition(position) ||
 			p.team.enemy.pawnDoubleMove.isTakeOnThePass(position)) &&
 			!p.kingOnTheBeatenFieldAfterMove(position) {
-			pi = poss.Set(pi, position)
+			mi = mvs.Set(mi, NewMove(position))
 			if has {
-				return &poss
+				return &mvs
 			}
 		}
 	}
-	return &poss
+	return &mvs
 }
 
 // CanWalkLikeThat returns true if the pawn's move follows the rules for how it moves, otherwise it returns false

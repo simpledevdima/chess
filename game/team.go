@@ -154,7 +154,7 @@ func (t *Team) ImportFigures(figuresJSON []byte) {
 }
 
 // TeamPossibleMoves data type with possible moves of pieces
-type TeamPossibleMoves map[FigurerIndex]*Positions
+type TeamPossibleMoves map[FigurerIndex]*Moves
 
 // GetPossibleMoves returns a map with the keys of the team's shapes and the slices of coordinates that those shapes can make
 func (t *Team) GetPossibleMoves() *TeamPossibleMoves {
@@ -175,7 +175,7 @@ func (t *Team) ShowBrokenFields() {
 		fields := figure.GetBrokenFields()
 		if len(*fields) > 0 {
 			x, y := figure.GetPosition().Get()
-			fmt.Printf("i=%d n=%s p=%dx%d to", index, figure.GetName(), x, y)
+			fmt.Printf("i=%2d n=%6s p=%dx%d to", index, figure.GetName(), x, y)
 			for _, field := range *fields {
 				fmt.Printf(" %dx%d", field.X, field.Y)
 			}
@@ -189,12 +189,12 @@ func (t *Team) ShowBrokenFields() {
 func (t *Team) ShowPossibleMoves() {
 	fmt.Printf("possible moves, team: %s\n", t.Name.String())
 	for index, figure := range t.Figures {
-		fields := figure.GetPossibleMoves(false)
-		if len(*fields) > 0 {
+		mvs := figure.GetPossibleMoves(false)
+		if len(*mvs) > 0 {
 			x, y := figure.GetPosition().Get()
-			fmt.Printf("i=%d n=%s p=%dx%d to", index, figure.GetName(), x, y)
-			for _, field := range *fields {
-				fmt.Printf(" %dx%d", field.X, field.Y)
+			fmt.Printf("i=%2d n=%6s p=%dx%d to", index, figure.GetName(), x, y)
+			for _, mv := range *mvs {
+				fmt.Printf(" %dx%d(%.2f)", mv.X, mv.Y, mv.GetRating())
 			}
 			fmt.Printf("\n")
 		}

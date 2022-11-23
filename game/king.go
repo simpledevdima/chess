@@ -35,31 +35,31 @@ func (k *King) GetBrokenFields() *Positions {
 // has is a boolean variable passed as an argument
 // if set to true, returns the map with the first value found, interrupting further calculations
 // created in order to minimize the load in case you need to know that there are available moves
-func (k *King) GetPossibleMoves(has bool) *Positions {
-	poss := make(Positions)
-	var pi PositionIndex
+func (k *King) GetPossibleMoves(has bool) *Moves {
+	mvs := make(Moves)
+	var mi MoveIndex
 
 	// castling
 	if !k.IsAlreadyMove() {
 		pos := NewPosition(3, k.Y)
 		if k.castlingIsPossible(pos) && !k.kingOnTheBeatenFieldAfterMove(pos) {
-			pi = poss.Set(pi, pos)
+			mi = mvs.Set(mi, NewMove(pos))
 		}
 		pos = NewPosition(7, k.Y)
 		if k.castlingIsPossible(pos) && !k.kingOnTheBeatenFieldAfterMove(pos) {
-			pi = poss.Set(pi, pos)
+			mi = mvs.Set(mi, NewMove(pos))
 		}
 	}
 
 	for _, position := range *k.GetBrokenFields() {
 		if !k.team.Figures.ExistsByPosition(position) && !k.kingOnTheBeatenFieldAfterMove(position) {
-			pi = poss.Set(pi, position)
+			mi = mvs.Set(mi, NewMove(position))
 			if has {
-				return &poss
+				return &mvs
 			}
 		}
 	}
-	return &poss
+	return &mvs
 }
 
 // CanWalkLikeThat returns true if the king's move matches the rules for how he moves, otherwise returns false

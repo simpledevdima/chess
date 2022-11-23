@@ -35,8 +35,8 @@ func (f *Figure) ErrorDetail(pos *Position) error {
 
 // Validation return true if this move are valid or return false
 func (f *Figure) Validation(pos *Position) (bool, error) {
-	for _, position := range *f.figurer.GetPossibleMoves(false) {
-		if *position == *pos {
+	for _, mv := range *f.figurer.GetPossibleMoves(false) {
+		if *mv.Position == *pos {
 			return true, nil
 		}
 	}
@@ -110,18 +110,18 @@ func (f *Figure) GetPositionByDirectionAndRemote(dir Direction, remote uint8) *P
 // has is a boolean variable passed as an argument
 // if set to true, returns the map with the first value found, interrupting further calculations
 // created in order to minimize the load in case you need to know that there are available moves
-func (f *Figure) GetPossibleMoves(has bool) *Positions {
-	poss := make(Positions)
-	var pi PositionIndex
+func (f *Figure) GetPossibleMoves(has bool) *Moves {
+	mvs := make(Moves)
+	var mi MoveIndex
 	for _, position := range *f.figurer.GetBrokenFields() {
 		if !f.team.Figures.ExistsByPosition(position) && !f.kingOnTheBeatenFieldAfterMove(position) {
-			pi = poss.Set(pi, position)
+			mi = mvs.Set(mi, NewMove(position))
 			if has {
-				return &poss
+				return &mvs
 			}
 		}
 	}
-	return &poss
+	return &mvs
 }
 
 // GetName get name from figure

@@ -7,7 +7,6 @@ import (
 
 func newTurn() *turn {
 	turn := &turn{}
-	//turn.setDefault()
 	return turn
 }
 

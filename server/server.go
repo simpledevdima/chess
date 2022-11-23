@@ -78,14 +78,14 @@ func (s *server) newGame() {
 	s.timers.white.setLeft(s.config.StepTimeLeft, s.config.ReserveTimeLeft)
 	s.timers.black.setLeft(s.config.StepTimeLeft, s.config.ReserveTimeLeft)
 
-	// set turn to default
-	s.turn.setDefault()
-
 	// set draw attempts left to values from config
 	s.drawAttemptsLeft.setLeft(s.config.OfferDrawTimesLeft)
 
 	// new board
 	s.board.NewBoard()
+
+	// set turn to default
+	s.turn.setDefault()
 }
 
 // setupBoardLinks setting links in objects contained inside the board

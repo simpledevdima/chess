@@ -5,6 +5,7 @@ import (
 	"github.com/skvdmt/nrp"
 )
 
+// newStatus returns a reference to the new status structure
 func newStatus() *status {
 	return &status{}
 }

@@ -1,5 +1,7 @@
 package game
 
+// NewBishop returns a reference to the new bishop
+// with references to the position and command passed in the argument
 func NewBishop(pos *Position, t *Team) *Bishop {
 	b := &Bishop{}
 	b.figurer = b
@@ -25,7 +27,7 @@ func (b *Bishop) GetBrokenFields() *Positions {
 	return b.GetPositionsByDirectionsAndMaxRemote(opened, 7)
 }
 
-// CanWalkLikeThat desc
+// CanWalkLikeThat returns true if the bishop's move matches the rules for how he moves, otherwise returns false
 func (b *Bishop) CanWalkLikeThat(pos *Position) bool {
 	if (pos.X < b.X && pos.Y < b.Y && b.X-pos.X == b.Y-pos.Y) ||
 		(pos.X < b.X && pos.Y > b.Y && b.X-pos.X == pos.Y-b.Y) ||

@@ -1,5 +1,7 @@
 package game
 
+// NewKing returns a reference to the new king
+// with references to the position and command passed in the argument
 func NewKing(pos *Position, t *Team) *King {
 	k := &King{}
 	k.figurer = k
@@ -30,7 +32,10 @@ func (k *King) GetBrokenFields() *Positions {
 }
 
 // GetPossibleMoves return slice of Position with coords for possible moves
-func (k *King) GetPossibleMoves(thereIs bool) *Positions {
+// has is a boolean variable passed as an argument
+// if set to true, returns the map with the first value found, interrupting further calculations
+// created in order to minimize the load in case you need to know that there are available moves
+func (k *King) GetPossibleMoves(has bool) *Positions {
 	poss := make(Positions)
 	var pi PositionIndex
 
@@ -52,7 +57,7 @@ func (k *King) GetPossibleMoves(thereIs bool) *Positions {
 			}
 			pi = poss.Set(pi, pos)
 		}()
-		if thereIs && len(poss) > 0 {
+		if has && len(poss) > 0 {
 			return &poss
 		}
 		func() {
@@ -71,7 +76,7 @@ func (k *King) GetPossibleMoves(thereIs bool) *Positions {
 			}
 			pi = poss.Set(pi, pos)
 		}()
-		if thereIs && len(poss) > 0 {
+		if has && len(poss) > 0 {
 			return &poss
 		}
 	}
@@ -79,7 +84,7 @@ func (k *King) GetPossibleMoves(thereIs bool) *Positions {
 	for _, position := range *k.GetBrokenFields() {
 		if !k.team.Figures.ExistsByPosition(position) && !k.kingOnTheBeatenFieldAfterMove(position) {
 			pi = poss.Set(pi, position)
-			if thereIs {
+			if has {
 				return &poss
 			}
 		}
@@ -87,7 +92,7 @@ func (k *King) GetPossibleMoves(thereIs bool) *Positions {
 	return &poss
 }
 
-// CanWalkLikeThat desc
+// CanWalkLikeThat returns true if the king's move matches the rules for how he moves, otherwise returns false
 func (k *King) CanWalkLikeThat(pos *Position) bool {
 	if (k.X-1 == pos.X || k.X == pos.X || k.X+1 == pos.X) &&
 		(k.Y-1 == pos.Y || k.Y == pos.Y || k.Y+1 == pos.Y) {

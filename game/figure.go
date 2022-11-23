@@ -15,7 +15,7 @@ type Figure struct {
 	team        *Team
 }
 
-// ErrorDetail desc
+// ErrorDetail returns an error with text matching the error condition
 func (f *Figure) ErrorDetail(pos *Position) error {
 	switch {
 	case !f.positionOnBoard(pos):
@@ -43,6 +43,7 @@ func (f *Figure) Validation(pos *Position) (bool, error) {
 	return false, f.ErrorDetail(pos)
 }
 
+// Direction data type to indicate the direction of movement of the figure
 type Direction int
 
 const (
@@ -56,6 +57,7 @@ const (
 	leftTop
 )
 
+// GetPositionsByDirectionsAndMaxRemote returns a link to the map of positions available in case of free directions and distances specified in the map passed in the argument
 func (f *Figure) GetPositionsByDirectionsAndMaxRemote(opened map[Direction]bool, maxRemote uint8) *Positions {
 	poss := make(Positions)
 	var pi PositionIndex
@@ -80,6 +82,7 @@ func (f *Figure) GetPositionsByDirectionsAndMaxRemote(opened map[Direction]bool,
 	return &poss
 }
 
+// GetPositionByDirectionAndRemote returns a link to a new position corresponding to the direction and distance
 func (f *Figure) GetPositionByDirectionAndRemote(dir Direction, remote uint8) *Position {
 	var pos *Position
 	switch dir {
@@ -103,14 +106,17 @@ func (f *Figure) GetPositionByDirectionAndRemote(dir Direction, remote uint8) *P
 	return pos
 }
 
-// GetPossibleMoves return slice of Position with coords for possible moves
-func (f *Figure) GetPossibleMoves(thereIs bool) *Positions {
+// GetPossibleMoves return a position map with the coordinates of the possible moves of the figure
+// has is a boolean variable passed as an argument
+// if set to true, returns the map with the first value found, interrupting further calculations
+// created in order to minimize the load in case you need to know that there are available moves
+func (f *Figure) GetPossibleMoves(has bool) *Positions {
 	poss := make(Positions)
 	var pi PositionIndex
 	for _, position := range *f.figurer.GetBrokenFields() {
 		if !f.team.Figures.ExistsByPosition(position) && !f.kingOnTheBeatenFieldAfterMove(position) {
 			pi = poss.Set(pi, position)
-			if thereIs {
+			if has {
 				return &poss
 			}
 		}
@@ -216,12 +222,6 @@ func (f *Figure) Move(pos *Position) {
 	}
 
 	f.transformPawnTOQueen(pos)
-
-	// Debug
-	//f.team.ShowBrokenFields()
-	//f.team.enemy.ShowBrokenFields()
-	//f.team.ShowPossibleMoves()
-	//f.team.enemy.ShowPossibleMoves()
 }
 
 // transformPawnToQueen promote a pawn to a queen

@@ -8,6 +8,7 @@ import (
 	"log"
 )
 
+// newMove returns a reference to a new action with a reference to the client passed in the argument
 func newMove(c *client) *move {
 	m := &move{}
 	m.setClient(c)

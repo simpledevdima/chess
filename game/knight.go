@@ -1,5 +1,7 @@
 package game
 
+// NewKnight returns a reference to the new knight
+// with references to the position and command passed in the argument
 func NewKnight(pos *Position, t *Team) *Knight {
 	k := &Knight{}
 	k.figurer = k
@@ -62,7 +64,7 @@ func (k *Knight) GetBrokenFields() *Positions {
 	return &poss
 }
 
-// CanWalkLikeThat desc
+// CanWalkLikeThat returns true if the knight's move matches the rules for how it moves, otherwise it returns false
 func (k *Knight) CanWalkLikeThat(pos *Position) bool {
 	if (k.X+1 == pos.X && k.Y+2 == pos.Y) ||
 		(k.X+2 == pos.X && k.Y+1 == pos.Y) ||

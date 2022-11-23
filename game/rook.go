@@ -1,5 +1,7 @@
 package game
 
+// NewRook returns a reference to the new rook
+// with references to the position and command passed in the argument
 func NewRook(pos *Position, t *Team) *Rook {
 	r := &Rook{}
 	r.figurer = r
@@ -25,7 +27,7 @@ func (r *Rook) GetBrokenFields() *Positions {
 	return r.GetPositionsByDirectionsAndMaxRemote(opened, 7)
 }
 
-// CanWalkLikeThat desc
+// CanWalkLikeThat returns true if the rook's move follows the rules for how it moves, otherwise it returns false
 func (r *Rook) CanWalkLikeThat(pos *Position) bool {
 	if r.X == pos.X || r.Y == pos.Y {
 		return true

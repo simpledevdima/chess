@@ -7,6 +7,7 @@ import (
 	"log"
 )
 
+// NewTeam returns a link to a new command with the name specified in the argument
 func NewTeam(n TeamName) *Team {
 	return &Team{Name: n}
 }

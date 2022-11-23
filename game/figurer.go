@@ -13,7 +13,7 @@ type Figurer interface {
 	kingOnTheBeatenFieldAfterMove(*Position) bool
 	GetPositionByDirectionAndRemote(Direction, uint8) *Position
 	GetBrokenFields() *Positions
-	GetPossibleMoves(thereIs bool) *Positions
+	GetPossibleMoves(has bool) *Positions
 	CanWalkLikeThat(*Position) bool
 	IsAlreadyMove() bool
 	setAlreadyMove(bool)

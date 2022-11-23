@@ -2,10 +2,11 @@ package server
 
 import (
 	"gopkg.in/yaml.v2"
-	"io/ioutil"
 	"log"
+	"os"
 )
 
+// newConfig returns a link to a new config with the configuration file specified in the argument
 func newConfig(configFile string) *config {
 	c := &config{}
 	c.setConfigFile(configFile)
@@ -31,7 +32,7 @@ func (c *config) setConfigFile(configFile string) {
 
 // read get data from file in argument
 func (c *config) read() []byte {
-	data, err := ioutil.ReadFile(c.configFile)
+	data, err := os.ReadFile(c.configFile)
 	if err != nil {
 		log.Println(err)
 	}

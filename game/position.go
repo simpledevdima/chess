@@ -1,5 +1,6 @@
 package game
 
+// NewPosition returns a link to a new position with the parameters specified in the argument
 func NewPosition(x, y uint8) *Position {
 	p := &Position{}
 	p.Set(x, y)

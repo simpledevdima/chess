@@ -5,6 +5,7 @@ import (
 	"github.com/skvdmt/nrp"
 )
 
+// newTurn returns a reference to the new turn structure
 func newTurn() *turn {
 	turn := &turn{}
 	return turn

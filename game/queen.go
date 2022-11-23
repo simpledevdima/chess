@@ -1,5 +1,7 @@
 package game
 
+// NewQueen returns a reference to the new queen
+// with references to the position and command passed in the argument
 func NewQueen(pos *Position, t *Team) *Queen {
 	q := &Queen{}
 	q.figurer = q
@@ -29,7 +31,7 @@ func (q *Queen) GetBrokenFields() *Positions {
 	return q.GetPositionsByDirectionsAndMaxRemote(opened, 7)
 }
 
-// CanWalkLikeThat desc
+// CanWalkLikeThat returns true if the queen's move matches the rules for how she moves, otherwise returns false
 func (q *Queen) CanWalkLikeThat(pos *Position) bool {
 	if (q.X == pos.X || q.Y == pos.Y) ||
 		(pos.X < q.X && pos.Y < q.Y && q.X-pos.X == q.Y-pos.Y) ||

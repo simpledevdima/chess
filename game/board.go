@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// NewBoard returns a link to a new board with the three teams created
 func NewBoard() *Board {
 	return &Board{
 		White:      NewTeam(White),

@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// newTimer returns a reference to the new timer structure
 func newTimer() *timer {
 	return &timer{}
 }

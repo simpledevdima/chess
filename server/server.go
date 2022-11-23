@@ -37,6 +37,7 @@ type server struct {
 	drawAttemptsLeft *drawAttemptsLeft
 }
 
+// newTimes returns a reference to the new timers structure
 func newTimers() *timers {
 	return &timers{
 		white: newTimer(),
@@ -50,21 +51,24 @@ type timers struct {
 	black *timer
 }
 
+// newDrawAttemptsLeft returns a reference to the new drawAttemptsLeft structure
 func newDrawAttemptsLeft() *drawAttemptsLeft {
 	return &drawAttemptsLeft{}
 }
 
-// attemptsLeft type with the number of pops to offer a draw
+// drawAttemptsLeft type with the number of pops to offer a draw
 type drawAttemptsLeft struct {
 	white int
 	black int
 }
 
+// setLeft set to drawAttempts time left from argument
 func (d *drawAttemptsLeft) setLeft(left int) {
 	d.white = left
 	d.black = left
 }
 
+// loadConfig read the configuration from the installed file and set the data to the structure
 func (s *server) loadConfig() {
 	s.config.importYAML(s.config.read())
 }

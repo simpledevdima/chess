@@ -1,5 +1,7 @@
 package game
 
+// NewPawn returns a reference to the new pawn
+// with references to the position and command passed in the argument
 func NewPawn(pos *Position, t *Team) *Pawn {
 	p := &Pawn{}
 	p.figurer = p
@@ -42,7 +44,10 @@ func (p *Pawn) GetBrokenFields() *Positions {
 }
 
 // GetPossibleMoves return slice of Position with coords for possible moves
-func (p *Pawn) GetPossibleMoves(thereIs bool) *Positions {
+// has is a boolean variable passed as an argument
+// if set to true, returns the map with the first value found, interrupting further calculations
+// created in order to minimize the load in case you need to know that there are available moves
+func (p *Pawn) GetPossibleMoves(has bool) *Positions {
 	poss := make(Positions)
 	var pi PositionIndex
 	switch p.team.Name {
@@ -53,7 +58,7 @@ func (p *Pawn) GetPossibleMoves(thereIs bool) *Positions {
 			!p.team.enemy.Figures.ExistsByPosition(pos1) &&
 			!p.kingOnTheBeatenFieldAfterMove(pos1) {
 			pi = poss.Set(pi, pos1)
-			if thereIs {
+			if has {
 				return &poss
 			}
 		}
@@ -66,7 +71,7 @@ func (p *Pawn) GetPossibleMoves(thereIs bool) *Positions {
 			!p.team.enemy.Figures.ExistsByPosition(pos2) &&
 			!p.kingOnTheBeatenFieldAfterMove(pos2) {
 			pi = poss.Set(pi, pos2)
-			if thereIs {
+			if has {
 				return &poss
 			}
 		}
@@ -77,7 +82,7 @@ func (p *Pawn) GetPossibleMoves(thereIs bool) *Positions {
 			!p.team.enemy.Figures.ExistsByPosition(pos1) &&
 			!p.kingOnTheBeatenFieldAfterMove(pos1) {
 			pi = poss.Set(pi, pos1)
-			if thereIs {
+			if has {
 				return &poss
 			}
 		}
@@ -90,7 +95,7 @@ func (p *Pawn) GetPossibleMoves(thereIs bool) *Positions {
 			!p.team.enemy.Figures.ExistsByPosition(pos2) &&
 			!p.kingOnTheBeatenFieldAfterMove(pos2) {
 			pi = poss.Set(pi, pos2)
-			if thereIs {
+			if has {
 				return &poss
 			}
 		}
@@ -100,7 +105,7 @@ func (p *Pawn) GetPossibleMoves(thereIs bool) *Positions {
 			p.team.enemy.pawnDoubleMove.isTakeOnThePass(position)) &&
 			!p.kingOnTheBeatenFieldAfterMove(position) {
 			pi = poss.Set(pi, position)
-			if thereIs {
+			if has {
 				return &poss
 			}
 		}
@@ -108,7 +113,7 @@ func (p *Pawn) GetPossibleMoves(thereIs bool) *Positions {
 	return &poss
 }
 
-// CanWalkLikeThat desc
+// CanWalkLikeThat returns true if the pawn's move follows the rules for how it moves, otherwise it returns false
 func (p *Pawn) CanWalkLikeThat(pos *Position) bool {
 	switch p.team.Name {
 	case White:

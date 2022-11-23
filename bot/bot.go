@@ -194,8 +194,6 @@ func (bot *Bot) getRandomMove() *move {
 }
 
 func (bot *Bot) move() {
-	//bot.ShowMoves(bot.team)
-	//bot.ShowMoves(bot.enemy)
 	time.Sleep(time.Second / 10)
 	randomMove := bot.getRandomMove()
 	randomMove.send()

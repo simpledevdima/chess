@@ -17,4 +17,5 @@ type Figurer interface {
 	CanWalkLikeThat(*Position) bool
 	IsAlreadyMove() bool
 	setAlreadyMove(bool)
+	SimulationMove(*Position, func() bool) bool
 }

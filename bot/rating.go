@@ -129,6 +129,41 @@ func (r *rating) moveUnprotectedFigureFromBrokenFieldToProtectedOrSecureField() 
 	}
 }
 
+// защита незащищенных атакуемых соперником фигур
+func (r *rating) protectAttackedUnprotectedFigure() {
+	for fi, mvs := range *r.teamPossibleMoves {
+		figure := r.bot.team.Figures[fi]
+		for _, mv := range *mvs {
+			callback := func() bool {
+				for _, pos := range *figure.GetBrokenFields() {
+					if r.bot.team.Figures.ExistsByPosition(pos) &&
+						!r.posIsProtected(pos) &&
+						r.posIsAttacked(pos) {
+						f := r.bot.team.Figures.GetByPosition(pos)
+						var rat float64
+						switch f.GetName() {
+						case "pawn":
+							rat = 1
+						case "knight":
+							rat = 2
+						case "bishop":
+							rat = 2
+						case "rook":
+							rat = 3
+						case "queen":
+							rat = 4
+						}
+						//fmt.Printf("protect figure rat=%f\n\n", rat)
+						mv.SetRating(mv.GetRating() + rat)
+					}
+				}
+				return false
+			}
+			figure.SimulationMove(mv.Position, callback)
+		}
+	}
+}
+
 // figureIsProtected returns true if the position is protected otherwise returns false
 func (r *rating) posIsProtected(pos *game.Position) bool {
 	for _, tbfs := range *r.teamBrokenFields {

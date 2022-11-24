@@ -136,34 +136,26 @@ func (r *rating) moveUnprotectedFigureFromBrokenFieldToProtectedOrSecureField() 
 
 // figureIsProtected returns true if the position is protected otherwise returns false
 func (r *rating) posIsProtected(pos *game.Position) bool {
-	var protected bool
-	func() {
-		for _, tbfs := range *r.teamBrokenFields {
-			for _, tbf := range *tbfs {
-				if *pos == *tbf {
-					protected = true
-					return
-				}
+	for _, tbfs := range *r.teamBrokenFields {
+		for _, tbf := range *tbfs {
+			if *pos == *tbf {
+				return true
 			}
 		}
-	}()
-	return protected
+	}
+	return false
 }
 
 // posIsAttacked returns true if the position is attacked otherwise returns false
 func (r *rating) posIsAttacked(pos *game.Position) bool {
-	var attacking bool
-	func() {
-		for _, ebfs := range *r.enemyBrokenFields {
-			for _, ebf := range *ebfs {
-				if *pos == *ebf {
-					attacking = true
-					return
-				}
+	for _, ebfs := range *r.enemyBrokenFields {
+		for _, ebf := range *ebfs {
+			if *pos == *ebf {
+				return true
 			}
 		}
-	}()
-	return attacking
+	}
+	return false
 }
 
 // GetMoveWithMaxRating get a link to the new action with the highest rating

@@ -93,9 +93,45 @@ func (r *rating) EatUnprotectedFigure() {
 	}
 }
 
+// MoveToBrokenField changing the rating for moves to broken opponent's fields
+func (r *rating) MoveToBrokenField() {
+	for fi, mvs := range *r.teamPossibleMoves {
+		for _, mv := range *mvs {
+			var broken bool
+			func() {
+				for _, ebfs := range *r.enemyBrokenFields {
+					for _, ebf := range *ebfs {
+						if *ebf == *mv.Position {
+							broken = true
+							return
+						}
+					}
+				}
+			}()
+			if broken {
+				var rat float64
+				switch r.bot.team.Figures[fi].GetName() {
+				case "pawn":
+					rat = 1
+				case "knight":
+					rat = 2
+				case "bishop":
+					rat = 2
+				case "rook":
+					rat = 3
+				case "queen":
+					rat = 4
+				}
+				mv.SetRating(mv.GetRating() - rat)
+			}
+
+		}
+	}
+}
+
 // GetMoveWithMaxRating get a link to the new action with the highest rating
 func (r *rating) getMoveWithMaxRating() *move {
-	var rat float64
+	var rat float64 = -99999
 	var m *game.Move
 	var fi game.FigurerIndex
 	for index, mvs := range *r.teamPossibleMoves {

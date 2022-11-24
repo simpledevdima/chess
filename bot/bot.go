@@ -190,8 +190,8 @@ func (bot *Bot) move() {
 	bot.rating.setRandomRatingToPossibleMoves()
 
 	bot.rating.EatUnprotectedFigure()
+	bot.rating.MoveToBrokenField()
 
 	mv := bot.rating.getMoveWithMaxRating()
-
 	mv.send()
 }

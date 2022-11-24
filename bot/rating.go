@@ -129,6 +129,43 @@ func (r *rating) MoveToBrokenField() {
 	}
 }
 
+// remove an unprotected piece from the opponent's beaten square
+func (r *rating) moveUnprotectedFigureFromBrokenFieldToProtectedOrSecureField() {
+
+}
+
+// figureIsProtected returns true if the position is protected otherwise returns false
+func (r *rating) posIsProtected(pos *game.Position) bool {
+	var protected bool
+	func() {
+		for _, tbfs := range *r.teamBrokenFields {
+			for _, tbf := range *tbfs {
+				if *pos == *tbf {
+					protected = true
+					return
+				}
+			}
+		}
+	}()
+	return protected
+}
+
+// posIsAttacked returns true if the position is attacked otherwise returns false
+func (r *rating) posIsAttacked(pos *game.Position) bool {
+	var attacking bool
+	func() {
+		for _, ebfs := range *r.enemyBrokenFields {
+			for _, ebf := range *ebfs {
+				if *pos == *ebf {
+					attacking = true
+					return
+				}
+			}
+		}
+	}()
+	return attacking
+}
+
 // GetMoveWithMaxRating get a link to the new action with the highest rating
 func (r *rating) getMoveWithMaxRating() *move {
 	var rat float64 = -99999

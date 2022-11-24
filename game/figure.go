@@ -167,7 +167,7 @@ func (f *Figure) SimulationMove(pos *Position, callback func() bool) bool {
 		}()
 	}
 	// take on the pass
-	if f.team.enemy.pawnDoubleMove.isTakeOnThePass(pos) && f.GetName() == "pawn" {
+	if f.team.enemy.pawnDoubleMove.isTakeOnThePass(pos) && f.GetName() == "pawn" && f.team.enemy.Figures.ExistsByPosition(f.team.enemy.pawnDoubleMove.pawn.GetPosition()) {
 		index, figure := f.team.enemy.Figures.GetIndexAndFigureByPosition(f.team.enemy.pawnDoubleMove.pawn.GetPosition())
 		f.team.enemy.Eaten.Set(index, figure)
 		f.team.enemy.Figures.Remove(index)

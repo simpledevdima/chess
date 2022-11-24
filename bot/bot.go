@@ -191,6 +191,7 @@ func (bot *Bot) move() {
 
 	bot.rating.EatUnprotectedFigure()
 	bot.rating.MoveToBrokenField()
+	bot.rating.moveUnprotectedFigureFromBrokenFieldToProtectedOrSecureField()
 
 	mv := bot.rating.getMoveWithMaxRating()
 	mv.send()

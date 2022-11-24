@@ -58,36 +58,22 @@ func (r *rating) setRandomRatingToPossibleMoves() {
 func (r *rating) EatUnprotectedFigure() {
 	for _, mvs := range *r.teamPossibleMoves {
 		for _, mv := range *mvs {
-			for _, ef := range r.bot.enemy.Figures {
-				if *mv.Position == *ef.GetPosition() {
-					var protected bool
-					func() {
-						for _, ebfs := range *r.enemyBrokenFields {
-							for _, ebf := range *ebfs {
-								if *ebf == *mv.Position {
-									protected = true
-									return
-								}
-							}
-						}
-					}()
-					if !protected {
-						var rat float64
-						switch ef.GetName() {
-						case "pawn":
-							rat = 1
-						case "knight":
-							rat = 2
-						case "bishop":
-							rat = 2
-						case "rook":
-							rat = 3
-						case "queen":
-							rat = 4
-						}
-						mv.SetRating(mv.GetRating() + rat)
-					}
+			if r.bot.enemy.Figures.ExistsByPosition(mv.Position) && !r.posIsAttacked(mv.Position) {
+				ef := r.bot.enemy.Figures.GetByPosition(mv.Position)
+				var rat float64
+				switch ef.GetName() {
+				case "pawn":
+					rat = 1
+				case "knight":
+					rat = 2
+				case "bishop":
+					rat = 2
+				case "rook":
+					rat = 3
+				case "queen":
+					rat = 4
 				}
+				mv.SetRating(mv.GetRating() + rat)
 			}
 		}
 	}
@@ -97,18 +83,7 @@ func (r *rating) EatUnprotectedFigure() {
 func (r *rating) MoveToBrokenField() {
 	for fi, mvs := range *r.teamPossibleMoves {
 		for _, mv := range *mvs {
-			var broken bool
-			func() {
-				for _, ebfs := range *r.enemyBrokenFields {
-					for _, ebf := range *ebfs {
-						if *ebf == *mv.Position {
-							broken = true
-							return
-						}
-					}
-				}
-			}()
-			if broken {
+			if r.posIsAttacked(mv.Position) {
 				var rat float64
 				switch r.bot.team.Figures[fi].GetName() {
 				case "pawn":
@@ -124,14 +99,34 @@ func (r *rating) MoveToBrokenField() {
 				}
 				mv.SetRating(mv.GetRating() - rat)
 			}
-
 		}
 	}
 }
 
 // remove an unprotected piece from the opponent's beaten square
 func (r *rating) moveUnprotectedFigureFromBrokenFieldToProtectedOrSecureField() {
-
+	for fi, mvs := range *r.teamPossibleMoves {
+		if !r.posIsProtected(r.bot.team.Figures[fi].GetPosition()) && r.posIsAttacked(r.bot.team.Figures[fi].GetPosition()) {
+			for _, mv := range *mvs {
+				if (r.posIsProtected(mv.Position) && r.posIsAttacked(mv.Position)) || !r.posIsAttacked(mv.Position) {
+					var rat float64
+					switch r.bot.team.Figures[fi].GetName() {
+					case "pawn":
+						rat = 1
+					case "knight":
+						rat = 2
+					case "bishop":
+						rat = 2
+					case "rook":
+						rat = 3
+					case "queen":
+						rat = 4
+					}
+					mv.SetRating(mv.GetRating() + rat)
+				}
+			}
+		}
+	}
 }
 
 // figureIsProtected returns true if the position is protected otherwise returns false

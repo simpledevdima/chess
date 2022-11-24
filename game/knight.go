@@ -16,10 +16,10 @@ type Knight struct {
 	Figure
 }
 
-// GetBrokenFields return a slice of Positions with broken fields
-func (k *Knight) GetBrokenFields() *Positions {
-	poss := make(Positions)
-	var pi PositionIndex
+// GetBrokenFields return a slice of BrokenFields with broken fields
+func (k *Knight) GetBrokenFields() *BrokenFields {
+	poss := make(BrokenFields)
+	var pi BrokenFieldIndex
 
 	pos := NewPosition(k.X+1, k.Y+2)
 	if k.positionOnBoard(pos) {

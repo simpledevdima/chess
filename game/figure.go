@@ -57,10 +57,10 @@ const (
 	leftTop
 )
 
-// GetPositionsByDirectionsAndMaxRemote returns a link to the map of positions available in case of free directions and distances specified in the map passed in the argument
-func (f *Figure) GetPositionsByDirectionsAndMaxRemote(opened map[Direction]bool, maxRemote uint8) *Positions {
-	poss := make(Positions)
-	var pi PositionIndex
+// GetBrokenFieldsByDirectionsAndMaxRemote returns a link to the map of positions available in case of free directions and distances specified in the map passed in the argument
+func (f *Figure) GetBrokenFieldsByDirectionsAndMaxRemote(opened map[Direction]bool, maxRemote uint8) *BrokenFields {
+	poss := make(BrokenFields)
+	var pi BrokenFieldIndex
 	for remote := uint8(1); remote <= maxRemote; remote++ {
 		for dir := range opened {
 			if opened[dir] {

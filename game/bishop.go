@@ -16,15 +16,15 @@ type Bishop struct {
 	Figure
 }
 
-// GetBrokenFields return a slice of Positions with broken fields
-func (b *Bishop) GetBrokenFields() *Positions {
+// GetBrokenFields return a slice of BrokenFields with broken fields
+func (b *Bishop) GetBrokenFields() *BrokenFields {
 	opened := map[Direction]bool{
 		topRight:    true,
 		rightBottom: true,
 		bottomLeft:  true,
 		leftTop:     true,
 	}
-	return b.GetPositionsByDirectionsAndMaxRemote(opened, 7)
+	return b.GetBrokenFieldsByDirectionsAndMaxRemote(opened, 7)
 }
 
 // CanWalkLikeThat returns true if the bishop's move matches the rules for how he moves, otherwise returns false

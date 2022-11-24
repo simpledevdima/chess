@@ -43,8 +43,8 @@ func (t *turn) setDefault() {
 	t.teamName = game.White
 
 	// Debug
-	t.server.board.White.ShowBrokenFields()
-	t.server.board.White.ShowPossibleMoves()
+	t.server.board.White.ShowBrokenFields(t.server.board.White.GetBrokenFields())
+	t.server.board.White.ShowPossibleMoves(t.server.board.White.GetPossibleMoves())
 }
 
 // change transfers the turn to the opposing team
@@ -57,8 +57,8 @@ func (t *turn) change() {
 			if t.server.board.Black.HavePossibleMove() {
 
 				// Debug
-				t.server.board.Black.ShowBrokenFields()
-				t.server.board.Black.ShowPossibleMoves()
+				t.server.board.Black.ShowBrokenFields(t.server.board.Black.GetBrokenFields())
+				t.server.board.Black.ShowPossibleMoves(t.server.board.Black.GetPossibleMoves())
 
 				t.teamName = game.Black
 				go t.server.timers.black.play()
@@ -76,8 +76,8 @@ func (t *turn) change() {
 			if t.server.board.White.HavePossibleMove() {
 
 				// Debug
-				t.server.board.White.ShowBrokenFields()
-				t.server.board.White.ShowPossibleMoves()
+				t.server.board.White.ShowBrokenFields(t.server.board.White.GetBrokenFields())
+				t.server.board.White.ShowPossibleMoves(t.server.board.White.GetPossibleMoves())
 
 				t.teamName = game.White
 				go t.server.timers.white.play()

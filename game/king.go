@@ -16,8 +16,8 @@ type King struct {
 	Figure
 }
 
-// GetBrokenFields return a slice of Positions with broken fields
-func (k *King) GetBrokenFields() *Positions {
+// GetBrokenFields return a slice of BrokenFields with broken fields
+func (k *King) GetBrokenFields() *BrokenFields {
 	opened := map[Direction]bool{
 		top:         true,
 		topRight:    true,
@@ -28,7 +28,7 @@ func (k *King) GetBrokenFields() *Positions {
 		left:        true,
 		leftTop:     true,
 	}
-	return k.GetPositionsByDirectionsAndMaxRemote(opened, 1)
+	return k.GetBrokenFieldsByDirectionsAndMaxRemote(opened, 1)
 }
 
 // GetPossibleMoves return slice of Position with coords for possible moves

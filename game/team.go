@@ -55,7 +55,7 @@ func (t *Team) CheckingCheck() bool {
 	king := t.Figures.GetByName("king")
 	kingPos := king.GetPosition()
 	for _, figure := range t.enemy.Figures {
-		var poss *Positions
+		var poss *BrokenFields
 		poss = figure.GetBrokenFields()
 		for _, figPos := range *poss {
 			if *figPos == *kingPos {
@@ -160,7 +160,7 @@ type TeamPossibleMoves map[FigurerIndex]*Moves
 func (t *Team) GetPossibleMoves() *TeamPossibleMoves {
 	possibleMoves := make(TeamPossibleMoves)
 	for index, figure := range t.Figures {
-		moves := figure.GetPossibleMoves(true)
+		moves := figure.GetPossibleMoves(false)
 		if len(*moves) > 0 {
 			possibleMoves[index] = moves
 		}
@@ -168,36 +168,47 @@ func (t *Team) GetPossibleMoves() *TeamPossibleMoves {
 	return &possibleMoves
 }
 
-// ShowBrokenFields displays the squares that beat the figures of the team
-func (t *Team) ShowBrokenFields() {
-	fmt.Printf("broken fields, team: %s\n", t.Name.String())
+// TeamBrokenFields map
+type TeamBrokenFields map[FigurerIndex]*BrokenFields
+
+// GetBrokenFields return
+func (t *Team) GetBrokenFields() *TeamBrokenFields {
+	bfs := make(TeamBrokenFields)
 	for index, figure := range t.Figures {
-		fields := figure.GetBrokenFields()
-		if len(*fields) > 0 {
-			x, y := figure.GetPosition().Get()
-			fmt.Printf("i=%2d n=%6s p=%dx%d to", index, figure.GetName(), x, y)
-			for _, field := range *fields {
-				fmt.Printf(" %dx%d", field.X, field.Y)
-			}
-			fmt.Printf("\n")
+		bf := figure.GetBrokenFields()
+		if len(*bf) > 0 {
+			bfs[index] = bf
 		}
+	}
+	return &bfs
+}
+
+// ShowBrokenFields displays the squares that beat the figures of the team
+func (t *Team) ShowBrokenFields(tbfs *TeamBrokenFields) {
+	fmt.Printf("broken fields, team: %s\n", t.Name.String())
+	for index, bfs := range *tbfs {
+		figure := t.Figures[index]
+		x, y := figure.GetPosition().Get()
+		fmt.Printf("i=%2d n=%6s p=%dx%d to", index, figure.GetName(), x, y)
+		for _, field := range *bfs {
+			fmt.Printf(" %dx%d", field.X, field.Y)
+		}
+		fmt.Printf("\n")
 	}
 	fmt.Println()
 }
 
 // ShowPossibleMoves displays the possible moves of each piece of the team
-func (t *Team) ShowPossibleMoves() {
+func (t *Team) ShowPossibleMoves(tpms *TeamPossibleMoves) {
 	fmt.Printf("possible moves, team: %s\n", t.Name.String())
-	for index, figure := range t.Figures {
-		mvs := figure.GetPossibleMoves(false)
-		if len(*mvs) > 0 {
-			x, y := figure.GetPosition().Get()
-			fmt.Printf("i=%2d n=%6s p=%dx%d to", index, figure.GetName(), x, y)
-			for _, mv := range *mvs {
-				fmt.Printf(" %dx%d(%.2f)", mv.X, mv.Y, mv.GetRating())
-			}
-			fmt.Printf("\n")
+	for index, mvs := range *tpms {
+		figure := t.Figures[index]
+		x, y := figure.GetPosition().Get()
+		fmt.Printf("i=%2d n=%6s p=%dx%d to", index, figure.GetName(), x, y)
+		for _, mv := range *mvs {
+			fmt.Printf(" %dx%d(%.2f)", mv.X, mv.Y, mv.GetRating())
 		}
+		fmt.Printf("\n")
 	}
 	fmt.Println()
 }

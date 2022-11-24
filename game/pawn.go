@@ -16,10 +16,10 @@ type Pawn struct {
 	Figure
 }
 
-// GetBrokenFields return a slice of Positions with broken fields
-func (p *Pawn) GetBrokenFields() *Positions {
-	poss := make(Positions)
-	var pi PositionIndex
+// GetBrokenFields return a slice of BrokenFields with broken fields
+func (p *Pawn) GetBrokenFields() *BrokenFields {
+	poss := make(BrokenFields)
+	var pi BrokenFieldIndex
 	switch p.team.Name {
 	case White:
 		pos := NewPosition(p.X+1, p.Y+1)

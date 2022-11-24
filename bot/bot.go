@@ -9,7 +9,6 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
-	"reflect"
 	"time"
 )
 
@@ -32,6 +31,7 @@ type Bot struct {
 	status    status
 	team      *game.Team
 	enemy     *game.Team
+	tpm       *game.TeamPossibleMoves
 }
 
 func (bot *Bot) setLinks() {
@@ -179,22 +179,69 @@ func (bot *Bot) wait() {
 	}
 }
 
-func (bot *Bot) getRandomIndexMap(m interface{}) int {
-	keys := reflect.ValueOf(m).MapKeys()
-	return int(keys[rand.Intn(len(keys))].Int())
-}
+//func (bot *Bot) getRandomIndexMap(m interface{}) int {
+//	keys := reflect.ValueOf(m).MapKeys()
+//	return int(keys[rand.Intn(len(keys))].Int())
+//}
+//
+//func (bot *Bot) getRandomMove() *move {
+//	possibleMoves := *bot.team.GetPossibleMoves()
+//	indexFigure := game.FigurerIndex(bot.getRandomIndexMap(possibleMoves))
+//	indexMove := game.MoveIndex(bot.getRandomIndexMap(*possibleMoves[indexFigure]))
+//	to := (*possibleMoves[indexFigure])[indexMove]
+//	pos := bot.team.Figures[indexFigure].GetPosition()
+//	return newMove(bot, pos, game.NewPosition(to.X, to.Y))
+//}
 
-func (bot *Bot) getRandomMove() *move {
-	possibleMoves := *bot.team.GetPossibleMoves()
-	indexFigure := game.FigurerIndex(bot.getRandomIndexMap(possibleMoves))
-	indexMove := game.MoveIndex(bot.getRandomIndexMap(*possibleMoves[indexFigure]))
-	to := (*possibleMoves[indexFigure])[indexMove]
-	pos := bot.team.Figures[indexFigure].GetPosition()
-	return newMove(bot, pos, game.NewPosition(to.X, to.Y))
+func (bot *Bot) SetTeamPossibleMoves(tpm *game.TeamPossibleMoves) {
+	bot.tpm = tpm
 }
 
 func (bot *Bot) move() {
+	//randomMove := bot.getRandomMove()
+	//randomMove.send()
+	fmt.Println("MOVE")
 	time.Sleep(time.Second / 10)
-	randomMove := bot.getRandomMove()
-	randomMove.send()
+
+	bot.SetTeamPossibleMoves(bot.team.GetPossibleMoves())
+
+	// set random rating
+	for _, mvs := range *bot.tpm {
+		for _, mv := range *mvs {
+			mv.SetRating(rand.Float64() * 10)
+		}
+	}
+	//bot.ShowPossibleMoves(bot.tpm)
+	bot.team.ShowPossibleMoves(bot.tpm)
+
+	// get move with max rating
+	var rat float64
+	var m *game.Move
+	var fi game.FigurerIndex
+	for index, mvs := range *bot.tpm {
+		for _, mv := range *mvs {
+			if mv.GetRating() > rat {
+				rat = mv.GetRating()
+				m = mv
+				fi = index
+			}
+		}
+	}
+	bm := newMove(bot, bot.team.Figures[fi].GetPosition(), game.NewPosition(m.X, m.Y))
+	bm.send()
 }
+
+// ShowPossibleMoves displays the possible moves of each piece of the team
+//func (bot *Bot) ShowPossibleMoves(pm *game.TeamPossibleMoves) {
+//	fmt.Printf("possible moves, team: %s\n", bot.team.Name.String())
+//	for index, mvs := range *pm {
+//		figure := bot.team.Figures[index]
+//		x, y := figure.GetPosition().Get()
+//		fmt.Printf("i=%2d n=%6s p=%dx%d to", index, figure.GetName(), x, y)
+//		for _, mv := range *mvs {
+//			fmt.Printf(" %dx%d(%.2f)", mv.X, mv.Y, mv.GetRating())
+//		}
+//		fmt.Printf("\n")
+//	}
+//	fmt.Println()
+//}

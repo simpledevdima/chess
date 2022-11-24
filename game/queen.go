@@ -16,8 +16,8 @@ type Queen struct {
 	Figure
 }
 
-// GetBrokenFields return a slice of Positions with broken fields
-func (q *Queen) GetBrokenFields() *Positions {
+// GetBrokenFields return a slice of BrokenFields with broken fields
+func (q *Queen) GetBrokenFields() *BrokenFields {
 	opened := map[Direction]bool{
 		top:         true,
 		topRight:    true,
@@ -28,7 +28,7 @@ func (q *Queen) GetBrokenFields() *Positions {
 		left:        true,
 		leftTop:     true,
 	}
-	return q.GetPositionsByDirectionsAndMaxRemote(opened, 7)
+	return q.GetBrokenFieldsByDirectionsAndMaxRemote(opened, 7)
 }
 
 // CanWalkLikeThat returns true if the queen's move matches the rules for how she moves, otherwise returns false

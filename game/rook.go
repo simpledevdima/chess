@@ -16,15 +16,15 @@ type Rook struct {
 	Figure
 }
 
-// GetBrokenFields return a slice of Positions with broken fields
-func (r *Rook) GetBrokenFields() *Positions {
+// GetBrokenFields return a slice of BrokenFields with broken fields
+func (r *Rook) GetBrokenFields() *BrokenFields {
 	opened := map[Direction]bool{
 		top:    true,
 		right:  true,
 		bottom: true,
 		left:   true,
 	}
-	return r.GetPositionsByDirectionsAndMaxRemote(opened, 7)
+	return r.GetBrokenFieldsByDirectionsAndMaxRemote(opened, 7)
 }
 
 // CanWalkLikeThat returns true if the rook's move follows the rules for how it moves, otherwise it returns false

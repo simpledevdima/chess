@@ -25,31 +25,28 @@ type move struct {
 }
 
 // setBot
-func (move *move) setBot(bot *Bot) {
-	move.bot = bot
+func (m *move) setBot(bot *Bot) {
+	m.bot = bot
 }
 
 // send отправка данных о совершаемом ходе на сервер
-func (move *move) send() {
-	if move.bot.status.isYourTurn() {
-		request := nrp.Simple{Post: "move", Body: move}
+func (m *move) send() {
+	if m.bot.status.isYourTurn() {
+		request := nrp.Simple{Post: "move", Body: m}
 		fmt.Println("BOT SEND MOVE:", string(request.Export()))
-		move.bot.send <- request.Export()
+		m.bot.send <- request.Export()
 	}
 }
 
 // exec выполнение хода информаци о котором поступила с сервера
-func (move *move) exec() {
-	//fmt.Println(move)
-	if move.bot.team.Figures.ExistsByPosition(move.From.Position) {
+func (m *move) exec() {
+	if m.bot.team.Figures.ExistsByPosition(m.From.Position) {
 		// your team move
-		figureID := move.bot.team.Figures.GetIndexByPosition(move.From.Position)
-		move.bot.team.Figures[figureID].Move(move.To.Position)
-		//fmt.Println(move.bot.team.Figures)
-	} else if move.bot.enemy.Figures.ExistsByPosition(move.From.Position) {
+		figureID := m.bot.team.Figures.GetIndexByPosition(m.From.Position)
+		m.bot.team.Figures[figureID].Move(m.To.Position)
+	} else if m.bot.enemy.Figures.ExistsByPosition(m.From.Position) {
 		// enemy team move
-		figureID := move.bot.enemy.Figures.GetIndexByPosition(move.From.Position)
-		move.bot.enemy.Figures[figureID].Move(move.To.Position)
-		//fmt.Println(move.bot.enemy.Figures)
+		figureID := m.bot.enemy.Figures.GetIndexByPosition(m.From.Position)
+		m.bot.enemy.Figures[figureID].Move(m.To.Position)
 	}
 }

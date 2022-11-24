@@ -189,6 +189,8 @@ func (bot *Bot) move() {
 
 	bot.rating.setRandomRatingToPossibleMoves()
 
+	bot.rating.EatUnprotectedFigure()
+
 	mv := bot.rating.getMoveWithMaxRating()
 
 	mv.send()

@@ -156,6 +156,20 @@ func (t *Team) ImportFigures(figuresJSON []byte) {
 // TeamPossibleMoves data type with possible moves of pieces
 type TeamPossibleMoves map[FigurerIndex]*Moves
 
+// Iter map iteration
+func (t *TeamPossibleMoves) Iter(callback func(FigurerIndex, *Moves)) {
+	for fi, mvs := range *t {
+		callback(fi, mvs)
+	}
+}
+
+// IterMoves iteration all moves
+func (t *TeamPossibleMoves) IterMoves(callback func(MoveIndex, *Move)) {
+	t.Iter(func(_ FigurerIndex, mvs *Moves) {
+		mvs.Iter(callback)
+	})
+}
+
 // GetPossibleMoves returns a map with the keys of the team's shapes and the slices of coordinates that those shapes can make
 func (t *Team) GetPossibleMoves() *TeamPossibleMoves {
 	possibleMoves := make(TeamPossibleMoves)

@@ -11,6 +11,13 @@ type MoveIndex int
 // Moves map referencing moves
 type Moves map[MoveIndex]*Move
 
+// Iter map iteration
+func (m *Moves) Iter(callback func(MoveIndex, *Move)) {
+	for index, mv := range *m {
+		callback(index, mv)
+	}
+}
+
 // Clear remove all Moves from the map
 func (m *Moves) Clear() {
 	for index := range *m {

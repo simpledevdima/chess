@@ -34,6 +34,7 @@ type Bot struct {
 	team      *game.Team
 	enemy     *game.Team
 	rating    *rating
+	board     *board
 }
 
 func (bot *Bot) setLinks() {
@@ -188,6 +189,9 @@ func (bot *Bot) move() {
 	bot.rating.setEnemyBrokenFields(bot.enemy.GetBrokenFields())
 
 	bot.rating.setRandomRatingToPossibleMoves()
+
+	//bot.board = newBoard()
+	//bot.board.calculate()
 
 	bot.rating.EatUnprotectedFigure()
 	bot.rating.MoveToBrokenField()

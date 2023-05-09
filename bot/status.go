@@ -2,7 +2,7 @@ package chess_bot
 
 import (
 	"fmt"
-	"github.com/skvdmt/nrp"
+	"github.com/simpledevdima/nrp"
 )
 
 type status struct {

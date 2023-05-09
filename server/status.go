@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/skvdmt/chess/game"
-	"github.com/skvdmt/nrp"
+	"github.com/simpledevdima/chess/game"
+	"github.com/simpledevdima/nrp"
 )
 
 // newStatus returns a reference to the new status structure

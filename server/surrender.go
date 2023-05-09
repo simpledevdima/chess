@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/skvdmt/chess/game"
+	"github.com/simpledevdima/chess/game"
 )
 
 // surrender surrender control capability data type

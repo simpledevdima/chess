@@ -2,8 +2,8 @@ package server
 
 import (
 	"fmt"
-	"github.com/skvdmt/chess/game"
-	"github.com/skvdmt/nrp"
+	"github.com/simpledevdima/chess/game"
+	"github.com/simpledevdima/nrp"
 	"log"
 	"time"
 )

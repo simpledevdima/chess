@@ -2,7 +2,7 @@ package server
 
 import (
 	"fmt"
-	"github.com/skvdmt/chess/game"
+	"github.com/simpledevdima/chess/game"
 	"log"
 	"net/http"
 )

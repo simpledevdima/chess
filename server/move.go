@@ -3,8 +3,8 @@ package server
 import (
 	"encoding/json"
 	"errors"
-	"github.com/skvdmt/chess/game"
-	"github.com/skvdmt/nrp"
+	"github.com/simpledevdima/chess/game"
+	"github.com/simpledevdima/nrp"
 	"log"
 )
 

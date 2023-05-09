@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
-	"github.com/skvdmt/chess/game"
-	"github.com/skvdmt/nrp"
+	"github.com/simpledevdima/chess/game"
+	"github.com/simpledevdima/nrp"
 	"log"
 	"net/http"
 	"time"
@@ -34,7 +34,7 @@ type Bot struct {
 	team      *game.Team
 	enemy     *game.Team
 	rating    *rating
-	board     *board
+	//board     *board
 }
 
 func (bot *Bot) setLinks() {

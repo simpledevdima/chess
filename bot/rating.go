@@ -1,7 +1,7 @@
 package chess_bot
 
 import (
-	"github.com/skvdmt/chess/game"
+	"github.com/simpledevdima/chess/game"
 	"math/rand"
 )
 

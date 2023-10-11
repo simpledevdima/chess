@@ -1,7 +1,0 @@
-github.com/gorilla/websocket v1.5.0 h1:PPwGk2jz7EePpoHN/+ClbZu8SPxiqlu12wZP/3sWmnc=
-github.com/gorilla/websocket v1.5.0/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
-github.com/simpledevdima/nrp v0.0.0-20230509191851-4ab76880cb08 h1:f0K/vhAD9PI2bciyLxgN1aiCiUzvha2Om1JmIR+SO9o=
-github.com/simpledevdima/nrp v0.0.0-20230509191851-4ab76880cb08/go.mod h1:onYLmgeqiUv6anG2UIbKb9+zVHI+iHEB46AVo337WJc=
-gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
-gopkg.in/yaml.v2 v2.4.0 h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=
-gopkg.in/yaml.v2 v2.4.0/go.mod h1:RDklbk79AGWmwhnvt/jBztapEOGDOx6ZbXqjP6csGnQ=

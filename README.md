@@ -4,7 +4,7 @@ Chess game server
 ## Installation
 get chess package
 ```
-go get github.com/simpledevdima/chess
+go install github.com/simpledevdima/chess@latest
 ```
 
 ## Run chess server application

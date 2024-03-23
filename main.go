@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/simpledevdima/chess/server"
+	"github.com/skvdmt/chess/server"
 	"html/template"
 	"log"
 	"net/http"

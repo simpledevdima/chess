@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/simpledevdima/chess/game"
-	"github.com/simpledevdima/nrp"
+	"github.com/skvdmt/chess/game"
+	"github.com/skvdmt/nrp"
 	"time"
 )
 

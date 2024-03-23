@@ -1,7 +1,7 @@
 package game
 
 import (
-	"github.com/simpledevdima/nrp"
+	"github.com/skvdmt/nrp"
 	"log"
 )
 

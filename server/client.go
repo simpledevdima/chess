@@ -2,8 +2,8 @@ package server
 
 import (
 	"github.com/gorilla/websocket"
-	"github.com/simpledevdima/chess/game"
-	"github.com/simpledevdima/nrp"
+	"github.com/skvdmt/chess/game"
+	"github.com/skvdmt/nrp"
 	"log"
 	"net/http"
 )
